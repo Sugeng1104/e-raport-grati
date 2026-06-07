@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kompetensi & Nilai Siswa - UPT SDN Ranuklindungan I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen text-slate-800">
+
+    <header class="bg-[#1e6ca8] text-white p-4 shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">🎯</span>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">Pemetaan Kompetensi & Nilai UH</h1>
+                    <p class="text-xs text-blue-100">UPT SDN Ranuklindungan I</p>
+                </div>
+            </div>
+            <a href="index.html" class="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-xl transition text-sm flex items-center space-x-1">
+                <span>⬅️</span> <span>Kembali ke Hub Utama</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-6">
+        
+        <section class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+            <div class="inline-flex items-center space-x-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                <span>📖</span> <span>Kerangka Kerja Kurikulum Merdeka</span>
+            </div>
+            <h2 class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">Konsep Evaluasi Berkelanjutan & Capaian Pembelajaran</h2>
+            <p class="text-slate-600 text-sm leading-relaxed text-justify">
+                Evaluasi melalui <strong>Ulangan Harian (UH)</strong> pada platform ini dirancang bukan sekadar untuk mengukur angka kuantitatif, melainkan sebagai instrumen <em>Formatif</em> untuk memetakan ketercapaian Tujuan Pembelajaran (TP) pada tiap peserta didik di UPT SDN Ranuklindungan I. Pengumpulan data nilai harian secara berkala (UH-1 sampai UH-5) memungkinkan pendidik melakukan diagnosis dini terhadap kompetensi kognitif siswa, mengenali laju belajar anak yang heterogen, serta memberikan intervensi secara personal sebelum menuju penilaian sumatif akhir semester.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-1">
+                    <span class="font-bold text-slate-800 block">🎯 Aspek Formatif</span>
+                    <span class="text-slate-500">Mendorong perbaikan kualitas pembelajaran (Refleksi Pendidik) dan penyesuaian materi remedial secara berkala.</span>
+                </div>
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-1">
+                    <span class="font-bold text-slate-800 block">📊 Otomatisasi Terintegrasi</span>
+                    <span class="text-slate-500">Data nilai dari Excel disinkronkan secara instan untuk mempercepat kalkulasi rata-rata rapor digital tanpa entri manual.</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <div class="lg:col-span-5 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-6">
+                <div class="space-y-3">
+                    <h3 class="font-bold text-lg text-slate-900 flex items-center space-x-2">
+                        <span>📥</span> <span>Upload Spreadsheet UH</span>
+                    </h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Silakan unggah dokumen rekap nilai Ulangan Harian. Sistem akan memvalidasi kesesuaian nama dokumen dan struktur tab internal sebelum dikirim ke awan.
+                    </p>
+                    
+                    <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3.5 text-xs space-y-1.5 font-medium">
+                        <span class="font-bold block text-amber-900">⚠️ Aturan Validasi Dokumen:</span>
+                        <ul class="list-disc pl-4 space-y-1">
+                            <li>Nama file Excel harus tepat: <code class="bg-amber-200/60 px-1 py-0.5 rounded text-amber-900 font-bold">uh_siswa.xlsx</code></li>
+                            <li>Wajib memuat tab-tab mapel (misal: <code class="bg-amber-200/40 px-0.5 rounded">n_agama</code>, <code class="bg-amber-200/40 px-0.5 rounded">n_matematika</code>, dll)</li>
+                            <li>Urutan Kolom: <strong>no_absen, NISN, nama_siswa, uh_1, uh_2, uh_3, uh_4, uh_5</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 bg-slate-50 rounded-2xl p-4 text-center hover:bg-slate-100/50 transition relative">
+                        <input type="file" id="fileExcelUH" accept=".xlsx, .xls" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" onchange="validasiPilihFile()">
+                        <span class="text-3xl mb-1">📊</span>
+                        <span class="text-xs font-bold text-slate-700" id="labelNamaFile">Pilih file Excel dari gawai Anda</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Mendukung format .xlsx / .xls</span>
+                    </div>
+
+                    <button type="button" onclick="eksekusiKirimNilaiExcel()" id="btnKirimNilai" class="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow transition text-sm flex items-center justify-center space-x-2">
+                        <span>🚀</span> <span>Kirim Nilai</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="font-bold text-base text-slate-900 flex items-center space-x-2">
+                    <span>🧭</span> <span>Daftar Tab Sheet Tujuan Sistem</span>
+                </h3>
+                <p class="text-xs text-slate-500">
+                    Nilai di dalam file akan diurai secara otomatis dan dialokasikan langsung ke dalam 10 tab database Google Sheets di bawah ini:
+                </p>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_agama</div>
+                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_BIndonesia</div>
+                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_pancasila</div>
+                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_matematika</div>
+                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_IPAS</div>
+                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_pjok</div>
+                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_kesenian</div>
+                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_bJawa</div>
+                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_bIng</div>
+                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_BTQ</div>
+                </div>
+                
+                <div class="mt-4 p-4 bg-blue-50/50 rounded-2xl border border-blue-100 flex items-start space-x-3 text-xs">
+                    <span class="text-lg">💡</span>
+                    <p class="text-slate-600 leading-relaxed">
+                        <strong>Tips Sinkronisasi Ekspor:</strong> Kolom <code class="bg-blue-100 px-0.5 rounded font-bold">no_absen</code> dan <code class="bg-blue-100 px-0.5 rounded font-bold">NISN</code> pada berkas Excel Anda disarankan disalin (copy-paste) dari halaman <strong>Data Induk Siswa</strong> sebelumnya agar data relasi murid tidak melompat atau tertukar.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-6 text-center text-[11px] font-medium text-slate-400">
+            © 2026 E-Rapor Engine • Sistem Unggah Administrasi Nilai Terpusat UPT SDN Ranuklindungan I
+        </footer>
+    </footer>
+
+    <script>
+        const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+
+        // VALIDASI AWAL NAMA FILE SAAT USER MEMILIH FILE
+        function validasiPilihFile() {
+            const input = document.getElementById('fileExcelUH');
+            const label = document.getElementById('labelNamaFile');
+            
+            if (input.files.length === 0) return;
+            
+            const namaFile = input.files[0].name.toLowerCase();
+            
+            // Memastikan nama file mengandung kata 'uh_siswa' sesuai instruksi wajib
+            if (!namaFile.includes("uh_siswa")) {
+                alert("🚨 PENOLAKAN SISTEM: Nama file wajib mengandung nama 'uh_siswa'. Contoh: uh_siswa.xlsx");
+                input.value = ""; // Batalkan pilihan file
+                label.innerText = "Pilih file Excel dari gawai Anda";
+                label.className = "text-xs font-bold text-slate-700";
+                return;
+            }
+
+            label.innerText = `✅ Berkas Siap: ${input.files[0].name}`;
+            label.className = "text-xs font-bold text-emerald-600";
+        }
+
+        // BONGKAR FILE EXCEL KE BASE64 DAN TEMBAK KE GOOGLE APPS SCRIPT DENGAN AJAX
+        function eksekusiKirimNilaiExcel() {
+            const input = document.getElementById('fileExcelUH');
+            const btn = document.getElementById('btnKirimNilai');
+            
+            if (input.files.length === 0) {
+                alert("Silakan pilih file Excel uh_siswa terlebih dahulu.");
+                return;
+            }
+
+            const file = input.files[0];
+            const reader = new FileReader();
+            
+            // Set animasi loading pada tombol kirim nilai
+            btn.disabled = true;
+            btn.innerHTML = `<span>⏳</span> <span>Memproses & Menyinkronkan Nilai...</span>`;
+
+            reader.onload = async function(e) {
+                const base64Data = e.target.result.split(',')[1]; // Ambil data raw base64 string
+                
+                try {
+                    // Mengirim paket data ke server Apps Script
+                    await fetch(API_SHEET_URL, {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: {
+                            "Content-Type": "text/plain;charset=utf-8"
+                        },
+                        body: JSON.stringify({
+                            tipe: "upload_excel_uh",
+                            fileName: file.name,
+                            fileData: base64Data
+                        })
+                    });
+
+                    // Notifikasi Sukses Terkirim
+                    alert("Selesai! File 'uh_siswa' berhasil diunggah. Server Google sedang memproses penulisan ke 10 tab mata pelajaran. Silakan cek berkas Spreadsheet Anda.");
+                    
+                    // Reset Form Input
+                    input.value = "";
+                    document.getElementById('labelNamaFile').innerText = "Pilih file Excel dari gawai Anda";
+                    document.getElementById('labelNamaFile').className = "text-xs font-bold text-slate-700";
+
+                } catch (error) {
+                    console.error(error);
+                    alert("Gagal melakukan transmisi dokumen: " + error.message);
+                } finally {
+                    // Kembalikan tombol ke kondisi aktif semula
+                    btn.disabled = false;
+                    btn.innerHTML = `<span>🚀</span> <span>Kirim Nilai</span>`;
+                }
+            };
+
+            // Baca berkas sebagai data URL untuk konversi Base64
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
