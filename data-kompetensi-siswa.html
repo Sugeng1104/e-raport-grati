@@ -85,19 +85,49 @@
                     <span>🧭</span> <span>Daftar Tab Sheet Tujuan Sistem</span>
                 </h3>
                 <p class="text-xs text-slate-500">
-                    Nilai di dalam file akan diurai secara otomatis dan dialokasikan langsung ke dalam 10 tab database Google Sheets di bawah ini:
+                    Nilai di dalam file dialokasikan langsung ke 10 tab database Google Sheets di bawah ini. <strong>Klik salah satu nama tab untuk memunculkan pop-up pratinjau data:</strong>
                 </p>
                 <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
-                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_agama</div>
-                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_BIndonesia</div>
-                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_pancasila</div>
-                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_matematika</div>
-                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_IPAS</div>
-                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_pjok</div>
-                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_kesenian</div>
-                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_bJawa</div>
-                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_bIng</div>
-                    <div class="p-2 bg-slate-50 rounded-xl border font-bold text-xs text-slate-600">n_BTQ</div>
+                    <div onclick="bukaPreviewTab('n_agama')" class="p-2 bg-slate-50 rounded-xl border border-slate-200 font-bold text-xs text-slate-600 cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 hover:text-blue-600 transition duration-200 select-none flex flex-col justify-center">
+                        <span>n_agama</span>
+                        <span class="text-[9px] text-slate-400 font-normal mt-0.5">Preview 🔍</span>
+                    </div>
+                    <div onclick="bukaPreviewTab('n_BIndonesia')" class="p-2 bg-slate-50 rounded-xl border border-slate-200 font-bold text-xs text-slate-600 cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 hover:text-blue-600 transition duration-200 select-none flex flex-col justify-center">
+                        <span>n_BIndonesia</span>
+                        <span class="text-[9px] text-slate-400 font-normal mt-0.5">Preview 🔍</span>
+                    </div>
+                    <div onclick="bukaPreviewTab('n_pancasila')" class="p-2 bg-slate-50 rounded-xl border border-slate-200 font-bold text-xs text-slate-600 cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 hover:text-blue-600 transition duration-200 select-none flex flex-col justify-center">
+                        <span>n_pancasila</span>
+                        <span class="text-[9px] text-slate-400 font-normal mt-0.5">Preview 🔍</span>
+                    </div>
+                    <div onclick="bukaPreviewTab('n_matematika')" class="p-2 bg-slate-50 rounded-xl border border-slate-200 font-bold text-xs text-slate-600 cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 hover:text-blue-600 transition duration-200 select-none flex flex-col justify-center">
+                        <span>n_matematika</span>
+                        <span class="text-[9px] text-slate-400 font-normal mt-0.5">Preview 🔍</span>
+                    </div>
+                    <div onclick="bukaPreviewTab('n_IPAS')" class="p-2 bg-slate-50 rounded-xl border border-slate-200 font-bold text-xs text-slate-600 cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 hover:text-blue-600 transition duration-200 select-none flex flex-col justify-center">
+                        <span>n_IPAS</span>
+                        <span class="text-[9px] text-slate-400 font-normal mt-0.5">Preview 🔍</span>
+                    </div>
+                    <div onclick="bukaPreviewTab('n_pjok')" class="p-2 bg-slate-50 rounded-xl border border-slate-200 font-bold text-xs text-slate-600 cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 hover:text-blue-600 transition duration-200 select-none flex flex-col justify-center">
+                        <span>n_pjok</span>
+                        <span class="text-[9px] text-slate-400 font-normal mt-0.5">Preview 🔍</span>
+                    </div>
+                    <div onclick="bukaPreviewTab('n_kesenian')" class="p-2 bg-slate-50 rounded-xl border border-slate-200 font-bold text-xs text-slate-600 cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 hover:text-blue-600 transition duration-200 select-none flex flex-col justify-center">
+                        <span>n_kesenian</span>
+                        <span class="text-[9px] text-slate-400 font-normal mt-0.5">Preview 🔍</span>
+                    </div>
+                    <div onclick="bukaPreviewTab('n_bJawa')" class="p-2 bg-slate-50 rounded-xl border border-slate-200 font-bold text-xs text-slate-600 cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 hover:text-blue-600 transition duration-200 select-none flex flex-col justify-center">
+                        <span>n_bJawa</span>
+                        <span class="text-[9px] text-slate-400 font-normal mt-0.5">Preview 🔍</span>
+                    </div>
+                    <div onclick="bukaPreviewTab('n_bIng')" class="p-2 bg-slate-50 rounded-xl border border-slate-200 font-bold text-xs text-slate-600 cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 hover:text-blue-600 transition duration-200 select-none flex flex-col justify-center">
+                        <span>n_bIng</span>
+                        <span class="text-[9px] text-slate-400 font-normal mt-0.5">Preview 🔍</span>
+                    </div>
+                    <div onclick="bukaPreviewTab('n_BTQ')" class="p-2 bg-slate-50 rounded-xl border border-slate-200 font-bold text-xs text-slate-600 cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 hover:text-blue-600 transition duration-200 select-none flex flex-col justify-center">
+                        <span>n_BTQ</span>
+                        <span class="text-[9px] text-slate-400 font-normal mt-0.5">Preview 🔍</span>
+                    </div>
                 </div>
                 
                 <div class="mt-4 p-4 bg-blue-50/50 rounded-2xl border border-blue-100 flex items-start space-x-3 text-xs">
@@ -109,6 +139,37 @@
             </div>
         </section>
     </main>
+
+    <div id="modalPreviewTab" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden transform transition-all scale-95 duration-200 opacity-0" id="modalContent">
+            <div class="bg-slate-800 px-6 py-4 flex justify-between items-center text-white">
+                <div>
+                    <h3 class="font-bold text-base md:text-lg tracking-wide" id="modalTitle">Pratinjau Data Tab</h3>
+                    <p class="text-xs text-slate-400 mt-0.5" id="modalSubtitle">Menghubungkan ke server...</p>
+                </div>
+                <button onclick="tutupModalPreview()" class="text-slate-400 hover:text-white text-2xl font-bold focus:outline-none transition-colors">&times;</button>
+            </div>
+            <div class="p-6 max-h-[380px] overflow-y-auto">
+                <div id="modalLoading" class="text-center py-10 text-slate-500 text-sm">
+                    <span class="inline-block animate-spin mr-2">⏳</span> Mengambil 5 sampel data baris terbaru langsung dari Google Sheet...
+                </div>
+                <div id="modalTableWrapper" class="hidden overflow-x-auto border border-slate-200 rounded-xl shadow-inner">
+                    <table class="w-full text-left text-xs text-slate-700 whitespace-nowrap">
+                        <thead class="bg-slate-100 text-slate-700 uppercase border-b border-slate-200 font-bold sticky top-0" id="modalTableHead">
+                            </thead>
+                        <tbody id="modalTableBody" class="divide-y divide-slate-100 font-medium">
+                            </tbody>
+                    </table>
+                </div>
+                <p id="modalEmptyNotice" class="hidden text-center py-12 text-sm text-slate-400 italic">
+                    📭 Tab sheet ini terdeteksi masih kosong atau belum dibuat oleh sistem di database pusat.
+                </p>
+            </div>
+            <div class="bg-slate-50 px-6 py-3.5 flex justify-end border-t border-slate-100">
+                <button onclick="tutupModalPreview()" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-sm transition-colors">Tutup Jendela</button>
+            </div>
+        </div>
+    </div>
 
     <footer class="bg-white border-t border-slate-200 py-6 mt-12">
         <div class="max-w-7xl mx-auto px-6 text-center text-[11px] font-medium text-slate-400">
@@ -140,65 +201,161 @@
         }
 
         function eksekusiKirimNilaiExcel() {
-    const input = document.getElementById('fileExcelUH');
-    const btn = document.getElementById('btnKirimNilai');
-    
-    if (input.files.length === 0) {
-        alert("Silakan pilih file Excel uh_siswa terlebih dahulu.");
-        return;
-    }
-
-    const file = input.files[0];
-    const reader = new FileReader();
-    
-    btn.disabled = true;
-    btn.innerHTML = `<span>⏳</span> <span>Memproses & Menyinkronkan Nilai...</span>`;
-
-    reader.onload = async function(e) {
-        const base64Data = e.target.result.split(',')[1];
-        
-        const payloadData = {
-            tipe: "upload_excel_uh",
-            fileName: file.name,
-            fileData: base64Data
-        };
-
-        try {
-            // Gunakan mode cors dengan pembacaan teks murni
-            const response = await fetch(API_SHEET_URL, {
-                method: "POST",
-                mode: "cors", 
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8"
-                },
-                body: JSON.stringify(payloadData)
-            });
-
-            // Baca sebagai Text terlebih dahulu untuk meruntuhkan tembok pembatas Google Redirect
-            const textResponse = await response.text();
-            const result = JSON.parse(textResponse); 
-
-            if (result.status === "SUCCESS") {
-                alert(`🎉 BERHASIL! ${result.message}`);
-                input.value = "";
-                document.getElementById('labelNamaFile').innerText = "Pilih file Excel dari gawai Anda";
-                document.getElementById('labelNamaFile').className = "text-xs font-bold text-slate-700";
-            } else {
-                alert(`❌ GAGAL SERVER: ${result.message}`);
+            const input = document.getElementById('fileExcelUH');
+            const btn = document.getElementById('btnKirimNilai');
+            
+            if (input.files.length === 0) {
+                alert("Silakan pilih file Excel uh_siswa terlebih dahulu.");
+                return;
             }
 
-        } catch (error) {
-            console.error("Fetch Error:", error);
-            alert("Terjadi gangguan komunikasi data. Namun silakan periksa Google Sheet Anda beberapa saat lagi untuk memastikan apakah proses background berhasil.");
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = `<span>🚀</span> <span>Kirim Nilai</span>`;
-        }
-    };
+            const file = input.files[0];
+            const reader = new FileReader();
+            
+            btn.disabled = true;
+            btn.innerHTML = `<span>⏳</span> <span>Memproses & Menyinkronkan Nilai...</span>`;
 
-    reader.readAsDataURL(file);
-}
-        
+            reader.onload = async function(e) {
+                const base64Data = e.target.result.split(',')[1];
+                
+                const payloadData = {
+                    tipe: "upload_excel_uh",
+                    fileName: file.name,
+                    fileData: base64Data
+                };
+
+                try {
+                    const response = await fetch(API_SHEET_URL, {
+                        method: "POST",
+                        mode: "cors", 
+                        headers: {
+                            "Content-Type": "text/plain;charset=utf-8"
+                        },
+                        body: JSON.stringify(payloadData)
+                    });
+
+                    const textResponse = await response.text();
+                    const result = JSON.parse(textResponse); 
+
+                    if (result.status === "SUCCESS") {
+                        alert(`🎉 BERHASIL! ${result.message}`);
+                        input.value = "";
+                        document.getElementById('labelNamaFile').innerText = "Pilih file Excel dari gawai Anda";
+                        document.getElementById('labelNamaFile').className = "text-xs font-bold text-slate-700";
+                    } else {
+                        alert(`❌ GAGAL SERVER: ${result.message}`);
+                    }
+
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    alert("Terjadi gangguan komunikasi data. Namun silakan periksa Google Sheet Anda beberapa saat lagi untuk memastikan apakah proses background berhasil.");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = `<span>🚀</span> <span>Kirim Nilai</span>`;
+                }
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        // =========================================================================
+        // LOGIKA POP-UP INTERAKTIF UNTUK DAFTAR TAB SHEET (TERBARU)
+        // =========================================================================
+        async function bukaPreviewTab(namaTab) {
+            const modal = document.getElementById('modalPreviewTab');
+            const content = document.getElementById('modalContent');
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            const loading = document.getElementById('modalLoading');
+            const wrapper = document.getElementById('modalTableWrapper');
+            const emptyNotice = document.getElementById('modalEmptyNotice');
+            
+            const tHead = document.getElementById('modalTableHead');
+            const tBody = document.getElementById('modalTableBody');
+
+            // Jalankan animasi pembukaan Modal
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 25);
+
+            // Set tampilan awal status memuat data
+            title.innerText = `Pratinjau Database: ${namaTab}`;
+            subtitle.innerText = "Menghubungkan ke API Gateway...";
+            loading.classList.remove('hidden');
+            wrapper.classList.add('hidden');
+            emptyNotice.classList.add('hidden');
+            tHead.innerHTML = '';
+            tBody.innerHTML = '';
+
+            try {
+                // Request GET ke Apps Script memakai parameter action=getPreviewTab
+                const responServer = await fetch(`${API_SHEET_URL}?action=getPreviewTab&tabName=${namaTab}`);
+                const dataJson = await responServer.json();
+
+                loading.classList.add('hidden');
+
+                if (dataJson.status === "SUCCESS") {
+                    subtitle.innerText = `Total Data Tersimpan: ${dataJson.totalBaris} Baris Siswa`;
+                    
+                    if (dataJson.data.length === 0) {
+                        emptyNotice.classList.remove('hidden');
+                    } else {
+                        // Susun Header Kolom Tabel secara Dinamis
+                        let barisHeaderHtml = '<tr>';
+                        dataJson.headers.forEach(headKolom => {
+                            barisHeaderHtml += `<th class="px-4 py-2.5 border-b border-slate-200 font-bold bg-slate-100 text-slate-800">${headKolom}</th>`;
+                        });
+                        barisHeaderHtml += '</tr>';
+                        tHead.innerHTML = barisHeaderHtml;
+
+                        // Susun Seluruh Baris Sampel Data Nilai Siswa (Maksimal 5)
+                        let barisDataHtml = '';
+                        dataJson.data.forEach(itemBaris => {
+                            barisDataHtml += '<tr class="hover:bg-slate-50/80 transition-colors">';
+                            itemBaris.forEach(itemSel => {
+                                let isiSel = itemSel !== "" ? itemSel : "-";
+                                barisDataHtml += `<td class="px-4 py-2 border-b border-slate-100 max-w-[150px] truncate">${isiSel}</td>`;
+                            });
+                            barisDataHtml += '</tr>';
+                        });
+                        tBody.innerHTML = barisDataHtml;
+                        wrapper.classList.remove('hidden');
+                    }
+                } else {
+                    subtitle.innerText = "Gagal memproses permintaan.";
+                    tBody.innerHTML = `<tr><td class="px-4 py-8 text-center text-red-500 font-bold italic">${dataJson.message}</td></tr>`;
+                    wrapper.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Gagal mendapatkan pratinjau tab:", err);
+                loading.classList.add('hidden');
+                subtitle.innerText = "Koneksi terputus.";
+                tBody.innerHTML = `<tr><td class="px-4 py-8 text-center text-red-500 font-bold text-xs">Gagal terhubung dengan server cloud. Mohon verifikasi apakah Web App Apps Script sudah dideploy dengan benar sebagai 'Anyone'.</td></tr>`;
+                wrapper.classList.remove('hidden');
+            }
+        }
+
+        function tutupModalPreview() {
+            const modal = document.getElementById('modalPreviewTab');
+            const content = document.getElementById('modalContent');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 180);
+        }
+
+        // Tutup otomatis jika admin mengklik area luar modal yang transparan
+        window.onclick = function(e) {
+            const modal = document.getElementById('modalPreviewTab');
+            if (e.target === modal) {
+                tutupModalPreview();
+            }
+        }
     </script>
 </body>
 </html>
