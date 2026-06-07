@@ -8,9 +8,7 @@
 </head>
 <body class="bg-slate-50 font-sans min-h-screen text-slate-800">
 
-    <!-- HERO BANNER & WELCOME HEADER -->
     <header class="bg-gradient-to-r from-blue-700 via-[#1e6ca8] to-indigo-700 text-white shadow-lg relative overflow-hidden">
-        <!-- Elemen Dekoratif Latar Belakang -->
         <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
         
         <div class="max-w-7xl mx-auto px-6 py-8 md:py-12 relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
@@ -31,12 +29,9 @@
         </div>
     </header>
 
-    <!-- KONTEN UTAMA APLIKASI -->
     <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
         
-        <!-- SECTION 1: RINGKASAN EKSEKUTIF (REAL-TIME ANALYTICS COUNTER) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Box Total Siswa -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
                 <div class="p-3 bg-blue-50 text-blue-600 rounded-xl text-2xl">👨‍🎓</div>
                 <div>
@@ -44,7 +39,6 @@
                     <p class="text-xl font-extrabold text-slate-800 tracking-tight" id="summarySiswa">...</p>
                 </div>
             </div>
-            <!-- Box Mata Pelajaran -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
                 <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl text-2xl">📚</div>
                 <div>
@@ -52,7 +46,6 @@
                     <p class="text-xl font-extrabold text-slate-800 tracking-tight" id="summaryMapel">...</p>
                 </div>
             </div>
-            <!-- Box Ekstrakurikuler -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
                 <div class="p-3 bg-amber-50 text-amber-600 rounded-xl text-2xl">🏅</div>
                 <div>
@@ -60,7 +53,6 @@
                     <p class="text-xl font-extrabold text-slate-800 tracking-tight" id="summaryEkskul">...</p>
                 </div>
             </div>
-            <!-- Box Status API Pipeline -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
                 <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-2xl">🔄</div>
                 <div>
@@ -73,32 +65,33 @@
             </div>
         </div>
 
-        <!-- SECTION 2: GRID MODUL NAVIGASI SISTEM -->
         <div class="space-y-4">
             <h2 class="text-lg font-extrabold text-slate-900 tracking-wide flex items-center space-x-2">
                 <span class="text-blue-600">🚀</span> <span>Akses Cepat Modul Sistem</span>
             </h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
-                <!-- PILAR 1: PILAR ADMINISTRASI SEKOLAH -->
                 <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
                     <div class="space-y-2">
                         <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold">🏛️</div>
                         <h3 class="font-bold text-lg text-slate-900">Modul Administrasi & E-Rapor</h3>
-                        <p class="text-slate-500 text-xs leading-relaxed">Kelola identitas legalitas sekolah secara dinamis, manajemen profil dan personalia pendidik, serta kontrol database induk peserta didik secara terpusat.</p>
+                        <p class="text-slate-500 text-xs leading-relaxed">Kelola identitas legalitas sekolah secara dinamis, manajemen profil dan personalia pendidik, kontrol database induk peserta didik, serta pemetaan capaian kompetensi dasar siswa.</p>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 pt-4 border-t border-slate-100">
-                        <a href="identitas-sekolah.html" class="p-3 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-center rounded-xl border border-slate-200 transition font-bold text-xs flex flex-col items-center justify-center gap-1">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-4 border-t border-slate-100">
+                        <a href="identitas-sekolah.html" class="p-3 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-center rounded-xl border border-slate-200 transition font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm">
                             <span class="text-lg">📋</span> <span>Identitas Sekolah</span>
                         </a>
-                        <a href="data-siswa.html" class="p-3 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-center rounded-xl border border-slate-200 transition font-bold text-xs flex flex-col items-center justify-center gap-1">
+                        <a href="data-siswa.html" class="p-3 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-center rounded-xl border border-slate-200 transition font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm">
                             <span class="text-lg">👥</span> <span>Data Induk Siswa</span>
+                        </a>
+                        <a href="data-kompetensi-siswa.html" class="p-3 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-center rounded-xl border border-blue-200/60 bg-blue-50/20 transition font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm">
+                            <span class="text-lg">🎯</span> <span class="text-blue-700">Kompetensi Siswa</span>
                         </a>
                     </div>
                 </div>
 
-                <!-- PILAR 2: PILAR PLATFORM UJIAN & TKA -->
                 <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
                     <div class="space-y-2">
                         <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold">🧠</div>
@@ -106,7 +99,6 @@
                         <p class="text-slate-500 text-xs leading-relaxed">Kelola bank soal ujian, pengaturan sistem pengacakan (*shuffling algorithm*), durasi waktu pengerjaan, dan pantau grafik hasil analisis kompetensi kognitif anak.</p>
                     </div>
                     <div class="grid grid-cols-2 gap-2 pt-4 border-t border-slate-100">
-                        <!-- ID href disiapkan untuk pengembangan masa depan -->
                         <a href="#bank-soal" class="opacity-60 cursor-not-allowed p-3 bg-slate-50 text-center rounded-xl border border-slate-200 font-bold text-xs flex flex-col items-center justify-center gap-1">
                             <span class="text-lg">🗂️</span> <span>Bank Soal (Soon)</span>
                         </a>
@@ -120,7 +112,6 @@
         </div>
     </main>
 
-    <!-- FOOTER SISTEM -->
     <footer class="bg-white border-t border-slate-200 py-6 mt-12">
         <div class="max-w-7xl mx-auto px-6 text-center space-y-1">
             <p class="text-xs font-bold text-slate-500">© 2026 E-Rapor & TKA Engine • Premium EduTech Architecture</p>
@@ -128,18 +119,15 @@
         </div>
     </footer>
 
-    <!-- ENGINE CODE SINKRONISASI HUB -->
     <script>
         const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
-        // 1. SET LIVE TANGGAL (Lokalisasi Indonesia Barat)
         function jalankanLiveTanggal() {
             const opsi = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const hariIni = new Date();
             document.getElementById('liveTanggal').innerText = hariIni.toLocaleDateString('id-ID', opsi);
         }
 
-        // 2. FETCH AGREGASI DATA DARI GOOGLE APPS SCRIPT
         async function sinkronisasiDataHub() {
             try {
                 const respon = await fetch(`${API_SHEET_URL}?action=getDashboardSummary`, {
@@ -151,24 +139,19 @@
 
                 if (json.status === "SUCCESS") {
                     const data = json.summary;
-                    // Pasang hasil hitung data ke UI secara dinamis
                     document.getElementById('namaSekolahHub').innerText = data.namaSekolah;
                     document.getElementById('summarySiswa').innerText = data.totalSiswa + " Anak";
                     document.getElementById('summaryMapel').innerText = data.totalMapel + " Pelajaran";
                     document.getElementById('summaryEkskul').innerText = data.totalEkskul + " Kegiatan";
-                } else {
-                    console.error("Gagal memuat ringkasan data sheet:", json.message);
                 }
             } catch (error) {
                 console.error("Gagal terhubung ke pipeline API:", error);
-                // Mengubah status koneksi jika server down
                 document.getElementById('summarySiswa').innerText = "Err";
                 document.getElementById('summaryMapel').innerText = "Err";
                 document.getElementById('summaryEkskul').innerText = "Err";
             }
         }
 
-        // Jalankan seluruh fungsi utama saat jendela browser siap
         window.onload = function() {
             jalankanLiveTanggal();
             sinkronisasiDataHub();
