@@ -6,7 +6,7 @@
     <title>Cetak Rapor Murid - UPT SDN Ranuklindungan I</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Gaya Khusus saat Mode Cetak / Print Aktif */
+        /* Pengaturan Layout Optimal Saat Dicetak Menjadi Kertas / PDF */
         @media print {
             .no-print { display: none !important; }
             body { background-color: #ffffff; color: #000000; font-size: 12px; padding: 0; }
@@ -22,8 +22,8 @@
         <div class="flex items-center space-x-3">
             <a href="data-kompetensi-siswa.html" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm transition">⬅️ Kembali</a>
             <div>
-                <h1 class="font-bold text-sm text-slate-900">Modul Cetak Rapor Digital</h1>
-                <p class="text-[11px] text-slate-500">Kalkulasi Nilai Rapor Otomatis dari Tab Rapor & Nilai UH</p>
+                <h1 class="font-bold text-sm text-slate-900">Modul Cetak Rapor Digital v2.0</h1>
+                <p class="text-[11px] text-slate-500">Kalkulasi Otomatis dari 10 Tab Nilai Mata Pelajaran</p>
             </div>
         </div>
         <div class="flex items-center space-x-2 w-full sm:w-auto">
@@ -80,9 +80,9 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-black">
-                <tr><td class="border-r border-black p-2 text-center">1</td><td class="border-r border-black p-2">Pramuka (Wajib)</td><td class="p-2">Melaksanakan kegiatan kepramukaan semester 2 dengan sangat baik dan aktif.</td></tr>
-                <tr><td class="border-r border-black p-2 text-center">2</td><td class="border-r border-black p-2">Keagamaan / BTQ Ext</td><td class="p-2">Menunjukkan kefasihan yang baik dalam tartil bacaan.</td></tr>
-                <tr><td class="border-r border-black p-2 text-center">3</td><td class="border-r border-black p-2">-</td><td class="p-2">-</td></tr>
+                <tr><td class="border-r border-black p-2 text-center">1</td><td class="border-r border-black p-2 font-medium">Pramuka (Wajib)</td><td class="p-2">Melaksanakan kegiatan kepramukaan semester 2 dengan sangat baik, disiplin, dan aktif.</td></tr>
+                <tr><td class="border-r border-black p-2 text-center">2</td><td class="border-r border-black p-2 font-medium">Keagamaan / Baca Tulis Al-Qur'an (BTQ)</td><td class="p-2">Menunjukkan perkembangan nilai religiusitas yang baik dalam tartil bacaan ayat pendek.</td></tr>
+                <tr><td class="border-r border-black p-2 text-center">3</td><td class="border-r border-black p-2 font-medium">-</td><td class="p-2">-</td></tr>
             </tbody>
         </table>
 
@@ -102,7 +102,7 @@
             <div class="md:col-span-7 flex flex-col border border-black">
                 <div class="bg-slate-100 font-bold border-b border-black p-2 text-center">Catatan Wali Kelas</div>
                 <div class="p-3 text-justify leading-relaxed flex-1 italic bg-white">
-                    "Pertahankan prestasi kognitif Anda, tingkatkan kedisiplinan belajar di rumah agar performa pada jenjang kelas berikutnya semakin cemerlang."
+                    "Pertahankan prestasi akademik Anda, tingkatkan ritme kedisiplinan belajar di rumah agar performa pada jenjang kelas berikutnya semakin cemerlang dan membanggakan."
                 </div>
             </div>
         </div>
@@ -138,13 +138,12 @@
     </div>
 
     <div id="statusNotice" class="max-w-4xl mx-auto bg-white border rounded-2xl p-12 text-center text-slate-400 font-medium text-sm shadow-sm no-print">
-        👋 Silakan masukkan Nomor Absen siswa pada panel di atas lalu klik <strong>Cari Data</strong> untuk merender struktur rapor.
+        👋 Silakan masukkan Nomor Absen siswa pada panel di atas lalu klik <strong>Cari Data</strong> untuk merender lembar rapor murid.
     </div>
 
     <script>
-       <script>
-        // 1. PASTIKAN URL INI ADALAH URL WEB APP DARI SPREADSHEET "NILAI_ASAS_SMT2" YANG BARU
-        const API_URL_NILAI = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+        // TEMPELKAN URL WEB APP ANDA YANG BARU DI SINI
+        const API_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
         async function muatDataRaporSiswa() {
             const noAbsen = document.getElementById('inputNoAbsen').value.trim();
@@ -153,23 +152,23 @@
             const raporArea = document.getElementById('kontenRapor');
 
             if (!noAbsen) {
-                alert("Mohon masukkan nomor absen terlebih dahulu.");
+                alert("Mohon ketik nomor absen murid terlebih dahulu.");
                 return;
             }
 
             btn.disabled = true;
             btn.innerText = "⏳ Memuat...";
-            notice.innerHTML = `<span>⏳</span> Sedang mengunduh akumulasi nilai UH dari Cloud Server...`;
+            notice.innerHTML = `<span>⏳</span> Menghubungkan ke server cloud. Sedang mengompilasi nilai dari 10 tab mata pelajaran...`;
             notice.classList.remove('hidden');
             raporArea.classList.add('hidden');
 
             try {
-                // Tembak HANYA ke API Nilai saja secara mandiri tanpa embel-embel parameter action
-                const response = await fetch(`${API_URL_NILAI}?no_absen=${noAbsen}`);
+                // Pemanggilan data aman bebas hambatan parameter action
+                const response = await fetch(`${API_URL}?no_absen=${noAbsen}`);
                 const data = await response.json();
 
                 if (data.status === "SUCCESS") {
-                    // 1. Pasang data profil sekolah & identitas murid
+                    // 1. Sinkronisasi Data Judul & Profil Sekolah
                     document.getElementById('txtNamaSekolah').innerText = data.sekolah.namaSekolah;
                     document.getElementById('txtAlamatSekolah').innerText = data.sekolah.alamat;
                     document.getElementById('txtKelas').innerText = data.sekolah.kelas;
@@ -177,10 +176,11 @@
                     document.getElementById('txtSemester').innerText = data.sekolah.semester;
                     document.getElementById('txtTahunAjaran').innerText = data.sekolah.tahunAjaran;
                     
+                    // 2. Sinkronisasi Profil Murid
                     document.getElementById('txtNamaSiswa').innerText = data.siswa.nama;
                     document.getElementById('txtNisnisn').innerText = ` - / ${data.siswa.nisn}`;
 
-                    // 2. Render otomatis baris tabel nilai harian dari 10 tab mapel
+                    // 3. Render Baris Tabel Nilai Rapor
                     const tbodyNilai = document.getElementById('bodyTabelNilai');
                     tbodyNilai.innerHTML = "";
                     
@@ -195,23 +195,21 @@
                         tbodyNilai.appendChild(row);
                     });
 
-                    // Tampilkan dokumen rapor ke layar monitor
+                    // Tampilkan kertas rapor utuh, sembunyikan loading notice
                     notice.classList.add('hidden');
                     raporArea.classList.remove('hidden');
 
                 } else {
-                    // Jika script nilai melempar eror internal
                     notice.innerHTML = `❌ <span class="text-red-500 font-bold">${data.message}</span>`;
                 }
             } catch (err) {
-                console.error("Gagal memuat:", err);
-                notice.innerHTML = `❌ <span class="text-red-500 font-bold">Koneksi diblokir. Pastikan URL API sudah benar dan lakukan rilis versi baru (New Version) pada Apps Script.</span>`;
+                console.error("Gagal menarik data rapor:", err);
+                notice.innerHTML = `❌ <span class="text-red-500 font-bold">Koneksi API terputus atau salah pasang URL Web App. Silakan periksa kembali tautan Apps Script Anda.</span>`;
             } finally {
                 btn.disabled = false;
                 btn.innerText = "🔍 Cari Data";
             }
         }
-    </script>
     </script>
 </body>
 </html>
