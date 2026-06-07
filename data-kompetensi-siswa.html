@@ -140,64 +140,65 @@
         }
 
         function eksekusiKirimNilaiExcel() {
-            const input = document.getElementById('fileExcelUH');
-            const btn = document.getElementById('btnKirimNilai');
-            
-            if (input.files.length === 0) {
-                alert("Silakan pilih file Excel uh_siswa terlebih dahulu.");
-                return;
+    const input = document.getElementById('fileExcelUH');
+    const btn = document.getElementById('btnKirimNilai');
+    
+    if (input.files.length === 0) {
+        alert("Silakan pilih file Excel uh_siswa terlebih dahulu.");
+        return;
+    }
+
+    const file = input.files[0];
+    const reader = new FileReader();
+    
+    btn.disabled = true;
+    btn.innerHTML = `<span>⏳</span> <span>Memproses & Menyinkronkan Nilai...</span>`;
+
+    reader.onload = async function(e) {
+        const base64Data = e.target.result.split(',')[1];
+        
+        const payloadData = {
+            tipe: "upload_excel_uh",
+            fileName: file.name,
+            fileData: base64Data
+        };
+
+        try {
+            // Gunakan mode cors dengan pembacaan teks murni
+            const response = await fetch(API_SHEET_URL, {
+                method: "POST",
+                mode: "cors", 
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: JSON.stringify(payloadData)
+            });
+
+            // Baca sebagai Text terlebih dahulu untuk meruntuhkan tembok pembatas Google Redirect
+            const textResponse = await response.text();
+            const result = JSON.parse(textResponse); 
+
+            if (result.status === "SUCCESS") {
+                alert(`🎉 BERHASIL! ${result.message}`);
+                input.value = "";
+                document.getElementById('labelNamaFile').innerText = "Pilih file Excel dari gawai Anda";
+                document.getElementById('labelNamaFile').className = "text-xs font-bold text-slate-700";
+            } else {
+                alert(`❌ GAGAL SERVER: ${result.message}`);
             }
 
-            const file = input.files[0];
-            const reader = new FileReader();
-            
-            btn.disabled = true;
-            btn.innerHTML = `<span>⏳</span> <span>Memproses & Menyinkronkan Nilai...</span>`;
-
-            reader.onload = async function(e) {
-                const base64Data = e.target.result.split(',')[1];
-                
-                // DATA PAYLOAD MURNI UNTUK DISERAHKAN KE BACKEND GOOGLE
-                const payloadData = {
-                    tipe: "upload_excel_uh",
-                    fileName: file.name,
-                    fileData: base64Data
-                };
-
-                try {
-                    // MENGGUNAKAN METODE REDIRECT DAN CORS VALID UNTUK TRANSAKSI DATA BESAR
-                    const response = await fetch(API_SHEET_URL, {
-                        method: "POST",
-                        mode: "cors", 
-                        headers: {
-                            "Content-Type": "text/plain;charset=utf-8"
-                        },
-                        body: JSON.stringify(payloadData)
-                    });
-
-                    const result = await response.json();
-
-                    if (result.status === "SUCCESS") {
-                        alert(`🎉 BEBERHASIL! ${result.message}`);
-                        input.value = "";
-                        document.getElementById('labelNamaFile').innerText = "Pilih file Excel dari gawai Anda";
-                        document.getElementById('labelNamaFile').className = "text-xs font-bold text-slate-700";
-                    } else {
-                        alert(`❌ GAGAL SISTEM: ${result.message}`);
-                    }
-
-                } catch (error) {
-                    console.error("Fetch Error:", error);
-                    // Fallback jika Google Apps Script merespons redirect tanpa header CORS, namun eksekusi sukses dijalankan backend
-                    alert("Proses pengiriman selesai dieksekusi. Silakan periksa kembali Google Sheets Anda untuk memverifikasi data.");
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = `<span>🚀</span> <span>Kirim Nilai</span>`;
-                }
-            };
-
-            reader.readAsDataURL(file);
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            alert("Terjadi gangguan komunikasi data. Namun silakan periksa Google Sheet Anda beberapa saat lagi untuk memastikan apakah proses background berhasil.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<span>🚀</span> <span>Kirim Nilai</span>`;
         }
+    };
+
+    reader.readAsDataURL(file);
+}
+        
     </script>
 </body>
 </html>
