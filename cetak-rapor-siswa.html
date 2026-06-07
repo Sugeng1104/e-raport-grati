@@ -142,8 +142,9 @@
     </div>
 
     <script>
-        // MASUKKAN URL WEB APP YANG ANDA DAPATKAN SAAT DEPLOY SPREADSHEET NILAI_ASAS_SMT2
-        const API_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+       <script>
+        // 1. PASTIKAN URL INI ADALAH URL WEB APP DARI SPREADSHEET "NILAI_ASAS_SMT2" YANG BARU
+        const API_URL_NILAI = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
         async function muatDataRaporSiswa() {
             const noAbsen = document.getElementById('inputNoAbsen').value.trim();
@@ -163,12 +164,12 @@
             raporArea.classList.add('hidden');
 
             try {
-                // Ambil data langsung tanpa menyertakan parameter action yang membingungkan server
-                const response = await fetch(`${API_URL}?no_absen=${noAbsen}`);
+                // Tembak HANYA ke API Nilai saja secara mandiri tanpa embel-embel parameter action
+                const response = await fetch(`${API_URL_NILAI}?no_absen=${noAbsen}`);
                 const data = await response.json();
 
                 if (data.status === "SUCCESS") {
-                    // 1. Petakan Profil & Sekolah
+                    // 1. Pasang data profil sekolah & identitas murid
                     document.getElementById('txtNamaSekolah').innerText = data.sekolah.namaSekolah;
                     document.getElementById('txtAlamatSekolah').innerText = data.sekolah.alamat;
                     document.getElementById('txtKelas').innerText = data.sekolah.kelas;
@@ -179,7 +180,7 @@
                     document.getElementById('txtNamaSiswa').innerText = data.siswa.nama;
                     document.getElementById('txtNisnisn').innerText = ` - / ${data.siswa.nisn}`;
 
-                    // 2. Render Baris Tabel Nilai
+                    // 2. Render otomatis baris tabel nilai harian dari 10 tab mapel
                     const tbodyNilai = document.getElementById('bodyTabelNilai');
                     tbodyNilai.innerHTML = "";
                     
@@ -194,21 +195,23 @@
                         tbodyNilai.appendChild(row);
                     });
 
-                    // Sembunyikan notice dan tampilkan kertas rapor
+                    // Tampilkan dokumen rapor ke layar monitor
                     notice.classList.add('hidden');
                     raporArea.classList.remove('hidden');
 
                 } else {
+                    // Jika script nilai melempar eror internal
                     notice.innerHTML = `❌ <span class="text-red-500 font-bold">${data.message}</span>`;
                 }
             } catch (err) {
                 console.error("Gagal memuat:", err);
-                notice.innerHTML = `❌ <span class="text-red-500 font-bold">Respons error diterima. Pastikan Anda telah melakukan DEPLOY ULANG dengan memilih 'NEW VERSION' pada Apps Script.</span>`;
+                notice.innerHTML = `❌ <span class="text-red-500 font-bold">Koneksi diblokir. Pastikan URL API sudah benar dan lakukan rilis versi baru (New Version) pada Apps Script.</span>`;
             } finally {
                 btn.disabled = false;
                 btn.innerText = "🔍 Cari Data";
             }
         }
+    </script>
     </script>
 </body>
 </html>
