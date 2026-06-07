@@ -6,14 +6,26 @@
     <title>Identitas Sekolah - UPT SDN Ranuklindungan I</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 font-sans min-h-screen text-slate-800">
+<body class="bg-slate-50 font-sans min-h-screen text-slate-800 relative">
 
-    <header class="bg-[#1e6ca8] text-white p-4 shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
+    <header class="bg-[#1e6ca8] text-white p-4 shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
                 <span class="text-2xl">🏛️</span>
                 <h1 class="text-xl font-bold tracking-wide" id="headerNamaSekolah">Memuat Data...</h1>
             </div>
+            
+            <div class="flex items-center space-x-2 bg-white/10 p-1.5 rounded-xl border border-white/20">
+                <select id="pilihanEdit" class="bg-slate-800 text-white text-sm font-semibold px-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <option value="identitas">🗄️ Profil & Personalia</option>
+                    <option value="mapel">📚 Mata Pelajaran</option>
+                    <option value="ekskul">🏅 Ekstrakurikuler</option>
+                </select>
+                <button onclick="bukaPopupEdit()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold px-4 py-2 rounded-lg shadow transition flex items-center space-x-1 text-sm">
+                    <span>✏️</span> <span>Edit</span>
+                </button>
+            </div>
+
             <a href="index.html" class="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg transition text-sm flex items-center space-x-1">
                 <span>⬅️</span> <span>Kembali ke Hub Utama</span>
             </a>
@@ -28,7 +40,6 @@
         </div>
 
         <div id="mainContent" class="grid grid-cols-1 lg:grid-cols-12 gap-6 hidden">
-            
             <section class="lg:col-span-7 space-y-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 border-b pb-3 mb-4 flex items-center space-x-2">
@@ -80,18 +91,37 @@
                     </div>
                 </div>
             </section>
-
         </div>
     </main>
 
-    <script>
-        // =========================================================================
-        // [TANDA KUNCI 1]: ENDPOINT API WEB APP GOOGLE APPS SCRIPT ANDA
-        // =========================================================================
-        const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+    <div id="popupModalEdit" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-5 border-b flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                <div class="flex items-center space-x-2 text-slate-900">
+                    <span class="text-xl">📝</span>
+                    <h2 id="judulPopup" class="font-bold text-lg">Edit Form Data</h2>
+                </div>
+                <button onclick="tutupPopupEdit()" class="text-slate-400 hover:text-slate-600 font-bold p-1 text-lg">&times;</button>
+            </div>
+            
+            <form id="formDinamis" class="p-6 overflow-y-auto space-y-4 flex-grow text-sm">
+                </form>
+            
+            <div class="p-4 border-t bg-slate-50 rounded-b-2xl flex justify-end space-x-2">
+                <button type="button" onclick="tutupPopupEdit()" class="px-4 py-2 border border-slate-300 rounded-xl text-slate-700 font-medium hover:bg-slate-100 transition text-sm">Batal</button>
+                <button type="button" onclick="eksekusiSimpanData()" id="btnSimpan" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow transition text-sm flex items-center space-x-2">
+                    <span>💾</span> <span>Simpan</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
-        // Fungsi bantu untuk merender baris kartu informasi
-        // (SUDAH DISINKRONKAN: Menggunakan nama cetakBarisInfo konsisten)
+    <script>
+        const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+        
+        // Cache data global untuk menyimpan salinan respons terakhir dari server
+        let DATABASE_CACHE = null;
+
         function cetakBarisInfo(label, value) {
             if (!value) return '';
             return `
@@ -104,56 +134,42 @@
 
         async function ambilDataIdentitas() {
             try {
-                // =========================================================================
-                // [TANDA KUNCI 2]: PIPELINE ANTI-CORS & ANTI-REDIRECT DARI GOOGLE
-                // =========================================================================
                 const respon = await fetch(`${API_SHEET_URL}?action=getIdentitas`, {
                     method: "GET",
                     mode: "cors",
                     redirect: "follow" 
                 });
                 
-                const json = await respon.json();
+                DATABASE_CACHE = await respon.json();
+                if (DATABASE_CACHE.status !== "SUCCESS") throw new Error(DATABASE_CACHE.message);
                 
-                if (json.status !== "SUCCESS") {
-                    throw new Error(json.message);
-                }
-                
-                // =========================================================================
-                // [TANDA KUNCI 3]: PROSES FILTER & RENDER KELOMPOK PROFIL SEKOLAH (KOLOM A-B)
-                // =========================================================================
+                // 1. Render Profil & Legalitas
                 let htmlProfil = "";
                 const listGrupProfil = ["Nama Sekolah", "NPSN", "NSS", "Alamat Sekolah", "Kode Pos", "Desa / Kelurahan", "Kecamatan", "Kabupaten", "Provinsi", "Website", "E-mail"];
                 
                 listGrupProfil.forEach(key => {
-                    if (json.profil[key]) {
-                        // Perbaikan Bug: Memanggil cetakBarisInfo secara tepat
-                        htmlProfil += cetakBarisInfo(key, json.profil[key]);
+                    if (DATABASE_CACHE.profil[key]) {
+                        htmlProfil += cetakBarisInfo(key, DATABASE_CACHE.profil[key]);
                     }
                 });
                 document.getElementById('dataProfil').innerHTML = htmlProfil;
                 
-                // Sinkronisasi Nama Sekolah ke Navbar Atas
-                if(json.profil["Nama Sekolah"]) {
-                    document.getElementById('headerNamaSekolah').innerText = json.profil["Nama Sekolah"];
+                if(DATABASE_CACHE.profil["Nama Sekolah"]) {
+                    document.getElementById('headerNamaSekolah').innerText = DATABASE_CACHE.profil["Nama Sekolah"];
                 }
 
-                // =========================================================================
-                // [TANDA KUNCI 4]: PROSES FILTER & RENDER KELOMPOK PERSONALIA (KOLOM A-B)
-                // =========================================================================
+                // 2. Render Waktu & Personalia
                 let htmlPersonalia = "";
-                Object.keys(json.profil).forEach(key => {
+                Object.keys(DATABASE_CACHE.profil).forEach(key => {
                     if (!listGrupProfil.includes(key)) {
-                        htmlPersonalia += cetakBarisInfo(key, json.profil[key]);
+                        htmlPersonalia += cetakBarisInfo(key, DATABASE_CACHE.profil[key]);
                     }
                 });
                 document.getElementById('dataPersonalia').innerHTML = htmlPersonalia;
 
-                // =========================================================================
-                // [TANDA KUNCI 5]: PROSES LOOPING & RENDER TABEL MATA PELAJARAN (KOLOM C-D)
-                // =========================================================================
+                // 3. Render Tabel Mata Pelajaran
                 let htmlMapel = "";
-                json.mapel.forEach(item => {
+                DATABASE_CACHE.mapel.forEach(item => {
                     htmlMapel += `
                         <tr class="hover:bg-slate-50 transition">
                             <td class="p-3 text-center font-bold text-blue-500 bg-slate-50/50">${item.no}</td>
@@ -163,11 +179,9 @@
                 });
                 document.getElementById('tabelMapel').innerHTML = htmlMapel;
 
-                // =========================================================================
-                // [TANDA KUNCI 6]: PROSES LOOPING & RENDER TABEL EKSTRAKURIKULER (KOLOM E-F)
-                // =========================================================================
+                // 4. Render Tabel Ekstrakurikuler
                 let htmlEkskul = "";
-                json.ekskul.forEach(item => {
+                DATABASE_CACHE.ekskul.forEach(item => {
                     htmlEkskul += `
                         <tr class="hover:bg-slate-50 transition">
                             <td class="p-3 text-center font-bold text-amber-500 bg-slate-50/50">${item.id}</td>
@@ -177,7 +191,6 @@
                 });
                 document.getElementById('tabelEkskul').innerHTML = htmlEkskul;
 
-                // STATUS TRANSISI UI (Sembunyikan loading spinner, munculkan data)
                 document.getElementById('loadingState').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
 
@@ -187,13 +200,106 @@
                     <div class="p-4 text-red-600 bg-red-50 rounded-xl border border-red-200 inline-block text-left max-w-md">
                         <p class="font-bold">⚠️ Gagal Memproses Sinkronisasi Data</p>
                         <p class="text-xs text-slate-500 mt-1">Detail Masalah: ${error.message}</p>
-                        <p class="text-xs text-slate-400 mt-2 font-mono bg-white p-2 rounded border">Solusi: Pastikan URL Apps Script di kode HTML Anda sudah menggunakan versi /exec terbaru.</p>
                     </div>
                 `;
             }
         }
 
-        // Jalankan sinkronisasi sesaat setelah seluruh dokumen HTML termuat sempurna
+        // =========================================================================
+        // LOGIKA INTERAKTIF FORM MODAL POPUP
+        // =========================================================================
+        function bukaPopupEdit() {
+            if (!DATABASE_CACHE) return alert("Data belum termuat sempurna dari Google Sheets. Mohon tunggu.");
+            
+            const pilihan = document.getElementById('pilihanEdit').value;
+            const form = document.getElementById('formDinamis');
+            const judul = document.getElementById('judulPopup');
+            form.innerHTML = ""; // Bersihkan form lama
+            
+            // Set penanda jenis data pada form menggunakan atribut data
+            form.setAttribute('data-tipe', pilihan);
+
+            if (pilihan === "identitas") {
+                judul.innerText = "Edit Profil & Personalia Sekolah";
+                Object.keys(DATABASE_CACHE.profil).forEach(key => {
+                    form.innerHTML += buatElemenInputForm(key, DATABASE_CACHE.profil[key]);
+                });
+            } else if (pilihan === "mapel") {
+                judul.innerText = "Edit Daftar Mata Pelajaran";
+                DATABASE_CACHE.mapel.forEach(item => {
+                    form.innerHTML += buatElemenInputForm(item.no, item.nama, `No. Urut ${item.no}`);
+                });
+            } else if (pilihan === "ekskul") {
+                judul.innerText = "Edit Kegiatan Ekstrakurikuler";
+                DATABASE_CACHE.ekskul.forEach(item => {
+                    form.innerHTML += buatElemenInputForm(item.id, item.nama, `ID Ekskul ${item.id}`);
+                });
+            }
+
+            document.getElementById('popupModalEdit').classList.remove('hidden');
+        }
+
+        function buatElemenInputForm(idKolom, nilaiLama, subLabel = "Isi Identitas") {
+            return `
+                <div class="flex flex-col space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <label class="font-bold text-slate-800 text-xs uppercase tracking-wide">${idKolom}</label>
+                    <span class="text-[10px] text-slate-400 font-medium">${subLabel}</span>
+                    <input type="text" name="${idKolom}" value="${nilaiLama}" class="w-full mt-1 p-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 shadow-inner">
+                </div>
+            `;
+        }
+
+        function tutupPopupEdit() {
+            document.getElementById('popupModalEdit').classList.add('hidden');
+        }
+
+        // =========================================================================
+        // LOGIKA AJAX POST: MENGIRIM DATA BARU KE GOOGLE SHEETS
+        // =========================================================================
+        async function eksekusiSimpanData() {
+            const form = document.getElementById('formDinamis');
+            const tipe = form.getAttribute('data-tipe');
+            const btnSimpan = document.getElementById('btnSimpan');
+            
+            // Kumpulkan seluruh data dari elemen input form menjadi objek JSON tunggal
+            const formData = new FormData(form);
+            const payload = {};
+            formData.forEach((value, key) => {
+                payload[key] = value;
+            });
+
+            // Berikan indikasi efek loading pada tombol simpan biru
+            btnSimpan.disabled = true;
+            btnSimpan.innerHTML = `<span>⏳</span> <span>Memproses...</span>`;
+
+            try {
+                const respon = await fetch(API_SHEET_URL, {
+                    method: "POST",
+                    mode: "no-cors", // Mode no-cors wajib digunakan untuk request POST ke Google Apps Script
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ tipe: tipe, payload: payload })
+                });
+
+                // Karena menggunakan mode 'no-cors', kita tidak bisa membaca isi JSON respons, 
+                // namun jika tidak terjadi error pelemparan, operasi dianggap sukses.
+                alert("Data berhasil dikirim ke Google Sheets! Halaman akan otomatis dimuat ulang untuk sinkronisasi.");
+                tutupPopupEdit();
+                document.getElementById('mainContent').classList.add('hidden');
+                document.getElementById('loadingState').classList.remove('hidden');
+                
+                // Muat ulang data terbaru secara instan
+                await ambilDataIdentitas();
+
+            } catch (error) {
+                console.error(error);
+                alert("Gagal melakukan penyimpanan data: " + error.message);
+            } finally {
+                // Kembalikan kondisi tombol simpan biru ke sediakala
+                btnSimpan.disabled = false;
+                btnSimpan.innerHTML = `<span>💾</span> <span>Simpan</span>`;
+            }
+        }
+
         window.onload = ambilDataIdentitas;
     </script>
 </body>
