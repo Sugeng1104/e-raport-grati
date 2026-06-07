@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Siswa - UPT SDN Ranuklindungan I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen text-slate-800">
+
+    <header class="bg-[#1e6ca8] text-white p-4 shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">👨‍🎓</span>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">Data Induk Peserta Didik</h1>
+                    <p class="text-xs text-blue-100">UPT SDN Ranuklindungan I</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <a href="identitas-sekolah.html" class="bg-white/10 hover:bg-white/20 text-white font-medium px-4 py-2 rounded-xl transition text-sm flex items-center space-x-1 border border-white/10">
+                    <span>🏛️</span> <span>Identitas Sekolah</span>
+                </a>
+                <a href="index.html" class="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-xl transition text-sm flex items-center space-x-1">
+                    <span>⬅️</span> <span>Hub Utama</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-6">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl text-xl">👥</div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Total Siswa Terdata</p>
+                    <p class="text-2xl font-extrabold text-slate-800" id="statTotal">-</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-xl">👦</div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Siswa Laki-Laki</p>
+                    <p class="text-2xl font-extrabold text-slate-800" id="statLaki">-</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="p-3 bg-pink-50 text-pink-600 rounded-xl text-xl">👧</div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Siswa Perempuan</p>
+                    <p class="text-2xl font-extrabold text-slate-800" id="statPerempuan">-</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
+            <div class="relative w-full md:max-w-md">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
+                <input type="text" id="pencarianSiswa" onkeyup="filterCariSiswa()" placeholder="Cari nama siswa, NIS, atau NISN..." class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+            </div>
+            <div class="text-xs text-slate-400 font-medium w-full md:w-auto text-center md:text-right">
+                *Klik pada baris nama siswa untuk melihat biodata & data orang tua lengkap.
+            </div>
+        </div>
+
+        <div id="loadingState" class="text-center py-12 bg-white rounded-2xl shadow-sm border border-slate-200">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent mb-2"></div>
+            <p class="text-slate-500 font-medium">Sinkronisasi data Excel `data_siswa` secara real-time...</p>
+        </div>
+
+        <div id="mainContent" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 uppercase tracking-wider text-xs">
+                            <th class="p-4 w-20 text-center">Absen</th>
+                            <th class="p-4 w-32">NIS / NISN</th>
+                            <th class="p-4">Nama Lengkap Siswa</th>
+                            <th class="p-4 w-24 text-center">JK</th>
+                            <th class="p-4">Tempat, Tanggal Lahir</th>
+                            <th class="p-4 w-28 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelSiswa" class="divide-y divide-slate-100 font-medium text-slate-700">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="modalDetailSiswa" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-6 border-b bg-gradient-to-r from-blue-600 to-[#1e6ca8] text-white rounded-t-3xl relative">
+                <button onclick="tutupModalDetail()" class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 h-9 w-9 flex items-center justify-center text-xl transition font-bold">&times;</button>
+                <p class="text-xs font-bold uppercase tracking-widest text-blue-200 mb-1" id="mdlAbsen">No. Absen --</p>
+                <h2 id="mdlNama" class="font-extrabold text-xl tracking-wide uppercase">NAMA SISWA</h2>
+                <p class="text-xs text-blue-100 mt-1" id="mdlIdentitas">NIS: - | NISN: -</p>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-6 text-sm">
+                <div>
+                    <h3 class="text-xs font-bold text-blue-600 uppercase tracking-wider border-b pb-1.5 mb-3">📌 Data Pribadi & Fisik</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Jenis Kelamin</p>
+                            <p class="font-semibold text-slate-700 mt-0.5" id="mdlJk">-</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Tempat, Tanggal Lahir</p>
+                            <p class="font-semibold text-slate-700 mt-0.5" id="mdlTTL">-</p>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Alamat Rumah</p>
+                            <p class="font-semibold text-slate-700 mt-0.5" id="mdlAlamat">-</p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 sm:col-span-2 pt-2 border-t border-slate-200/60">
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Berat Badan</p>
+                                <p class="font-bold text-slate-700" id="mdlBB">-</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Tinggi Badan</p>
+                                <p class="font-bold text-slate-700" id="mdlTB">-</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Lingkar Kepala</p>
+                                <p class="font-bold text-slate-700" id="mdlLK">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-bold text-emerald-600 uppercase tracking-wider border-b pb-1.5 mb-3">👨‍👩‍👦 Data Orang Tua / Wali</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Nama Bapak / Ayah</p>
+                            <p class="font-bold text-slate-700 mt-0.5" id="mdlAyah">-</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Pekerjaan Bapak</p>
+                            <p class="font-semibold text-slate-600 mt-0.5" id="mdlKerjaAyah">-</p>
+                        </div>
+                        <div class="pt-2 border-t border-slate-200/60">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Nama Ibu</p>
+                            <p class="font-bold text-slate-700 mt-0.5" id="mdlIbu">-</p>
+                        </div>
+                        <div class="pt-2 border-t border-slate-200/60">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Pekerjaan Ibu</p>
+                            <p class="font-semibold text-slate-600 mt-0.5" id="mdlKerjaIbu">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t bg-slate-50 rounded-b-3xl flex justify-end">
+                <button type="button" onclick="tutupModalDetail()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow transition text-xs">Tutup Biodata</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+        let ARRAY_SISWA_CACHE = [];
+
+        async function muatDataSiswa() {
+            try {
+                const respon = await fetch(`${API_SHEET_URL}?action=getDataSiswa`, {
+                    method: "GET",
+                    mode: "cors",
+                    redirect: "follow"
+                });
+                const json = await respon.json();
+                
+                if (json.status !== "SUCCESS") throw new Error(json.message);
+                
+                ARRAY_SISWA_CACHE = json.data;
+                
+                // Hitung & Pasang Statistik Atas
+                document.getElementById('statTotal').innerText = json.total + " Siswa";
+                const cowok = ARRAY_SISWA_CACHE.filter(s => s.jk === "L" || s.jk === "Laki-laki").length;
+                const cewek = ARRAY_SISWA_CACHE.filter(s => s.jk === "P" || s.jk === "Perempuan").length;
+                document.getElementById('statLaki').innerText = cowok + " Anak";
+                document.getElementById('statPerempuan').innerText = cewek + " Anak";
+
+                // Render Baris Tabel
+                renderTabelSiswa(ARRAY_SISWA_CACHE);
+
+                // Hilangkan Loading
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loadingState').innerHTML = `
+                    <div class="p-4 text-red-600 bg-red-50 rounded-xl border border-red-200 inline-block text-left max-w-md">
+                        <p class="font-bold">⚠️ Sinkronisasi Gagal</p>
+                        <p class="text-xs text-slate-500 mt-1">Detail Masalah: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderTabelSiswa(dataArray) {
+            const tbody = document.getElementById('tabelSiswa');
+            tbody.innerHTML = "";
+            
+            if (dataArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Tidak ada data siswa yang cocok dengan pencarian.</td></tr>`;
+                return;
+            }
+
+            dataArray.forEach((siswa, index) => {
+                const badgeJk = (siswa.jk === "L" || siswa.jk === "Laki-laki") 
+                    ? `<span class="bg-blue-50 text-blue-600 text-[11px] font-bold px-2 py-0.5 rounded-md border border-blue-100">L</span>`
+                    : `<span class="bg-pink-50 text-pink-600 text-[11px] font-bold px-2 py-0.5 rounded-md border border-pink-100">P</span>`;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/80 transition cursor-pointer" onclick="bukaModalDetail(${index})">
+                        <td class="p-4 text-center font-bold text-slate-400 bg-slate-50/30">${siswa.no_absen}</td>
+                        <td class="p-4 font-mono text-xs text-slate-500">
+                            <div>${siswa.nis}</div>
+                            <div class="text-[10px] text-slate-400 mt-0.5">${siswa.nisn}</div>
+                        </td>
+                        <td class="p-4 font-bold text-slate-900 tracking-wide">${siswa.nama}</td>
+                        <td class="p-4 text-center">${badgeJk}</td>
+                        <td class="p-4 text-xs text-slate-500">${siswa.tempat_lahir}, ${siswa.tanggal_lahir}</td>
+                        <td class="p-4 text-center" onclick="event.stopPropagation();">
+                            <button onclick="bukaModalDetail(${index})" class="bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-600 text-xs font-bold px-3 py-1.5 rounded-lg transition shadow-sm border border-slate-200/60">
+                                Lihat Detail
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // FUNGSI PENCARIAN LIVE FILTERING (Sangat Cepat karena Client-Side)
+        function filterCariSiswa() {
+            const keyword = document.getElementById('pencarianSiswa').value.toLowerCase();
+            const hasilFilter = ARRAY_SISWA_CACHE.filter(siswa => {
+                return siswa.nama.toLowerCase().includes(keyword) || 
+                       siswa.nis.includes(keyword) || 
+                       siswa.nisn.includes(keyword);
+            });
+            renderTabelSiswa(hasilFilter);
+        }
+
+        // BUKA POP-UP BIODATA DETAIL
+        function bukaModalDetail(indeksAsli) {
+            const siswa = ARRAY_SISWA_CACHE[indeksAsli];
+            
+            document.getElementById('mdlAbsen').innerText = `No. Absen ${siswa.no_absen}`;
+            document.getElementById('mdlNama').innerText = siswa.nama;
+            document.getElementById('mdlIdentitas').innerText = `NIS: ${siswa.nis} | NISN: ${siswa.nisn}`;
+            document.getElementById('mdlJk').innerText = (siswa.jk === "L" || siswa.jk === "Laki-laki") ? "Laki-Laki" : "Perempuan";
+            document.getElementById('mdlTTL').innerText = `${siswa.tempat_lahir}, ${siswa.tanggal_lahir}`;
+            document.getElementById('mdlAlamat').innerText = siswa.alamat;
+            document.getElementById('mdlBB').innerText = siswa.bb ? `${siswa.bb} kg` : "-";
+            document.getElementById('mdlTB').innerText = siswa.tb ? `${siswa.tb} cm` : "-";
+            document.getElementById('mdlLK').innerText = siswa.lingkar_kepala ? `${siswa.lingkar_kepala} cm` : "-";
+            document.getElementById('mdlAyah').innerText = siswa.ayah;
+            document.getElementById('mdlKerjaAyah').innerText = siswa.kerja_ayah;
+            document.getElementById('mdlIbu').innerText = siswa.ibu;
+            document.getElementById('mdlKerjaIbu').innerText = siswa.kerja_ibu;
+
+            document.getElementById('modalDetailSiswa').classList.remove('hidden');
+        }
+
+        function tutupModalDetail() {
+            document.getElementById('modalDetailSiswa').classList.add('hidden');
+        }
+
+        window.onload = muatDataSiswa;
+    </script>
+</body>
+</html>
