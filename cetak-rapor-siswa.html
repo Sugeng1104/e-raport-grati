@@ -139,7 +139,7 @@
     </div>
 
     <script>
-        // PASTIKAN URL WEB APP DEPLOYMENT BARU ANDA SUDAH DITEMPEL DI SINI
+        // TEMPELKAN URL WEB APP ANDA DI SINI
         const API_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
         async function muatDataRaporSiswa() {
@@ -155,12 +155,11 @@
 
             btn.disabled = true;
             btn.innerText = "⏳ Memuat...";
-            notice.innerHTML = `<span>⏳</span> Sedang mengambil ringkasan nilai ujian harian dari server cloud...`;
+            notice.innerHTML = `<span>⏳</span> Sedang mengambil data ringkasan nilai harian dari server cloud...`;
             notice.classList.remove('hidden');
             raporArea.classList.add('hidden');
 
             try {
-                // Menyertakan parameter action secara eksplisit sebagai pelindung ganda browser
                 const response = await fetch(`${API_URL}?action=read&no_absen=${noAbsen}`);
                 const data = await response.json();
 
@@ -198,7 +197,7 @@
             } catch (err) {
                 console.error(err);
                 notice.innerHTML = `❌ <span class="text-red-500 font-bold">Koneksi diblokir. Pastikan Web App dideploy dengan benar dan jalankan di Tab Penyamaran (Incognito).</span>`;
-            } final {
+            } finally {
                 btn.disabled = false;
                 btn.innerText = "🔍 Cari Data";
             }
