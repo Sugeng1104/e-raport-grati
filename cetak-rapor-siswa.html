@@ -21,7 +21,7 @@
         <div class="flex items-center space-x-3">
             <a href="data-kompetensi-siswa.html" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm transition">⬅️ Kembali</a>
             <div>
-                <h1 class="font-bold text-sm text-slate-900">Modul Cetak Rapor Digital</h1>
+                <h1 class="font-bold text-sm text-slate-900">Modul Cetak Rapor Digital (Bypass Action)</h1>
                 <p class="text-[11px] text-slate-500">UPT SDN Ranuklindungan I - Pasuruan</p>
             </div>
         </div>
@@ -139,7 +139,7 @@
     </div>
 
     <script>
-        // TEMPELKAN URL WEB APP ANDA DI SINI
+        // PENTING: PASTIKAN INI ADALAH URL MACROS DARI SPREADSHEET "Nilai_ASAS_Smt2"
         const API_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
         async function muatDataRaporSiswa() {
@@ -155,13 +155,25 @@
 
             btn.disabled = true;
             btn.innerText = "⏳ Memuat...";
-            notice.innerHTML = `<span>⏳</span> Sedang mengambil data ringkasan nilai harian dari server cloud...`;
+            notice.innerHTML = `<span>⏳</span> Membuka jalur data tanpa parameter filter...`;
             notice.classList.remove('hidden');
             raporArea.classList.add('hidden');
 
             try {
-                const response = await fetch(`${API_URL}?action=read&no_absen=${noAbsen}`);
-                const data = await response.json();
+                // KITA SAMA SEKALI TIDAK MENGIRIM PARAMETER ACTION AGAR TIDAK MEMANCING EROR
+                const response = await fetch(`${API_URL}?no_absen=${noAbsen}`);
+                
+                // Ambil respons dalam bentuk teks mentah terlebih dahulu untuk investigasi jika gagal
+                const rawText = await response.text();
+                
+                // Coba ubah teks menjadi objek JSON
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch(jsonErr) {
+                    // Jika yang kembali bukan JSON (melainkan teks eror "Aksi tidak dikenali")
+                    throw new Error(`Server mengembalikan teks non-JSON: "${rawText}"`);
+                }
 
                 if (data.status === "SUCCESS") {
                     document.getElementById('txtNamaSekolah').innerText = data.sekolah.namaSekolah;
@@ -196,7 +208,14 @@
                 }
             } catch (err) {
                 console.error(err);
-                notice.innerHTML = `❌ <span class="text-red-500 font-bold">Koneksi diblokir. Pastikan Web App dideploy dengan benar dan jalankan di Tab Penyamaran (Incognito).</span>`;
+                // Menampilkan debug pesan asli yang dikeluarkan oleh server secara transparan
+                notice.innerHTML = `
+                    <div class="text-left bg-red-50 p-4 rounded-xl border border-red-200 text-xs text-red-700">
+                        <p class="font-bold mb-1">🚨 Terjadi Hambatan Sinkronisasi:</p>
+                        <p class="italic mb-2">${err.message}</p>
+                        <p class="text-[10px] text-slate-500 font-normal">Solusi: Pastikan URL di kode HTML adalah URL Spreadsheet Nilai, lakukan Deploy Ulang sebagai 'New Version', dan jalankan halaman ini di Jendela Penyamaran (Incognito).</p>
+                    </div>
+                `;
             } finally {
                 btn.disabled = false;
                 btn.innerText = "🔍 Cari Data";
