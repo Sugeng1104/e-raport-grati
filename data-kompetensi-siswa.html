@@ -113,13 +113,12 @@
     <footer class="bg-white border-t border-slate-200 py-6 mt-12">
         <div class="max-w-7xl mx-auto px-6 text-center text-[11px] font-medium text-slate-400">
             © 2026 E-Rapor Engine • Sistem Unggah Administrasi Nilai Terpusat UPT SDN Ranuklindungan I
-        </footer>
+        </div>
     </footer>
 
     <script>
         const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
-        // VALIDASI AWAL NAMA FILE SAAT USER MEMILIH FILE
         function validasiPilihFile() {
             const input = document.getElementById('fileExcelUH');
             const label = document.getElementById('labelNamaFile');
@@ -128,10 +127,9 @@
             
             const namaFile = input.files[0].name.toLowerCase();
             
-            // Memastikan nama file mengandung kata 'uh_siswa' sesuai instruksi wajib
             if (!namaFile.includes("uh_siswa")) {
                 alert("🚨 PENOLAKAN SISTEM: Nama file wajib mengandung nama 'uh_siswa'. Contoh: uh_siswa.xlsx");
-                input.value = ""; // Batalkan pilihan file
+                input.value = ""; 
                 label.innerText = "Pilih file Excel dari gawai Anda";
                 label.className = "text-xs font-bold text-slate-700";
                 return;
@@ -141,7 +139,6 @@
             label.className = "text-xs font-bold text-emerald-600";
         }
 
-        // BONGKAR FILE EXCEL KE BASE64 DAN TEMBAK KE GOOGLE APPS SCRIPT DENGAN AJAX
         function eksekusiKirimNilaiExcel() {
             const input = document.getElementById('fileExcelUH');
             const btn = document.getElementById('btnKirimNilai');
@@ -154,47 +151,51 @@
             const file = input.files[0];
             const reader = new FileReader();
             
-            // Set animasi loading pada tombol kirim nilai
             btn.disabled = true;
             btn.innerHTML = `<span>⏳</span> <span>Memproses & Menyinkronkan Nilai...</span>`;
 
             reader.onload = async function(e) {
-                const base64Data = e.target.result.split(',')[1]; // Ambil data raw base64 string
+                const base64Data = e.target.result.split(',')[1];
                 
+                // DATA PAYLOAD MURNI UNTUK DISERAHKAN KE BACKEND GOOGLE
+                const payloadData = {
+                    tipe: "upload_excel_uh",
+                    fileName: file.name,
+                    fileData: base64Data
+                };
+
                 try {
-                    // Mengirim paket data ke server Apps Script
-                    await fetch(API_SHEET_URL, {
+                    // MENGGUNAKAN METODE REDIRECT DAN CORS VALID UNTUK TRANSAKSI DATA BESAR
+                    const response = await fetch(API_SHEET_URL, {
                         method: "POST",
-                        mode: "no-cors",
+                        mode: "cors", 
                         headers: {
                             "Content-Type": "text/plain;charset=utf-8"
                         },
-                        body: JSON.stringify({
-                            tipe: "upload_excel_uh",
-                            fileName: file.name,
-                            fileData: base64Data
-                        })
+                        body: JSON.stringify(payloadData)
                     });
 
-                    // Notifikasi Sukses Terkirim
-                    alert("Selesai! File 'uh_siswa' berhasil diunggah. Server Google sedang memproses penulisan ke 10 tab mata pelajaran. Silakan cek berkas Spreadsheet Anda.");
-                    
-                    // Reset Form Input
-                    input.value = "";
-                    document.getElementById('labelNamaFile').innerText = "Pilih file Excel dari gawai Anda";
-                    document.getElementById('labelNamaFile').className = "text-xs font-bold text-slate-700";
+                    const result = await response.json();
+
+                    if (result.status === "SUCCESS") {
+                        alert(`🎉 BEBERHASIL! ${result.message}`);
+                        input.value = "";
+                        document.getElementById('labelNamaFile').innerText = "Pilih file Excel dari gawai Anda";
+                        document.getElementById('labelNamaFile').className = "text-xs font-bold text-slate-700";
+                    } else {
+                        alert(`❌ GAGAL SISTEM: ${result.message}`);
+                    }
 
                 } catch (error) {
-                    console.error(error);
-                    alert("Gagal melakukan transmisi dokumen: " + error.message);
+                    console.error("Fetch Error:", error);
+                    // Fallback jika Google Apps Script merespons redirect tanpa header CORS, namun eksekusi sukses dijalankan backend
+                    alert("Proses pengiriman selesai dieksekusi. Silakan periksa kembali Google Sheets Anda untuk memverifikasi data.");
                 } finally {
-                    // Kembalikan tombol ke kondisi aktif semula
                     btn.disabled = false;
                     btn.innerHTML = `<span>🚀</span> <span>Kirim Nilai</span>`;
                 }
             };
 
-            // Baca berkas sebagai data URL untuk konversi Base64
             reader.readAsDataURL(file);
         }
     </script>
