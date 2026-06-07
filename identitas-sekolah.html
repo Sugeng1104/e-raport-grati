@@ -12,10 +12,10 @@
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-3">
                 <span class="text-2xl">🏛️</span>
-                <h1 class="text-xl font-bold tracking-wide" id="headerNamaSekolah">UPT SDN Ranuklindungan I</h1>
+                <h1 class="text-xl font-bold tracking-wide" id="headerNamaSekolah">Memuat Data...</h1>
             </div>
             <a href="index.html" class="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg transition text-sm flex items-center space-x-1">
-                <span>⬅️</span> <span>Kembali ke Hub</span>
+                <span>⬅️</span> <span>Kembali ke Hub Utama</span>
             </a>
         </div>
     </header>
@@ -24,7 +24,7 @@
         
         <div id="loadingState" class="text-center py-12 bg-white rounded-2xl shadow-sm border border-slate-200">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent mb-2"></div>
-            <p class="text-slate-500 font-medium">Sinkronisasi data langsung dari Google Sheets...</p>
+            <p class="text-slate-500 font-medium">Menarik data dari Google Sheets Anda secara Real-time...</p>
         </div>
 
         <div id="mainContent" class="grid grid-cols-1 lg:grid-cols-12 gap-6 hidden">
@@ -32,7 +32,7 @@
             <section class="lg:col-span-7 space-y-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 border-b pb-3 mb-4 flex items-center space-x-2">
-                        <span>ℹ️</span> <span>Profil & Legalitas Sekolah</span>
+                        <span class="text-blue-500">🏛️</span> <span>Profil & Legalitas Sekolah</span>
                     </h2>
                     <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm" id="dataProfil">
                         </dl>
@@ -40,7 +40,7 @@
 
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 border-b pb-3 mb-4 flex items-center space-x-2">
-                        <span>👥</span> <span>Manajemen & Tahun Pelajaran</span>
+                        <span class="text-emerald-500">👥</span> <span>Manajemen Personalia & Tahun Ajaran</span>
                     </h2>
                     <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm" id="dataPersonalia">
                         </dl>
@@ -50,7 +50,7 @@
             <section class="lg:col-span-5 space-y-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 border-b pb-3 mb-3 flex items-center space-x-2">
-                        <span>📚</span> <span>Kurikulum: Mata Pelajaran</span>
+                        <span class="text-indigo-500">📚</span> <span>Daftar Mata Pelajaran</span>
                     </h2>
                     <div class="overflow-hidden border border-slate-200 rounded-xl">
                         <table class="w-full text-left border-collapse text-sm">
@@ -68,14 +68,14 @@
 
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 border-b pb-3 mb-3 flex items-center space-x-2">
-                        <span>🏅</span> <span>Kegiatan Ekstrakurikuler</span>
+                        <span class="text-amber-500">🏅</span> <span>Kegiatan Ekstrakurikuler</span>
                     </h2>
                     <div class="overflow-hidden border border-slate-200 rounded-xl">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
                                     <th class="p-3 w-16 text-center">ID</th>
-                                    <th class="p-3">Nama Ekstrakurikuler</th>
+                                    <th class="p-3">Ekstrakurikuler</th>
                                 </tr>
                             </thead>
                             <tbody id="tabelEkskul" class="divide-y divide-slate-100">
@@ -89,102 +89,101 @@
     </main>
 
     <script>
-        // Masukkan URL Google Apps Script Web App Anda di sini
+        // Memakai URL Web App Apps Script milik Anda secara presisi
         const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
-        // Fungsi bantu membuat baris deskripsi data (Key-Value)
-        function buatRowInfo(label, value) {
+        function cetakBarisInfo(label, value) {
             if (!value) return '';
             return `
-                <div class="py-2 border-b border-slate-100 md:border-none">
-                    <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">${label}</dt>
-                    <dd class="text-sm font-medium text-slate-800 mt-0.5">${value}</dd>
+                <div class="py-2 border-b border-slate-100">
+                    <dt class="text-xs font-bold text-slate-400 uppercase tracking-wide">${label}</dt>
+                    <dd class="text-sm font-semibold text-slate-700 mt-0.5">${value}</dd>
                 </div>
             `;
         }
 
-        async function muatDataIdentitas() {
+        async function ambilDataIdentitas() {
             try {
-                // Fetch data dari Google Apps Script yang mengembalikan seluruh baris sheet 'identitas_sekolah'
                 const respon = await fetch(`${API_SHEET_URL}?action=getIdentitas`);
                 const json = await respon.json();
                 
                 if (json.status !== "SUCCESS") throw new Error(json.message);
                 
-                const rows = json.data; // Mengasumsikan respons berupa array 2 dimensi dari sheet
+                const rows = json.data;
 
-                // 1. PROSES KELOMPOK DOKUMEN: IDENTITAS & PERSONALIA (Kolom A & B)
                 let htmlProfil = "";
                 let htmlPersonalia = "";
+                let htmlMapel = "";
+                let htmlEkskul = "";
                 
-                rows.forEach(row => {
+                // Urutan filter grup Profil Sekolah
+                const grupProfil = ["Nama Sekolah", "NPSN", "NSS", "Alamat Sekolah", "Kode Pos", "Desa / Kelurahan", "Kecamatan", "Kabupaten", "Provinsi", "Website", "E-mail"];
+
+                rows.forEach((row, indeks) => {
+                    // Parsir Kolom A & B (Identitas & Personalia)
                     const key = row[0] ? row[0].toString().trim() : "";
                     const val = row[1] ? row[1].toString().trim() : "";
                     
-                    if (key && val) {
-                        // Pilah grup agar UI terstruktur rapi
-                        if (["Nama Sekolah", "NPSN", "NSS", "Alamat Sekolah", "Kode Pos", "Desa / Kelurahan", "Kecamatan", "Kabupaten", "Provinsi", "Website", "E-mail"].includes(key)) {
-                            htmlProfil += buatRowInfo(key, val);
+                    if (key && key !== "identitas") {
+                        if (grupProfil.includes(key)) {
+                            htmlProfil += cetakBarisInfo(key, val);
                             if (key === "Nama Sekolah") {
                                 document.getElementById('headerNamaSekolah').innerText = val;
                             }
-                        } else {
-                            htmlPersonalia += buatRowInfo(key, val);
+                        } else if(key !== "isi_identitas") {
+                            htmlPersonalia += cetakBarisInfo(key, val);
+                        }
+                    }
+
+                    // Parsir Kolom C & D (Mata Pelajaran) - Lewati baris judul header spreadsheet
+                    if(indeks > 0) {
+                        const noMapel = row[2] ? row[2].toString().trim() : "";
+                        const namaMapel = row[3] ? row[3].toString().trim() : "";
+                        if (noMapel || namaMapel) {
+                            htmlMapel += `
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-3 text-center font-bold text-blue-500 bg-slate-50/50">${noMapel}</td>
+                                    <td class="p-3 font-medium text-slate-700">${namaMapel}</td>
+                                </tr>
+                            `;
+                        }
+
+                        // Parsir Kolom E & F (Ekstrakurikuler)
+                        const idEks = row[4] ? row[4].toString().trim() : "";
+                        const namaEks = row[5] ? row[5].toString().trim() : "";
+                        if (idEks || namaEks) {
+                            htmlEkskul += `
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-3 text-center font-bold text-amber-500 bg-slate-50/50">${idEks}</td>
+                                    <td class="p-3 font-medium text-slate-700">${namaEks}</td>
+                                </tr>
+                            `;
                         }
                     }
                 });
+
+                // Terapkan HTML yang sudah siap pakai ke komponen DOM
                 document.getElementById('dataProfil').innerHTML = htmlProfil;
                 document.getElementById('dataPersonalia').innerHTML = htmlPersonalia;
-
-                // 2. PROSES KELOMPOK DOKUMEN: MATA PELAJARAN (Kolom C & D)
-                let htmlMapel = "";
-                rows.forEach((row, indeks) => {
-                    if (indeks === 0) return; // Lewati header tabel spreadsheet
-                    const noMapel = row[2] ? row[2].toString().trim() : "";
-                    const namaMapel = row[3] ? row[3].toString().trim() : "";
-                    if (noMapel || namaMapel) {
-                        htmlMapel += `
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="p-3 text-center font-bold text-slate-400">${noMapel}</td>
-                                <td class="p-3 font-semibold text-slate-700">${namaMapel}</td>
-                            </tr>
-                        `;
-                    }
-                });
                 document.getElementById('tabelMapel').innerHTML = htmlMapel;
-
-                // 3. PROSES KELOMPOK DOKUMEN: EKSTRAKURIKULER (Kolom E & F)
-                let htmlEkskul = "";
-                rows.forEach((row, indeks) => {
-                    if (indeks === 0) return; // Lewati header tabel
-                    const idEks = row[4] ? row[4].toString().trim() : "";
-                    const namaEks = row[5] ? row[5].toString().trim() : "";
-                    if (idEks || namaEks) {
-                        htmlEkskul += `
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="p-3 text-center font-bold text-slate-400">${idEks}</td>
-                                <td class="p-3 font-semibold text-slate-700">${namaEks}</td>
-                            </tr>
-                        `;
-                    }
-                });
                 document.getElementById('tabelEkskul').innerHTML = htmlEkskul;
 
-                // Modifikasi State UI
+                // Transisi Loading State
                 document.getElementById('loadingState').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
 
-            } catch ( error ) {
+            } catch (error) {
                 console.error(error);
                 document.getElementById('loadingState').innerHTML = `
-                    <p class="text-red-500 font-bold">⚠️ Gagal Memuat Data</p>
-                    <p class="text-xs text-slate-400 mt-1">Pastikan URL Apps Script benar dan izin akses diatur ke 'Anyone'.</p>
+                    <div class="p-4 text-red-600 bg-red-50 rounded-xl border border-red-200 inline-block">
+                        <p class="font-bold">⚠️ Sinkronisasi Gagal</p>
+                        <p class="text-xs text-slate-500 mt-1">Periksa kembali koneksi spreadsheet atau konfigurasi rilis Apps Script Anda.</p>
+                    </div>
                 `;
             }
         }
 
-        // Jalankan fungsi otomatis saat halaman dimuat
-        window.onload = muatDataIdentitas;
+        window.onload = ambilDataIdentitas;
     </script>
 </body>
 </html>
