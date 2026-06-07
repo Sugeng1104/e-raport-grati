@@ -34,16 +34,14 @@
                     <h2 class="text-lg font-bold text-slate-900 border-b pb-3 mb-4 flex items-center space-x-2">
                         <span class="text-blue-500">🏛️</span> <span>Profil & Legalitas Sekolah</span>
                     </h2>
-                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm" id="dataProfil">
-                        </dl>
+                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm" id="dataProfil"></dl>
                 </div>
 
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 border-b pb-3 mb-4 flex items-center space-x-2">
                         <span class="text-emerald-500">👥</span> <span>Manajemen Personalia & Tahun Ajaran</span>
                     </h2>
-                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm" id="dataPersonalia">
-                        </dl>
+                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm" id="dataPersonalia"></dl>
                 </div>
             </section>
 
@@ -60,8 +58,7 @@
                                     <th class="p-3">Nama Mata Pelajaran</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabelMapel" class="divide-y divide-slate-100">
-                                </tbody>
+                            <tbody id="tabelMapel" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
@@ -78,8 +75,7 @@
                                     <th class="p-3">Ekstrakurikuler</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabelEkskul" class="divide-y divide-slate-100">
-                                </tbody>
+                            <tbody id="tabelEkskul" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
@@ -89,9 +85,13 @@
     </main>
 
     <script>
-        // Memakai URL Web App Apps Script milik Anda secara presisi
+        // =========================================================================
+        // [TANDA KUNCI 1]: ENDPOINT API WEB APP GOOGLE APPS SCRIPT ANDA
+        // =========================================================================
         const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
+        // Fungsi bantu untuk merender baris kartu informasi
+        // (SUDAH DISINKRONKAN: Menggunakan nama cetakBarisInfo konsisten)
         function cetakBarisInfo(label, value) {
             if (!value) return '';
             return `
@@ -104,11 +104,13 @@
 
         async function ambilDataIdentitas() {
             try {
-                // TAMBAHAN ARSITEKTUR: Menggunakan mode 'cors' dan mengizinkan 'follow' redirect dari Google
+                // =========================================================================
+                // [TANDA KUNCI 2]: PIPELINE ANTI-CORS & ANTI-REDIRECT DARI GOOGLE
+                // =========================================================================
                 const respon = await fetch(`${API_SHEET_URL}?action=getIdentitas`, {
                     method: "GET",
                     mode: "cors",
-                    redirect: "follow" // <--- Ini kunci utama agar data dari Google mau mengalir ke GitHub!
+                    redirect: "follow" 
                 });
                 
                 const json = await respon.json();
@@ -117,32 +119,39 @@
                     throw new Error(json.message);
                 }
                 
-                // 1. Render Profil & Legalitas (Kolom Kiri Atas)
+                // =========================================================================
+                // [TANDA KUNCI 3]: PROSES FILTER & RENDER KELOMPOK PROFIL SEKOLAH (KOLOM A-B)
+                // =========================================================================
                 let htmlProfil = "";
                 const listGrupProfil = ["Nama Sekolah", "NPSN", "NSS", "Alamat Sekolah", "Kode Pos", "Desa / Kelurahan", "Kecamatan", "Kabupaten", "Provinsi", "Website", "E-mail"];
+                
                 listGrupProfil.forEach(key => {
                     if (json.profil[key]) {
-                        htmlProfil += generateRow(key, json.profil[key]);
+                        // Perbaikan Bug: Memanggil cetakBarisInfo secara tepat
+                        htmlProfil += cetakBarisInfo(key, json.profil[key]);
                     }
                 });
                 document.getElementById('dataProfil').innerHTML = htmlProfil;
                 
-                // Set nama sekolah di navbar secara dinamis
+                // Sinkronisasi Nama Sekolah ke Navbar Atas
                 if(json.profil["Nama Sekolah"]) {
                     document.getElementById('headerNamaSekolah').innerText = json.profil["Nama Sekolah"];
                 }
 
-                // 2. Render Waktu & Personalia (Kolom Kiri Bawah)
+                // =========================================================================
+                // [TANDA KUNCI 4]: PROSES FILTER & RENDER KELOMPOK PERSONALIA (KOLOM A-B)
+                // =========================================================================
                 let htmlPersonalia = "";
-                // Kita ambil semua key yang ada di json.profil namun tidak termasuk dalam grup profil utama
                 Object.keys(json.profil).forEach(key => {
                     if (!listGrupProfil.includes(key)) {
-                        htmlPersonalia += generateRow(key, json.profil[key]);
+                        htmlPersonalia += cetakBarisInfo(key, json.profil[key]);
                     }
                 });
                 document.getElementById('dataPersonalia').innerHTML = htmlPersonalia;
 
-                // 3. Render Tabel Mata Pelajaran (Kolom Kanan Atas)
+                // =========================================================================
+                // [TANDA KUNCI 5]: PROSES LOOPING & RENDER TABEL MATA PELAJARAN (KOLOM C-D)
+                // =========================================================================
                 let htmlMapel = "";
                 json.mapel.forEach(item => {
                     htmlMapel += `
@@ -154,7 +163,9 @@
                 });
                 document.getElementById('tabelMapel').innerHTML = htmlMapel;
 
-                // 4. Render Tabel Ekstrakurikuler (Kolom Kanan Bawah)
+                // =========================================================================
+                // [TANDA KUNCI 6]: PROSES LOOPING & RENDER TABEL EKSTRAKURIKULER (KOLOM E-F)
+                // =========================================================================
                 let htmlEkskul = "";
                 json.ekskul.forEach(item => {
                     htmlEkskul += `
@@ -166,7 +177,7 @@
                 });
                 document.getElementById('tabelEkskul').innerHTML = htmlEkskul;
 
-                // Sembunyikan loading, tampilkan dashboard utama identitas
+                // STATUS TRANSISI UI (Sembunyikan loading spinner, munculkan data)
                 document.getElementById('loadingState').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
 
@@ -181,6 +192,8 @@
                 `;
             }
         }
+
+        // Jalankan sinkronisasi sesaat setelah seluruh dokumen HTML termuat sempurna
         window.onload = ambilDataIdentitas;
     </script>
 </body>
