@@ -6,7 +6,6 @@
     <title>Cetak Rapor Murid - UPT SDN Ranuklindungan I</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Pengaturan Layout Optimal Saat Dicetak Menjadi Kertas / PDF */
         @media print {
             .no-print { display: none !important; }
             body { background-color: #ffffff; color: #000000; font-size: 12px; padding: 0; }
@@ -22,8 +21,8 @@
         <div class="flex items-center space-x-3">
             <a href="data-kompetensi-siswa.html" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm transition">⬅️ Kembali</a>
             <div>
-                <h1 class="font-bold text-sm text-slate-900">Modul Cetak Rapor Digital v2.0</h1>
-                <p class="text-[11px] text-slate-500">Kalkulasi Otomatis dari 10 Tab Nilai Mata Pelajaran</p>
+                <h1 class="font-bold text-sm text-slate-900">Modul Cetak Rapor Digital</h1>
+                <p class="text-[11px] text-slate-500">UPT SDN Ranuklindungan I - Pasuruan</p>
             </div>
         </div>
         <div class="flex items-center space-x-2 w-full sm:w-auto">
@@ -82,7 +81,6 @@
             <tbody class="divide-y divide-black">
                 <tr><td class="border-r border-black p-2 text-center">1</td><td class="border-r border-black p-2 font-medium">Pramuka (Wajib)</td><td class="p-2">Melaksanakan kegiatan kepramukaan semester 2 dengan sangat baik, disiplin, dan aktif.</td></tr>
                 <tr><td class="border-r border-black p-2 text-center">2</td><td class="border-r border-black p-2 font-medium">Keagamaan / Baca Tulis Al-Qur'an (BTQ)</td><td class="p-2">Menunjukkan perkembangan nilai religiusitas yang baik dalam tartil bacaan ayat pendek.</td></tr>
-                <tr><td class="border-r border-black p-2 text-center">3</td><td class="border-r border-black p-2 font-medium">-</td><td class="p-2">-</td></tr>
             </tbody>
         </table>
 
@@ -134,7 +132,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <div id="statusNotice" class="max-w-4xl mx-auto bg-white border rounded-2xl p-12 text-center text-slate-400 font-medium text-sm shadow-sm no-print">
@@ -142,7 +139,7 @@
     </div>
 
     <script>
-        // TEMPELKAN URL WEB APP ANDA YANG BARU DI SINI
+        // PASTIKAN URL WEB APP DEPLOYMENT BARU ANDA SUDAH DITEMPEL DI SINI
         const API_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
         async function muatDataRaporSiswa() {
@@ -158,17 +155,16 @@
 
             btn.disabled = true;
             btn.innerText = "⏳ Memuat...";
-            notice.innerHTML = `<span>⏳</span> Menghubungkan ke server cloud. Sedang mengompilasi nilai dari 10 tab mata pelajaran...`;
+            notice.innerHTML = `<span>⏳</span> Sedang mengambil ringkasan nilai ujian harian dari server cloud...`;
             notice.classList.remove('hidden');
             raporArea.classList.add('hidden');
 
             try {
-                // Pemanggilan data aman bebas hambatan parameter action
-                const response = await fetch(`${API_URL}?no_absen=${noAbsen}`);
+                // Menyertakan parameter action secara eksplisit sebagai pelindung ganda browser
+                const response = await fetch(`${API_URL}?action=read&no_absen=${noAbsen}`);
                 const data = await response.json();
 
                 if (data.status === "SUCCESS") {
-                    // 1. Sinkronisasi Data Judul & Profil Sekolah
                     document.getElementById('txtNamaSekolah').innerText = data.sekolah.namaSekolah;
                     document.getElementById('txtAlamatSekolah').innerText = data.sekolah.alamat;
                     document.getElementById('txtKelas').innerText = data.sekolah.kelas;
@@ -176,11 +172,9 @@
                     document.getElementById('txtSemester').innerText = data.sekolah.semester;
                     document.getElementById('txtTahunAjaran').innerText = data.sekolah.tahunAjaran;
                     
-                    // 2. Sinkronisasi Profil Murid
                     document.getElementById('txtNamaSiswa').innerText = data.siswa.nama;
                     document.getElementById('txtNisnisn').innerText = ` - / ${data.siswa.nisn}`;
 
-                    // 3. Render Baris Tabel Nilai Rapor
                     const tbodyNilai = document.getElementById('bodyTabelNilai');
                     tbodyNilai.innerHTML = "";
                     
@@ -195,7 +189,6 @@
                         tbodyNilai.appendChild(row);
                     });
 
-                    // Tampilkan kertas rapor utuh, sembunyikan loading notice
                     notice.classList.add('hidden');
                     raporArea.classList.remove('hidden');
 
@@ -203,9 +196,9 @@
                     notice.innerHTML = `❌ <span class="text-red-500 font-bold">${data.message}</span>`;
                 }
             } catch (err) {
-                console.error("Gagal menarik data rapor:", err);
-                notice.innerHTML = `❌ <span class="text-red-500 font-bold">Koneksi API terputus atau salah pasang URL Web App. Silakan periksa kembali tautan Apps Script Anda.</span>`;
-            } finally {
+                console.error(err);
+                notice.innerHTML = `❌ <span class="text-red-500 font-bold">Koneksi diblokir. Pastikan Web App dideploy dengan benar dan jalankan di Tab Penyamaran (Incognito).</span>`;
+            } final {
                 btn.disabled = false;
                 btn.innerText = "🔍 Cari Data";
             }
