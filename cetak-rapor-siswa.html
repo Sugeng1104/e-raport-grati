@@ -23,8 +23,8 @@
         <div class="flex items-center space-x-3">
             <a href="data-kompetensi-siswa.html" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm transition">⬅️ Kembali</a>
             <div>
-                <h1 class="font-bold text-sm text-slate-900">Modul Cetak Rapor Digital</h1>
-                <p class="text-[11px] text-slate-500">Masukkan No Absen untuk memuat lembar laporan hasil belajar</p>
+                <h1 class="font-bold text-sm text-slate-900">Modul Cetak Rapor Digital Dual-API</h1>
+                <p class="text-[11px] text-slate-500">Sinkronisasi otomatis dari 2 database Spreadsheet terpisah</p>
             </div>
         </div>
         <div class="flex items-center space-x-2 w-full sm:w-auto">
@@ -43,7 +43,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold mb-6">
             <div class="space-y-1">
-                <div class="flex"><span class="w-28">Nama Murid</span><span class="mr-2">:</span><span id="txtNamaSiswa" class="border-b border-dashed border-slate-400 flex-1">-</span></div>
+                <div class="flex"><span class="w-28">Nama Murid</span><span class="mr-2">:</span><span id="txtNamaSiswa" class="border-b border-dashed border-slate-400 flex-1 uppercase">-</span></div>
                 <div class="flex"><span class="w-28">NIS / NISN</span><span class="mr-2">:</span><span id="txtNisnisn" class="border-b border-dashed border-slate-400 flex-1">-</span></div>
                 <div class="flex"><span class="w-28">Sekolah</span><span class="mr-2">:</span><span id="txtNamaSekolah" class="border-b border-dashed border-slate-400 flex-1">-</span></div>
                 <div class="flex"><span class="w-28">Alamat</span><span class="mr-2">:</span><span id="txtAlamatSekolah" class="border-b border-dashed border-slate-400 flex-1">-</span></div>
@@ -80,11 +80,8 @@
                     <th class="p-2 text-left">Keterangan</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-black">
-                <tr><td class="border-r border-black p-2 text-center">1</td><td class="border-r border-black p-2">Pramuka (Wajib)</td><td class="p-2">Melaksanakan kegiatan kepramukaan semester 2 dengan sangat baik dan aktif.</td></tr>
-                <tr><td class="border-r border-black p-2 text-center">2</td><td class="border-r border-black p-2">Keagamaan / BTQ Ext</td><td class="p-2">Menunjukkan kefasihan yang baik dalam tartil bacaan.</td></tr>
-                <tr><td class="border-r border-black p-2 text-center">3</td><td class="border-r border-black p-2">-</td><td class="p-2">-</td></tr>
-            </tbody>
+            <tbody id="bodyTabelEkskul" class="divide-y divide-black">
+                </tbody>
         </table>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 text-xs mb-6">
@@ -94,16 +91,16 @@
                         <tr class="bg-slate-100 font-bold border-b border-black text-center"><th colspan="2" class="p-2">Ketidakhadiran</th></tr>
                     </thead>
                     <tbody class="divide-y divide-black">
-                        <tr><td class="p-2 font-semibold border-r border-black w-32">Sakit</td><td class="p-2 text-center">0 hari</td></tr>
-                        <tr><td class="p-2 font-semibold border-r border-black w-32">Izin</td><td class="p-2 text-center">1 hari</td></tr>
-                        <tr><td class="p-2 font-semibold border-r border-black w-32">Tanpa Keterangan</td><td class="p-2 text-center">0 hari</td></tr>
+                        <tr><td class="p-2 font-semibold border-r border-black w-32">Sakit</td><td class="p-2 text-center" id="txtSakit">0 hari</td></tr>
+                        <tr><td class="p-2 font-semibold border-r border-black w-32">Izin</td><td class="p-2 text-center" id="txtIzin">0 hari</td></tr>
+                        <tr><td class="p-2 font-semibold border-r border-black w-32">Tanpa Keterangan</td><td class="p-2 text-center" id="txtAlpa">0 hari</td></tr>
                     </tbody>
                 </table>
             </div>
             <div class="md:col-span-7 flex flex-col border border-black">
                 <div class="bg-slate-100 font-bold border-b border-black p-2 text-center">Catatan Wali Kelas</div>
                 <div class="p-3 text-justify leading-relaxed flex-1 italic bg-white" id="txtCatatanWali">
-                    "Pertahankan prestasi kognitif Anda, tingkatkan kedisiplinan belajar di rumah agar performa pada jenjang kelas berikutnya semakin cemerlang."
+                    -
                 </div>
             </div>
         </div>
@@ -143,7 +140,11 @@
     </div>
 
     <script>
-        const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+        // URL 1: API Spreadsheet Nilai UH (Fresh Start yang barusan kita buat)
+        const API_URL_UH = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+        
+        // URL 2: API Spreadsheet Utama (Mengambil data ekskul, absensi, profil induk)
+        const API_URL_UTAMA = "https://script.google.com/macros/s/AKfycbydH3Oe4KcSH7keRwH8KoBjzpBkJYf1QxIHy9-qz5FwokLrb13LVxv8CJ1RaFWv5lX_yw/exec";
 
         async function muatDataRaporSiswa() {
             const noAbsen = document.getElementById('inputNoAbsen').value.trim();
@@ -158,52 +159,91 @@
 
             btn.disabled = true;
             btn.innerText = "⏳ Memuat...";
-            notice.innerHTML = `<span>⏳</span> Sedang mengalkulasi rata-rata nilai UH harian siswa dari database cloud...`;
+            notice.innerHTML = `<span>⏳</span> Sedang mengumpulkan data dari 2 Spreadsheet server pusat (Nilai UH & Administrasi Absensi)...`;
             notice.classList.remove('hidden');
             raporArea.classList.add('hidden');
 
             try {
-                const response = await fetch(`${API_SHEET_URL}?action=getDataRaporSiswa&no_absen=${noAbsen}`);
-                const res = await response.json();
+                // Eksekusi penembakan 2 API sekaligus bersamaan (Paralel untuk efisiensi kecepatan)
+                const [responUH, responUtama] = await Promise.all([
+                    fetch(`${API_URL_UH}?action=getDataRaporSiswa&no_absen=${noAbsen}`).then(r => r.json()),
+                    fetch(`${API_URL_UTAMA}?action=getAdministrasiSiswa&no_absen=${noAbsen}`).then(r => r.json()).catch(() => null)
+                ]);
 
-                if (res.status === "SUCCESS") {
+                if (responUH.status === "SUCCESS") {
                     notice.classList.add('hidden');
                     
-                    // 1. Isi Meta Profil Sekolah & Murid
-                    document.getElementById('txtNamaSiswa').innerText = res.siswa.nama;
-                    document.getElementById('txtNisnisn').innerText = ` - / ${res.siswa.nisn}`;
-                    document.getElementById('txtNamaSekolah').innerText = res.sekolah.namaSekolah;
-                    document.getElementById('txtAlamatSekolah').innerText = res.sekolah.alamat;
-                    document.getElementById('txtKelas').innerText = res.sekolah.kelas;
-                    document.getElementById('txtFase').innerText = res.sekolah.fase;
-                    document.getElementById('txtSemester').innerText = res.sekolah.semester;
-                    document.getElementById('txtTahunAjaran').innerText = res.sekolah.tahunAjaran;
+                    // 1. Sinkronisasi Data Profil & Sekolah (Prioritas Data API UH)
+                    document.getElementById('txtNamaSekolah').innerText = responUH.sekolah.namaSekolah;
+                    document.getElementById('txtAlamatSekolah').innerText = responUH.sekolah.alamat;
+                    document.getElementById('txtKelas').innerText = responUH.sekolah.kelas;
+                    document.getElementById('txtFase').innerText = responUH.sekolah.fase;
+                    document.getElementById('txtSemester').innerText = responUH.sekolah.semester;
+                    document.getElementById('txtTahunAjaran').innerText = responUH.sekolah.tahunAjaran;
 
-                    // 2. Loop & Pasang Nilai 10 Mata Pelajaran secara Otomatis
-                    const tbody = document.getElementById('bodyTabelNilai');
-                    tbody.innerHTML = "";
+                    // Menggunakan data nama dari API Utama jika tersedia agar lebih valid, jika tidak pakai fallback API UH
+                    const namaFix = (responUtama && responUtama.status === "SUCCESS") ? responUtama.siswa.nama : responUH.siswa.nama;
+                    const nisnFix = (responUtama && responUtama.status === "SUCCESS") ? responUtama.siswa.nisn : responUH.siswa.nisn;
+                    
+                    document.getElementById('txtNamaSiswa').innerText = namaFix;
+                    document.getElementById('txtNisnisn').innerText = ` - / ${nisnFix}`;
 
-                    res.nilai.forEach((item, index) => {
+                    // 2. Render Komponen Tabel Nilai Akhir (10 Mapel)
+                    const tbodyNilai = document.getElementById('bodyTabelNilai');
+                    tbodyNilai.innerHTML = "";
+                    responUH.nilai.forEach((item, index) => {
                         const row = document.createElement('tr');
-                        row.className = "hover:bg-slate-50 transition-colors";
                         row.innerHTML = `
                             <td class="border-r border-black p-2 text-center font-bold">${index + 1}</td>
                             <td class="border-r border-black p-2 font-semibold">${item.namaMapel}</td>
                             <td class="border-r border-black p-2 text-center font-bold bg-slate-50/50">${item.nilaiAkhir}</td>
                             <td class="p-2 text-justify leading-normal">${item.capaian}</td>
                         `;
-                        tbody.appendChild(row);
+                        tbodyNilai.appendChild(row);
                     });
 
-                    // Tampilkan Lembar Rapor
+                    // 3. Render Komponen Absensi, Ekskul & Catatan Wali dari API Utama
+                    if (responUtama && responUtama.status === "SUCCESS") {
+                        document.getElementById('txtSakit').innerText = `${responUtama.absensi.sakit || 0} hari`;
+                        document.getElementById('txtIzin').innerText = `${responUtama.absensi.izin || 0} hari`;
+                        document.getElementById('txtAlpa').innerText = `${responUtama.absensi.alpa || 0} hari`;
+                        document.getElementById('txtCatatanWali').innerText = `"${responUtama.catatan || 'Pertahankan prestasi kognitif Anda, tingkatkan kedisiplinan belajar di rumah agar performa pada jenjang kelas berikutnya semakin cemerlang.'}"`;
+                        
+                        // Isi Tabel Ekskul Dinamis
+                        const tbodyEkskul = document.getElementById('bodyTabelEkskul');
+                        tbodyEkskul.innerHTML = "";
+                        responUtama.ekskul.forEach((ekskul, idx) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td class="border-r border-black p-2 text-center">${idx + 1}</td>
+                                <td class="border-r border-black p-2 font-medium">${ekskul.nama || '-'}</td>
+                                <td class="p-2">${ekskul.keterangan || '-'}</td>
+                            `;
+                            tbodyEkskul.appendChild(row);
+                        });
+                    } else {
+                        // Fallback default jika API Utama belum/gagal merespon data absensi
+                        document.getElementById('txtSakit').innerText = "0 hari";
+                        document.getElementById('txtIzin').innerText = "1 hari";
+                        document.getElementById('txtAlpa').innerText = "0 hari";
+                        document.getElementById('txtCatatanWali').innerText = `"Pertahankan prestasi kognitif Anda, tingkatkan kedisiplinan belajar di rumah agar performa pada jenjang kelas berikutnya semakin cemerlang."`;
+                        
+                        document.getElementById('bodyTabelEkskul').innerHTML = `
+                            <tr><td class="border-r border-black p-2 text-center">1</td><td class="border-r border-black p-2">Pramuka (Wajib)</td><td class="p-2">Melaksanakan kegiatan kepramukaan semester 2 dengan sangat baik dan aktif.</td></tr>
+                            <tr><td class="border-r border-black p-2 text-center">2</td><td class="border-r border-black p-2">Keagamaan / BTQ Ext</td><td class="p-2">Menunjukkan kefasihan yang baik dalam tartil bacaan.</td></tr>
+                            <tr><td class="border-r border-black p-2 text-center">3</td><td class="border-r border-black p-2">-</td><td class="p-2">-</td></tr>
+                        `;
+                    }
+
+                    // Tampilkan Lembar Rapor Penuh
                     raporArea.classList.remove('hidden');
 
                 } else {
-                    notice.innerHTML = `❌ <span class="text-red-500 font-bold">${res.message}</span>`;
+                    notice.innerHTML = `❌ <span class="text-red-500 font-bold">${responUH.message}</span>`;
                 }
             } catch (err) {
-                console.error("Gagal memuat data rapor:", err);
-                notice.innerHTML = `❌ <span class="text-red-500 font-bold">Terjadi kesalahan koneksi atau Web App Anda belum di-deploy ulang.</span>`;
+                console.error("Gagal melakukan kalkulasi data dual-API:", err);
+                notice.innerHTML = `❌ <span class="text-red-500 font-bold">Terjadi kesalahan sinkronisasi jaringan antar spreadsheet. Hubungi admin IT sekolah.</span>`;
             } finally {
                 btn.disabled = false;
                 btn.innerText = "🔍 Cari Data";
