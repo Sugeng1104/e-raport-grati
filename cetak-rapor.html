@@ -51,9 +51,8 @@
         width: 210mm !important; 
         min-height: auto !important; 
       }
-      tr, table, .blok-ttd {
-        page-break-inside: avoid;
-        page-break-after: auto;
+      .blok-ttd-container {
+        page-break-inside: avoid !important;
       }
     }
   </style>
@@ -61,7 +60,7 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (ISOLATED SYSTEM V13.3)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (ISOLATED SYSTEM V14.0)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -190,7 +189,7 @@
               <td class="p-2 text-left">hari</td>
             </tr>
             <tr>
-              <td class="p-2 font-medium">Tanpa Keterangan (Alfa)</td>
+              <td class="p-2 font-medium">Tanpa Keterangan</td>
               <td id="lblAlfa" class="p-2 text-center font-bold bg-slate-50">-</td>
               <td class="p-2 text-left">hari</td>
             </tr>
@@ -198,21 +197,26 @@
         </table>
       </div>
 
-      <div class="blok-ttd grid grid-cols-3 text-center text-xs mt-8 gap-4 leading-relaxed">
-        <div>
-          <p class="mb-16">Mengetahui,<br>Orang Tua / Wali Murid</p>
-          <div class="border-b border-black w-40 mx-auto"></div>
+      <div class="blok-ttd-container text-xs mt-12 leading-relaxed">
+        
+        <div class="grid grid-cols-2 text-center mb-12">
+          <div>
+            <p class="mb-20 font-medium text-sm">Orang Tua,</p>
+            <div class="border-b border-black w-48 mx-auto"></div>
+          </div>
+          <div>
+            <p class="mb-20 font-medium text-sm"><span id="lblTempatTanggal">-</span><br>Wali Kelas 4 (empat)</p>
+            <p id="lblNamaGuru" class="font-bold underline text-sm">-</p>
+            <p id="lblNipGuru" class="text-xs text-slate-700">-</p>
+          </div>
         </div>
-        <div>
-          <p class="mb-16"><br>Kepala Sekolah</p>
-          <div class="border-b border-black w-40 mx-auto"></div>
-          <p class="text-[10px] text-slate-500 mt-1">NIP. ...................................</p>
+
+        <div class="text-center w-full">
+          <p class="mb-20 font-medium text-sm">Mengetahui,<br>Kepala Sekolah</p>
+          <p id="lblNamaKepsek" class="font-bold underline text-sm">-</p>
+          <p id="lblNipKepsek" class="text-xs text-slate-700">-</p>
         </div>
-        <div>
-          <p class="mb-16">Pasuruan, <span id="lblTanggalCetak">..... .................... 2026</span><br>Guru Kelas IV</p>
-          <div class="border-b border-black w-40 mx-auto"></div>
-          <p class="text-[10px] text-slate-500 mt-1">NIP. ...................................</p>
-        </div>
+
       </div>
       
     </div>
@@ -265,9 +269,6 @@
       document.getElementById('lblAlamat').innerText = bundle.sekolah.alamat || "Bandilan, Ranuklindungan";
       document.getElementById('lblTp').innerText = bundle.sekolah.tp || "2025/2026";
       
-      const opsiTanggal = { year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('lblTanggalCetak').innerText = new Date().toLocaleDateString('id-ID', opsiTanggal);
-
       // 2. Render Tabel A: Muatan Pelajaran Utama
       const tbodyUtama = document.getElementById('bodyTabelRapor');
       tbodyUtama.innerHTML = "";
@@ -282,11 +283,9 @@
           `;
           tbodyUtama.appendChild(tr);
         });
-      } else {
-        tbodyUtama.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500 font-bold">Data nilai utama kosong dalam bundle.</td></tr>`;
       }
 
-      // 3. Render Tabel B: Muatan Lokal (Bahasa Jawa & BTQ)
+      // 3. Render Tabel B: Muatan Lokal
       const tbodyMulok = document.getElementById('bodyTabelMulok');
       tbodyMulok.innerHTML = "";
       if (bundle.payloadMulok && bundle.payloadMulok.length > 0) {
@@ -300,14 +299,11 @@
           `;
           tbodyMulok.appendChild(tr);
         });
-      } else {
-        tbodyMulok.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Tidak ada data Muatan Lokal.</td></tr>`;
       }
 
-      // 4. Render Tabel C: Ekstrakurikuler (Aman & Fleksibel)
+      // 4. Render Tabel C: Ekstrakurikuler
       const tbodyEkstra = document.getElementById('bodyTabelEkstra');
       tbodyEkstra.innerHTML = "";
-      
       const namaEkskul = (bundle.ekstra && bundle.ekstra.nama) ? bundle.ekstra.nama : "Pramuka";
       const predikatEkskul = (bundle.ekstra && bundle.ekstra.predikat) ? bundle.ekstra.predikat : "-";
       const keteranganEkskul = (bundle.ekstra && bundle.ekstra.keterangan) ? bundle.ekstra.keterangan : "-";
@@ -326,6 +322,15 @@
         document.getElementById('lblSakit').innerText = bundle.kehadiran.sakit !== "" ? bundle.kehadiran.sakit : "-";
         document.getElementById('lblIzin').innerText = bundle.kehadiran.izin !== "" ? bundle.kehadiran.izin : "-";
         document.getElementById('lblAlfa').innerText = bundle.kehadiran.alfa !== "" ? bundle.kehadiran.alfa : "-";
+      }
+
+      // 6. Injeksi Dinamis Blok Tanda Tangan Sesuai Request
+      if (bundle.ttd) {
+        document.getElementById('lblTempatTanggal').innerText = bundle.ttd.tanggal_cetak || "Pasuruan, .........................";
+        document.getElementById('lblNamaGuru').innerText = bundle.ttd.guru_kelas || "-";
+        document.getElementById('lblNipGuru').innerText = bundle.ttd.nip_guru ? "NIP. " + bundle.ttd.nip_guru : "NIP. ...........................";
+        document.getElementById('lblNamaKepsek').innerText = bundle.ttd.kepala_sekolah || "-";
+        document.getElementById('lblNipKepsek').innerText = bundle.ttd.nip_kepala ? "NIP. " + bundle.ttd.nip_kepala : "NIP. ...........................";
       }
     }
 
