@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pratinjau Rapor Resmi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Calibri', 'Arial', sans-serif; background-color: #f1f5f9; color: #000; }
+    .lembar-rapor {
+      background: white;
+      width: 210mm;
+      min-height: 297mm;
+      padding: 15mm 20mm;
+      margin: 20px auto;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .tabel-border-tegas, .tabel-border-tegas th, .tabel-border-tegas td {
+      border: 1.5px solid #000000 !important;
+    }
+    @media print {
+      body { background: white; margin: 0; padding: 0; }
+      .lembar-rapor { box-shadow: none; margin: 0; padding: 10mm; width: 100%; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md">
+    <div class="text-xs font-bold font-sans">📄 PRATINJAU DOKUMEN RAPOR ELEKTRONIK (UPT SDN RANUKLINDUNGAN I)</div>
+    <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
+  </div>
+
+  <div class="lembar-rapor" id="kontenRapor">
+    <div id="loader" class="text-center text-slate-400 font-bold text-sm pt-20 animate-pulse font-sans">
+      Menghubungkan ke Cloud Storage database, menyusun dokumen hasil belajar...
+    </div>
+
+    <div id="coreRapor" class="hidden">
+      <div class="flex items-center justify-start gap-6 border-b-2 border-black pb-4 mb-6">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Logo_Kabupaten_Pasuruan.png" class="w-20 h-auto object-contain" alt="Logo">
+        <div class="text-center flex-1 pr-16">
+          <h1 class="text-xl font-bold tracking-wide">LAPORAN HASIL BELAJAR</h1>
+          <h2 class="text-lg font-bold tracking-wider">(RAPOR)</h2>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-x-8 text-[13px] leading-relaxed mb-6">
+        <table class="w-full">
+          <tr>
+            <td class="w-36 py-0.5 font-medium">Nama Peserta Didik</td>
+            <td class="w-4">:</td>
+            <td id="lblNama" class="font-bold uppercase">-</td>
+          </tr>
+          <tr>
+            <td class="py-0.5 font-medium">NIS / NISN</td>
+            <td>:</td>
+            <td><span id="lblNis">-</span> / <span id="lblNisn">-</span></td>
+          </tr>
+          <tr>
+            <td class="py-0.5 font-medium">Nama Sekolah</td>
+            <td>:</td>
+            <td id="lblSekolah">-</td>
+          </tr>
+          <tr>
+            <td class="py-0.5 font-medium">Alamat</td>
+            <td>:</td>
+            <td id="lblAlamat">-</td>
+          </tr>
+        </table>
+        <table class="w-full">
+          <tr>
+            <td class="w-32 py-0.5 font-medium">Kelas</td>
+            <td class="w-4">:</td>
+            <td id="lblKelas">-</td>
+          </tr>
+          <tr>
+            <td class="py-0.5 font-medium">Fase</td>
+            <td>:</td>
+            <td id="lblFase">-</td>
+          </tr>
+          <tr>
+            <td class="py-0.5 font-medium">Semester</td>
+            <td>:</td>
+            <td id="lblSemester">-</td>
+          </tr>
+          <tr>
+            <td class="py-0.5 font-medium">Tahun Pelajaran</td>
+            <td>:</td>
+            <td id="lblTp">-</td>
+          </tr>
+        </table>
+      </div>
+
+      <table class="w-full tabel-border-tegas text-xs text-left">
+        <thead>
+          <tr class="bg-slate-100 text-center font-bold">
+            <th class="p-2 w-10">No</th>
+            <th class="p-2 w-52">Muatan Pelajaran</th>
+            <th class="p-2 w-20">Nilai Akhir</th>
+            <th class="p-2">Capaian Kompetensi</th>
+          </tr>
+        </thead>
+        <tbody id="bodyTabelRapor" class="divide-y divide-black font-normal">
+          </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Tarik parameter noAbsen dari template backend
+    const currentNoAbsen = "<?= noAbsen ?>";
+
+    window.addEventListener('DOMContentLoaded', function() {
+      if(!currentNoAbsen) return;
+      
+      // Ambil data ter-bundling dari server Google Apps Script
+      google.script.run
+        .withSuccessHandler(renderDataKeRapor)
+        .withFailureHandler(handleErrorFetch)
+        .getBundledDataRapor(currentNoAbsen);
+    });
+
+    function renderDataKeRapor(res) {
+      document.getElementById('loader').classList.add('hidden');
+      document.getElementById('coreRapor').classList.remove('hidden');
+      
+      // Pasang Meta Data Identitas
+      document.getElementById('lblNama').innerText = res.profil.nama || "-";
+      document.getElementById('lblNis').innerText = res.profil.nis || "-";
+      document.getElementById('lblNisn').innerText = res.profil.nisn || "-";
+      document.getElementById('lblKelas').innerText = res.profil.kelas || "-";
+      document.getElementById('lblFase').innerText = res.profil.fase || "-";
+      document.getElementById('lblSemester').innerText = res.profil.semester || "-";
+      
+      document.getElementById('lblSekolah').innerText = res.sekolah.nama_sekolah;
+      document.getElementById('lblAlamat').innerText = res.sekolah.alamat;
+      document.getElementById('lblTp').innerText = res.sekolah.tp;
+      
+      // Pasang Baris Tabel Nilai
+      const tbody = document.getElementById('bodyTabelRapor');
+      tbody.innerHTML = "";
+      
+      res.payloadNilai.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-2 text-center valign-top font-semibold">${item.no}</td>
+          <td class="p-2 font-semibold valign-top">${item.mapel}</td>
+          <td class="p-2 text-center font-bold valign-top text-sm">${item.nilai}</td>
+          <td class="p-2 text-justify leading-relaxed text-[11.5px]">${item.deskripsi}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handleErrorFetch(err) {
+      document.getElementById('loader').innerText = "Gagal memproses dokumen cetak: " + err.toString();
+    }
+  </script>
+</body>
+</html>
