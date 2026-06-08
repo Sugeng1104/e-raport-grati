@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Pemroses Data Rapor - UPT SDN Ranuklindungan I</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Style tambahan untuk memastikan border tabel berwarna hitam tegas */
+        .border-hitam { border: 1px solid #000000; }
+        .border-hitam th, .border-hitam td { border: 1px solid #000000; }
+    </style>
 </head>
 <body class="bg-slate-50 font-sans p-4 md:p-8 text-slate-800">
 
@@ -37,8 +42,7 @@
                             <th class="p-3 text-center">Nilai Murni ASAS</th>
                         </tr>
                     </thead>
-                    <tbody id="rowNilaiMurni" class="divide-y divide-slate-100 font-semibold text-slate-700">
-                        </tbody>
+                    <tbody id="rowNilaiMurni" class="divide-y divide-slate-100 font-semibold text-slate-700"></tbody>
                 </table>
             </div>
         </div>
@@ -52,10 +56,75 @@
             </div>
         </div>
 
+        <div id="boxTabelStatusCetak" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+            <div class="mb-4">
+                <h2 class="font-bold text-sm text-slate-900">🖨️ Daftar Status Monitor Cetak Rapor Siswa</h2>
+                <p class="text-[11px] text-slate-500">Warna tombol mendeteksi kelengkapan data 10 mata pelajaran pada lembar berkas <b>rapor_siswa</b>.</p>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-hitam font-semibold">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-900 font-bold">
+                            <th class="p-2.5 w-16 text-center">No Absen</th>
+                            <th class="p-2.5 w-36">NISN</th>
+                            <th class="p-2.5">Nama Siswa</th>
+                            <th class="p-2.5 w-40 text-center">Status / Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rowStatusCetak" class="divide-y divide-slate-900 text-slate-800">
+                        <tr>
+                            <td colspan="4" class="p-4 text-center text-slate-400 font-medium animate-pulse">Sedang memuat status data siswa dari server...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbydH3Oe4KcSH7keRwH8KoBjzpBkJYf1QxIHy9-qz5FwokLrb13LVxv8CJ1RaFWv5lX_yw/exec";
+
+        // Otomatis muat daftar tabel status cetak saat aplikasi dibuka pertama kali
+        window.addEventListener('DOMContentLoaded', muatStatusCetakSemuaSiswa);
+
+        async function muatStatusCetakSemuaSiswa() {
+            try {
+                const res = await fetch(`${API_URL}?action=get_status_cetak`);
+                const data = await res.json();
+                
+                if(data.status === "SUCCESS") {
+                    const tbody = document.getElementById('rowStatusCetak');
+                    tbody.innerHTML = "";
+                    
+                    data.dataSiswa.forEach(siswa => {
+                        const tr = document.createElement('tr');
+                        
+                        let tombolStatus = "";
+                        if(siswa.isLengkap) {
+                            // JIKA LENGKAP -> TOMBOL HIJAU
+                            tombolStatus = `<button onclick="aksiCetak('${siswa.no_absen}')" class="w-full px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold text-[11px] rounded-lg shadow-sm transition">🟢 Cetak Rapor</button>`;
+                        } else {
+                            // JIKA ADA YANG KOSONG -> TOMBOL MERAH
+                            tombolStatus = `<button onclick="alert('Data nilai Ananda ${siswa.nama} belum lengkap! Silakan klik tombol Ambil Data dilanjutkan Buat Rapor terlebih dahulu.')" class="w-full px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] rounded-lg shadow-sm transition">🔴 Belum Lengkap</button>`;
+                        }
+                        
+                        tr.innerHTML = `
+                            <td class="p-2.5 text-center">${siswa.no_absen}</td>
+                            <td class="p-2.5">${siswa.nisn || "-"}</td>
+                            <td class="p-2.5 uppercase">${siswa.nama}</td>
+                            <td class="p-2.5 text-center">${tombolStatus}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    document.getElementById('rowStatusCetak').innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-600">Gagal memuat: ${data.message}</td></tr>`;
+                }
+            } catch(e) {
+                document.getElementById('rowStatusCetak').innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-600">Gagal terhubung dengan cloud server database.</td></tr>`;
+            }
+        }
 
         async function ambilNilaiSiswa() {
             const noAbsen = document.getElementById('inputNoAbsen').value.trim();
@@ -110,12 +179,19 @@
                     document.getElementById('outNamaSiswa').innerText = data.nama;
                     document.getElementById('outputGenerator').classList.remove('hidden');
                     alert("Berhasil! Nilai Komparasi Rapor & Deskripsi Tersebar Otomatis ke tab sheet rapor_siswa.");
+                    // Segarkan kembali status tabel monitor bawah agar langsung berubah jadi hijau
+                    muatStatusCetakSemuaSiswa();
                 } else {
                     alert(data.message);
                 }
             } catch(e) {
                 alert("Engine gagal melakukan penulisan ke cloud storage.");
             }
+        }
+
+        function aksiCetak(noAbsen) {
+            alert("Membuka Dokumen Cetak Rapor Elektronik untuk Siswa dengan Nomor Absen: " + noAbsen);
+            // Bagian ini siap dihubungkan dengan modul PDF Generator atau cetak lembaran cetak Anda selanjutnya.
         }
     </script>
 </body>
