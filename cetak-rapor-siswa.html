@@ -46,10 +46,9 @@
         <div id="outputGenerator" class="bg-emerald-50 border border-emerald-200 rounded-3xl p-6 hidden">
             <h3 class="font-bold text-emerald-900 text-sm mb-2">🎉 Hasil Pemrosesan Engine Berhasil Ditulis!</h3>
             <div class="text-xs space-y-2 text-emerald-800 font-medium">
-                <p><strong>Nilai Akhir Rapor (n_rapor):</strong> <span id="outNRapor" class="px-2 py-0.5 bg-white border border-emerald-300 font-bold rounded text-slate-900">-</span></p>
-                <p><strong>Sintaks Deskripsi Otomatis:</strong></p>
-                <div id="outDeskripsi" class="p-3 bg-white border border-emerald-200 rounded-xl italic font-normal text-slate-700 leading-relaxed"></div>
-                <p class="text-[11px] text-emerald-600 pt-1 font-normal">Isi di atas telah disinkronkan dan tersimpan permanen di database kolom n_rapor & Deskripsi Spreadsheet Anda.</p>
+                <p><strong>Nama Siswa:</strong> <span id="outNamaSiswa" class="font-bold text-slate-900 uppercase">-</span></p>
+                <p><strong>Status Sinkronisasi:</strong> <span class="px-2 py-0.5 bg-white border border-emerald-300 font-bold rounded text-emerald-700">SUKSES</span></p>
+                <p class="text-[11px] text-emerald-600 pt-1 font-normal">Seluruh nilai tiap mata pelajaran telah dihitung berdasarkan rumus <strong>(Harian + ASAS) / 2</strong>. Hasil nilai akhir beserta deskripsi otomatisnya telah berhasil di-posting langsung ke tab sheet <strong>rapor_siswa</strong>.</p>
             </div>
         </div>
 
@@ -74,13 +73,10 @@
                     const tbody = document.getElementById('rowNilaiMurni');
                     tbody.innerHTML = "";
                     
-                    // Daftar 10 Mata Pelajaran Utama yang digunakan sebagai Key JSON
                     const mapelList = ["Agama", "B. Indonesia", "Pancasila", "Matematika", "IPAS", "PJOK", "Kesenian", "B. Jawa", "B. Inggris", "BTQ"];
                     
                     mapelList.forEach(m => {
                         const tr = document.createElement('tr');
-                        
-                        // Proteksi null value agar jika kosong tetap tampil tanda strip (-)
                         const nSumatif = data.dataSumatif[m] !== undefined && data.dataSumatif[m] !== "" ? data.dataSumatif[m] : "-";
                         const nAsas = data.dataAsas[m] !== undefined && data.dataAsas[m] !== "" ? data.dataAsas[m] : "-";
                         
@@ -111,10 +107,9 @@
                 const data = await res.json();
                 
                 if(data.status === "SUCCESS") {
-                    document.getElementById('outNRapor').innerText = data.n_rapor;
-                    document.getElementById('outDeskripsi').innerText = data.deskripsi;
+                    document.getElementById('outNamaSiswa').innerText = data.nama;
                     document.getElementById('outputGenerator').classList.remove('hidden');
-                    alert("Berhasil! Nilai Rapor & Deskripsi otomatis tersimpan ke Spreadsheet.");
+                    alert("Berhasil! Nilai Komparasi Rapor & Deskripsi Tersebar Otomatis ke tab sheet rapor_siswa.");
                 } else {
                     alert(data.message);
                 }
