@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Cetak Rapor Digital - UPT SDN Ranuklindungan I</title>
+    <title>Rapor Kurikulum Merdeka - UPT SDN Ranuklindungan I</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Optimasi Engine Browser Saat Mencetak Dokumen (A4) */
         @media print {
             .no-print { display: none !important; }
             body { background-color: #ffffff; color: #000000; font-family: 'Times New Roman', Times, serif; }
@@ -19,37 +18,32 @@
 </head>
 <body class="bg-slate-50 font-sans min-h-screen text-slate-800 p-4 md:p-8">
 
-    <!-- CONTROL PANEL NAVIGASI (Hanya Muncul di Layar) -->
     <div class="max-w-4xl mx-auto bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6 no-print flex flex-col sm:flex-row justify-between items-center gap-4">
         <div class="flex items-center space-x-3">
             <div class="p-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-lg">🏫</div>
             <div>
-                <h1 class="font-bold text-sm text-slate-900">Modul Administrasi Rapor Siswa</h1>
-                <p class="text-[11px] text-slate-500">UPT SDN Ranuklindungan I</p>
+                <h1 class="font-bold text-sm text-slate-900">Aplikasi Cetak Rapor Digital v2.0</h1>
+                <p class="text-[11px] text-slate-500">UPT SDN Ranuklindungan I — Tab Database: rekap_asas</p>
             </div>
         </div>
         <div class="flex items-center space-x-2 w-full sm:w-auto">
             <input type="number" id="inputNoAbsen" placeholder="No. Absen" class="w-full sm:w-28 px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <button onclick="fetchDataRapor()" id="btnCari" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm transition">🔍 Cari Data</button>
+            <button onclick="muatDataRaporDinamis()" id="btnCari" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm transition">🔍 Cari Data</button>
             <button onclick="window.print()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition">🖨️ Cetak</button>
         </div>
     </div>
 
-    <!-- AREA NOTIFIKASI / STATUS ENGINE -->
     <div id="statusNotice" class="max-w-4xl mx-auto bg-white border border-slate-200 rounded-2xl p-12 text-center text-slate-400 font-medium text-sm shadow-sm no-print">
-        💡 Masukkan Nomor Absen siswa, kemudian klik tombol <strong>Cari Data</strong>.
+        👋 Silakan masukkan Nomor Absen siswa pada panel di atas lalu klik <strong>Cari Data</strong>.
     </div>
 
-    <!-- DOKUMEN RAPOR UTAMA (Halaman Hasil Belajar Kurikulum Merdeka) -->
     <div id="kontenRapor" class="max-w-4xl mx-auto bg-white border border-slate-300 shadow-xl p-8 md:p-12 print-container hidden">
         
-        <!-- HEADER KOP RAPOR -->
         <div class="text-center font-bold uppercase tracking-wide space-y-1 text-sm md:text-base border-b-2 border-black pb-4 mb-6 text-black">
             <h2>LAPORAN HASIL BELAJAR</h2>
             <h2>(RAPOR)</h2>
         </div>
 
-        <!-- METADATA IDENTITAS SISWA & SEKOLAH -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-xs font-semibold mb-6 text-black">
             <div class="space-y-2">
                 <div class="flex"><span class="w-32 flex-shrink-0">Nama Peserta Didik</span><span class="mr-2">:</span><span id="txtNama" class="border-b border-dashed border-black flex-1 uppercase font-bold">-</span></div>
@@ -65,110 +59,81 @@
             </div>
         </div>
 
-        <!-- TABEL CAPAIAN AKADEMIK -->
         <table class="w-full text-left text-xs border border-black mb-6 text-black">
             <thead>
                 <tr class="bg-slate-100 font-bold text-center">
                     <th class="p-2.5 w-10 text-center">No</th>
                     <th class="p-2.5 w-60 text-left">Mata Pelajaran</th>
-                    <th class="p-2.5 w-24 text-center">Nilai Akhir</th>
+                    <th class="p-2.5 w-24 text-center">Nilai Akhir (NA)</th>
                     <th class="p-2.5 text-left">Capaian Kompetensi</th>
                 </tr>
             </thead>
             <tbody id="tabelNilaiBody" class="divide-y divide-black">
-                <!-- Injeksi Data Otomatis -->
-            </tbody>
+                </tbody>
         </table>
 
-        <!-- DATA TAMBAHAN (EKSTRAKURIKULER & ABSENSI) -->
         <div class="font-bold text-xs mb-1.5 uppercase text-black">A. Ekstrakurikuler</div>
         <table class="w-full text-left text-xs border border-black mb-6 text-black">
             <thead>
-                <tr class="bg-slate-100 font-bold text-center">
-                    <th class="p-2 w-10">No</th>
-                    <th class="p-2 w-64 text-left">Kegiatan Ekstrakurikuler</th>
-                    <th class="p-2 text-left">Keterangan</th>
-                </tr>
+                <tr class="bg-slate-100 font-bold text-center"><th class="p-2 w-10">No</th><th class="p-2 w-64 text-left">Kegiatan Ekstrakurikuler</th><th class="p-2 text-left">Keterangan</th></tr>
             </thead>
             <tbody>
-                <tr class="border-t border-black"><td class="p-2 text-center">1</td><td class="p-2 font-medium">Pramuka</td><td class="p-2">Sangat baik dalam mengikuti aktivitas kepramukaan dan mandiri.</td></tr>
+                <tr class="border-t border-black"><td class="p-2 text-center">1</td><td class="p-2 font-medium">Praja Muda Karana (Pramuka)</td><td class="p-2">Sangat baik dan aktif dalam mengikuti seluruh kegiatan kepramukaan semester ini.</td></tr>
             </tbody>
         </table>
 
-        <!-- FOOTER TANDA TANGAN VALIDASI -->
         <div class="text-xs font-semibold pt-6 text-black grid grid-cols-2 text-center gap-y-16">
-            <div>
-                <p>Mengetahui<br>Orang Tua / Wali Murid</p>
-                <div class="h-16"></div>
-                <p class="border-b border-black w-48 mx-auto"></p>
-            </div>
-            <div>
-                <p>Pasuruan, 22 Juni 2026<br>Wali Kelas</p>
-                <div class="h-16"></div>
-                <p class="border-b border-black w-48 mx-auto"></p>
-                <p class="text-[10px] text-left pl-14 font-normal">NIP. </p>
-            </div>
-            <div class="col-span-2 mx-auto">
-                <p>Mengetahui,<br>Kepala Sekolah</p>
-                <div class="h-16"></div>
-                <p class="font-bold border-b border-black w-56 mx-auto">SITI AMINAH, S.Pd.</p>
-                <p class="text-[10px] text-left pl-4 font-normal">NIP. 19780512 200501 2 003</p>
-            </div>
+            <div><p>Mengetahui<br>Orang Tua / Wali Murid</p><div class="h-16"></div><p class="border-b border-black w-48 mx-auto"></p></div>
+            <div><p>Pasuruan, 21 Juni 2026<br>Wali Kelas</p><div class="h-16"></div><p class="border-b border-black w-48 mx-auto"></p><p class="text-[10px] text-left pl-14 font-normal">NIP. </p></div>
+            <div class="col-span-2 mx-auto"><p>Mengetahui,<br>Kepala Sekolah</p><div class="h-16"></div><p class="font-bold border-b border-black w-56 mx-auto">SITI AMINAH, S.Pd.</p><p class="text-[10px] text-left pl-4 font-normal">NIP. 19780512 200501 2 003</p></div>
         </div>
     </div>
 
-    <!-- STATE MANAGEMENT & CONSUMING API CORE -->
     <script>
-        // PENTING: Ganti dengan URL Web App Apps Script yang didapatkan setelah Deploy Ulang
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+        // TEMPELKAN URL APPS SCRIPT BARU ANDA DI SINI
+        const API_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
-        async function fetchDataRapor() {
+        async function muatDataRaporDinamis() {
             const noAbsen = document.getElementById('inputNoAbsen').value.trim();
-            const btnCari = document.getElementById('btnCari');
+            const btn = document.getElementById('btnCari');
             const notice = document.getElementById('statusNotice');
             const raporArea = document.getElementById('kontenRapor');
 
             if (!noAbsen) {
-                alert("Silakan isi nomor absen siswa terlebih dahulu.");
+                alert("Silakan ketik nomor absen terlebih dahulu.");
                 return;
             }
 
-            // Set UI State ke Loading
-            btnCari.disabled = true;
-            btnCari.innerText = "⏳ Memuat...";
-            notice.innerHTML = `<span>⏳</span> Sedang mengompilasi data relasional dari Cloud Server...`;
+            btn.disabled = true;
+            btn.innerText = "⏳ Memuat...";
+            notice.innerHTML = `<span>⏳</span> Sedang membaca data baris nilai di tab rekap_asas...`;
             notice.classList.remove('hidden');
             raporArea.classList.add('hidden');
 
             try {
-                // Fetching data langsung ke endpoint router tanpa parameter action yang memicu eror
-                const response = await fetch(`${WEB_APP_URL}?no_absen=${noAbsen}`);
+                const response = await fetch(`${API_URL}?no_absen=${noAbsen}`);
+                if (!response.ok) throw new Error("Terjadi gangguan respons dari server Google.");
                 
-                if (!response.ok) throw new Error("Gagal terhubung ke gateway API server.");
-                
-                const result = await response.json();
+                const res = await response.json();
 
-                if (result.status === "SUCCESS") {
-                    // Mapping Data Profil Sekolah
-                    document.getElementById('txtSekolah').innerText = result.sekolah.namaSekolah;
-                    document.getElementById('txtAlamat').innerText = result.sekolah.alamat;
-                    document.getElementById('txtKelas').innerText = result.sekolah.kelas;
-                    document.getElementById('txtFase').innerText = result.sekolah.fase;
-                    document.getElementById('txtSemester').innerText = result.sekolah.semester;
-                    document.getElementById('txtTA').innerText = result.sekolah.tahunAjaran;
+                if (res.status === "SUCCESS") {
+                    document.getElementById('txtSekolah').innerText = res.sekolah.namaSekolah;
+                    document.getElementById('txtAlamat').innerText = res.sekolah.alamat;
+                    document.getElementById('txtKelas').innerText = res.sekolah.kelas;
+                    document.getElementById('txtFase').innerText = res.sekolah.fase;
+                    document.getElementById('txtSemester').innerText = res.sekolah.semester;
+                    document.getElementById('txtTA').innerText = res.sekolah.tahunAjaran;
 
-                    // Mapping Data Personal Siswa
-                    document.getElementById('txtNama').innerText = result.siswa.nama;
-                    document.getElementById('txtNis').innerText = result.siswa.nisn;
+                    document.getElementById('txtNama').innerText = res.siswa.nama;
+                    document.getElementById('txtNis').innerText = res.siswa.nisn;
 
-                    // Mapping Baris Nilai Rapor
                     const tbody = document.getElementById('tabelNilaiBody');
                     tbody.innerHTML = "";
 
-                    if (result.nilai.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center italic text-slate-400">Data nilai untuk siswa ini kosong pada sheet rekap_asas.</td></tr>`;
+                    if (res.nilai.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center italic text-slate-400">Nomor absen ${noAbsen} tidak ditemukan atau kolom nilai belum diisi pada tab rekap_asas.</td></tr>`;
                     } else {
-                        result.nilai.forEach((item, index) => {
+                        res.nilai.forEach((item, index) => {
                             const tr = document.createElement('tr');
                             tr.innerHTML = `
                                 <td class="p-2 text-center font-bold">${index + 1}</td>
@@ -180,26 +145,22 @@
                         });
                     }
 
-                    // Tampilkan dokumen rapor ke layar
                     notice.classList.add('hidden');
                     raporArea.classList.remove('hidden');
-
                 } else {
-                    notice.innerHTML = `❌ <span class="text-red-500 font-bold">${result.message}</span>`;
+                    notice.innerHTML = `❌ <span class="text-red-500 font-bold">${res.message}</span>`;
                 }
-
             } catch (err) {
                 console.error(err);
                 notice.innerHTML = `
                     <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs max-w-lg mx-auto text-left">
-                        <p class="font-bold mb-1">🚨 Hubungan Sinkronisasi Mengalami Kendala:</p>
+                        <p class="font-bold mb-1">🚨 Sinkronisasi Terhambat:</p>
                         <p class="italic">${err.message}</p>
-                        <p class="mt-2 text-[10px] text-slate-500 font-normal">Pastikan URL Apps Script yang dimasukkan sudah benar, status telah di-deploy ulang sebagai 'New Version', dan jalankan halaman ini melalui Incognito Mode (Tab Penyamaran) untuk menghindari proteksi cache lokal browser.</p>
                     </div>
                 `;
             } finally {
-                btnCari.disabled = false;
-                btnCari.innerText = "🔍 Cari Data";
+                btn.disabled = false;
+                btn.innerText = "🔍 Cari Data";
             }
         }
     </script>
