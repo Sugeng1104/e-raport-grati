@@ -52,7 +52,7 @@
             <div class="text-xs space-y-2 text-emerald-800 font-medium">
                 <p><strong>Nama Siswa:</strong> <span id="outNamaSiswa" class="font-bold text-slate-900 uppercase">-</span></p>
                 <p><strong>Status Sinkronisasi:</strong> <span class="px-2 py-0.5 bg-white border border-emerald-300 font-bold rounded text-emerald-700">SUKSES</span></p>
-                <p class="text-[11px] text-emerald-600 pt-1 font-normal">Seluruh nilai tiap mata pelajaran telah dihitung berdasarkan rumus rentang nilai pada sheet <strong>kkm_kktp</strong> dan deskripsi berbasis kode mapel sheet <strong>tp</strong>. Hasilnya berhasil di-posting langsung ke tab sheet <strong>rapor_siswa</strong>.</p>
+                <p class="text-[11px] text-emerald-600 pt-1 font-normal">Seluruh nilai tiap mata pelajaran telah dihitung berdasarkan rumus rentang nilai pada sheet <strong>kkm_kktp</strong> and deskripsi berbasis kode mapel sheet <strong>tp</strong>. Hasilnya berhasil di-posting langsung ke tab sheet <strong>rapor_siswa</strong>.</p>
             </div>
         </div>
 
@@ -94,15 +94,15 @@
                 const res = await fetch(`${API_URL}?action=get_status_cetak`);
                 const data = await res.json();
                 
-                if(data.status === "SUCCESS") {
+                if (data.status === "SUCCESS") {
                     const tbody = document.getElementById('rowStatusCetak');
                     tbody.innerHTML = "";
                     
                     data.dataSiswa.forEach(siswa => {
                         const tr = document.createElement('tr');
-                        
                         let tombolStatus = "";
-                        if(siswa.isLengkap) {
+                        
+                        if (siswa.isLengkap) {
                             // JIKA LENGKAP -> TOMBOL HIJAU
                             tombolStatus = `<button onclick="aksiCetak('${siswa.no_absen}')" class="w-full px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold text-[11px] rounded-lg shadow-sm transition">🟢 Cetak Rapor</button>`;
                         } else {
@@ -121,14 +121,14 @@
                 } else {
                     document.getElementById('rowStatusCetak').innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-600">Gagal memuat: ${data.message}</td></tr>`;
                 }
-            } catch(e) {
+            } catch (e) {
                 document.getElementById('rowStatusCetak').innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-600">Gagal terhubung dengan cloud server database.</td></tr>`;
             }
         }
 
         async function ambilNilaiSiswa() {
             const noAbsen = document.getElementById('inputNoAbsen').value.trim();
-            if(!noAbsen) return alert("Isi No. Absen!");
+            if (!noAbsen) return alert("Isi No. Absen!");
             
             document.getElementById('boxTabelAtas').classList.add('hidden');
             document.getElementById('outputGenerator').classList.add('hidden');
@@ -137,13 +137,13 @@
                 const res = await fetch(`${API_URL}?action=read&no_absen=${noAbsen}`);
                 const data = await res.json();
                 
-                if(data.status === "SUCCESS") {
+                if (data.status === "SUCCESS") {
                     document.getElementById('namaSiswaLabel').innerText = data.nama;
                     const tbody = document.getElementById('rowNilaiMurni');
                     tbody.innerHTML = "";
                     
-                    // STRUKTUR MAPPING BARU SINKRON DENGAN ENGINES V6.0
-                    const mapelList = ["Agama", "Pancasila", "B. Indonesia", "Matematika", "IPAS", "B. Inggris", "PJOK", "Kesenian", "KKA", "B. Jawa"];
+                    // DISESUAIKAN PERSIS DENGAN HEADERS FOTO PERTAMA ANDA KAK!
+                    const mapelList = ["Agama", "Pancasila", "B. Indonesia", "Matematika", "IPAS", "PJOK", "Kesenian", "B. Jawa", "B. Inggris", "BTQ"];
                     
                     mapelList.forEach(m => {
                         const tr = document.createElement('tr');
@@ -162,21 +162,21 @@
                 } else {
                     alert(data.message);
                 }
-            } catch(e) {
+            } catch (e) {
                 alert("Koneksi gagal membaca database.");
             }
         }
 
         async function prosesBuatRapor() {
             const noAbsen = document.getElementById('inputNoAbsen').value.trim();
-            if(!noAbsen) return alert("Pilih No. Absen Siswa!");
+            if (!noAbsen) return alert("Pilih No. Absen Siswa!");
 
             try {
                 document.getElementById('outputGenerator').classList.add('hidden');
                 const res = await fetch(`${API_URL}?action=generate&no_absen=${noAbsen}`);
                 const data = await res.json();
                 
-                if(data.status === "SUCCESS") {
+                if (data.status === "SUCCESS") {
                     document.getElementById('outNamaSiswa').innerText = data.nama;
                     document.getElementById('outputGenerator').classList.remove('hidden');
                     alert("Berhasil! Nilai Komparasi Rapor & Deskripsi Tersebar Otomatis ke tab sheet rapor_siswa.");
@@ -185,14 +185,13 @@
                 } else {
                     alert(data.message);
                 }
-            } catch(e) {
+            } catch (e) {
                 alert("Engine gagal melakukan penulisan ke cloud storage.");
             }
         }
 
         function aksiCetak(noAbsen) {
             alert("Membuka Dokumen Cetak Rapor Elektronik untuk Siswa dengan Nomor Absen: " + noAbsen);
-            // Bagian ini siap dihubungkan dengan modul PDF Generator atau cetak lembaran cetak Anda selanjutnya.
         }
     </script>
 </body>
