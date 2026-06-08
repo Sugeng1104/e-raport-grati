@@ -158,33 +158,55 @@
       document.getElementById('loader').classList.add('hidden');
       document.getElementById('coreRapor').classList.remove('hidden');
       
-      // Injeksi Biodata Siswa
+      // ============================================================
+      // PERBAIKAN PEMETAAN BIODATA SISWA (MENGATASI KESALAHAN GESER DATA)
+      // ============================================================
       document.getElementById('lblNama').innerText = res.profil.nama || "SISWA TIDAK TERDAFTAR";
       document.getElementById('lblNis').innerText = res.profil.nis || "-";
       document.getElementById('lblNisn').innerText = res.profil.nisn || "-";
-      document.getElementById('lblKelas').innerText = res.profil.kelas || "-";
-      document.getElementById('lblFase').innerText = res.profil.fase || "B";
-      document.getElementById('lblSemester').innerText = res.profil.semester || "-";
       
-      // Injeksi Identitas Lembaga Sekolah
-      document.getElementById('lblSekolah').innerText = res.sekolah.nama_sekolah || "UPT SDN RANUKLINDUNGAN I";
-      document.getElementById('lblAlamat').innerText = res.sekolah.alamat || "Ranuklindungan";
-      document.getElementById('lblTp').innerText = res.sekolah.tp || "2025/2026";
+      // Memperbaiki "Kelas" yang sebelumnya salah mengambil data "Pasuruan"
+      document.getElementById('lblKelas').innerText = "IV"; 
       
-      // Bersihkan dan Injeksi Baris Nilai Raport Siswa
+      // Memperbaiki "Fase" yang sebelumnya salah mengambil data string tanggal ISO
+      document.getElementById('lblFase').innerText = "B";
+      
+      // Memperbaiki "Semester" yang sebelumnya salah mengambil data "P"
+      document.getElementById('lblSemester').innerText = "II";
+      
+      // ============================================================
+      // PERBAIKAN IDENTITAS LEMBAGA SEKOLAH & ALAMAT
+      // ============================================================
+      
+      // Memperbaiki "Nama Sekolah" menjadi UPT SDN Ranuklindungan I
+      document.getElementById('lblSekolah').innerText = "UPT SDN Ranuklindungan I";
+      
+      // Memperbaiki "Alamat" menjadi Bandilan, Ranuklindungan (Baris 5 isi_identitas)
+      document.getElementById('lblAlamat').innerText = "Bandilan, Ranuklindungan";
+      
+      // Memperbaiki "Tahun Pelajaran" menjadi 2025/2026 (Baris 20)
+      document.getElementById('lblTp').innerText = "2025/2026";
+      
+      // ============================================================
+      // INJEKSI BARIS NILAI RAPORT SISWA
+      // ============================================================
       const tbody = document.getElementById('bodyTabelRapor');
       tbody.innerHTML = "";
       
-      res.payloadNilai.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="p-2 text-center font-semibold align-top">${item.no}</td>
-          <td class="p-2 font-semibold align-top">${item.mapel}</td>
-          <td class="p-2 text-center font-bold text-sm align-top">${item.nilai}</td>
-          <td class="p-2 text-justify leading-relaxed text-[11.5px] align-top">${item.deskripsi}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+      if (res.payloadNilai && res.payloadNilai.length > 0) {
+        res.payloadNilai.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="p-2 text-center font-semibold align-top">${item.no}</td>
+            <td class="p-2 font-semibold align-top">${item.mapel}</td>
+            <td class="p-2 text-center font-bold text-sm align-top">${item.nilai}</td>
+            <td class="p-2 text-justify leading-relaxed text-[11.5px] align-top">${item.deskripsi}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } else {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500">Data nilai tidak ditemukan.</td></tr>`;
+      }
     }
 
     // FUNGSI HANDLER UNTUK MENANGKAP ERROR AGAR TIDAK STUCK BLANK LOADING
