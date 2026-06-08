@@ -49,7 +49,7 @@
         margin: 0 auto !important; 
         padding: 15mm 15mm 15mm 15mm !important; 
         width: 210mm !important; 
-        min-height: auto !important; /* Membuka proteksi agar bisa mengalir sampai 5 halaman murni */
+        min-height: auto !important; 
       }
       tr, .blok-ttd {
         page-break-inside: avoid;
@@ -61,7 +61,7 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (CORE SYSTEM ENGINE V12.3)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (CORE SYSTEM ENGINE V12.4)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -176,7 +176,6 @@
         return;
       }
       
-      // Mengirim request terpadu menuju sistem pemetaan bundle
       const targetApiUrl = `${dynamicAppsScriptUrl}?action=read&no_absen=${encodeURIComponent(currentNoAbsen)}`;
       
       fetch(targetApiUrl)
@@ -185,10 +184,21 @@
           return response.json();
         })
         .then(responseObj => {
-          if (responseObj.status === "SUCCESS" && responseObj.data) {
-            renderBundleKeRapor(responseObj.data);
+          // DEFENSIVE ENGINE: Mengupas data secara cerdas dan adaptif
+          let bundleData = null;
+          
+          if (responseObj.data) {
+            bundleData = responseObj.data;
+          } else if (responseObj.status === "SUCCESS" && !responseObj.data) {
+            bundleData = responseObj;
+          } else if (responseObj.profil || responseObj.payloadNilai) {
+            bundleData = responseObj;
+          }
+
+          if (bundleData && (bundleData.profil || bundleData.payloadNilai)) {
+            renderBundleKeRapor(bundleData);
           } else {
-            tampilkanPesanGagal(responseObj.message || "Gagal menarik struktur paket data.");
+            throw new Error(responseObj.message || "Struktur data tidak dikenali sistem.");
           }
         })
         .catch(err => {
@@ -201,17 +211,19 @@
       document.getElementById('coreRapor').classList.remove('hidden');
       
       // 1. Sinkronisasi Data Profil Siswa
-      document.getElementById('lblNama').innerText = bundle.profil.nama || "-";
-      document.getElementById('lblMurniNis').innerText = bundle.profil.nis || "-";
-      document.getElementById('lblMurniNisn').innerText = bundle.profil.nisn || "-";
-      document.getElementById('lblKelas').innerText = bundle.profil.kelas || "IV";
-      document.getElementById('lblFase').innerText = bundle.profil.fase || "B";
-      document.getElementById('lblSemester').innerText = bundle.profil.semester || "II";
+      document.getElementById('lblNama').innerText = (bundle.profil && bundle.profil.nama) ? bundle.profil.nama : "-";
+      document.getElementById('lblMurniNis').innerText = (bundle.profil && bundle.profil.nis) ? bundle.profil.nis : "-";
+      document.getElementById('lblMurniNisn').innerText = (bundle.profil && bundle.profil.nisn) ? bundle.profil.nisn : "-";
+      document.getElementById('lblKelas').innerText = (bundle.profil && bundle.profil.kelas) ? bundle.profil.kelas : "IV";
+      document.getElementById('lblFase').innerText = (bundle.profil && bundle.profil.fase) ? bundle.profil.fase : "B";
+      document.getElementById('lblSemester').innerText = (bundle.profil && bundle.profil.semester) ? bundle.profil.semester : "II";
       
       // 2. Sinkronisasi Data Sekolah Dinamis Dari Spreadsheet Tab 'identitas_sekolah'
-      document.getElementById('lblSekolah').innerText = bundle.sekolah.nama_sekolah || "UPT SDN Ranuklindungan I";
-      document.getElementById('lblAlamat').innerText = bundle.sekolah.alamat || "Bandilan, Ranuklindungan";
-      document.getElementById('lblTp').innerText = bundle.sekolah.tp || "2025/2026";
+      if (bundle.sekolah) {
+        document.getElementById('lblSekolah').innerText = bundle.sekolah.nama_sekolah || "UPT SDN Ranuklindungan I";
+        document.getElementById('lblAlamat').innerText = bundle.sekolah.alamat || "Bandilan, Ranuklindungan";
+        document.getElementById('lblTp').innerText = bundle.sekolah.tp || "2025/2026";
+      }
       
       // Set otomatis tanggal lokal hari ini di lembar rapor
       const opsiTanggal = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -221,16 +233,21 @@
       const tbody = document.getElementById('bodyTabelRapor');
       tbody.innerHTML = "";
       
-      bundle.payloadNilai.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="p-2.5 text-center font-semibold align-top">${item.no}</td>
-          <td class="p-2.5 font-semibold align-top">${item.mapel}</td>
-          <td class="p-2.5 text-center font-bold text-sm align-top bg-slate-50">${item.nilai}</td>
-          <td class="p-2.5 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${item.deskripsi}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+      const daftarNilai = bundle.payloadNilai || [];
+      if (daftarNilai.length > 0) {
+        daftarNilai.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="p-2.5 text-center font-semibold align-top">${item.no}</td>
+            <td class="p-2.5 font-semibold align-top">${item.mapel}</td>
+            <td class="p-2.5 text-center font-bold text-sm align-top bg-slate-50">${item.nilai}</td>
+            <td class="p-2.5 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${item.deskripsi}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } else {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500 font-bold">Data nilai tidak ditemukan dalam paket.</td></tr>`;
+      }
     }
 
     function tampilkanPesanGagal(pesanError) {
