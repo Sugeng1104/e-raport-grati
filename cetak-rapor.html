@@ -61,8 +61,8 @@
         min-height: auto !important; 
       }
       
-      /* Mencegah pemotongan baris tabel di tengah-tengah kalimat */
-      tr {
+      /* Mencegah pemotongan baris tabel atau area tanda tangan di tengah-tengah halaman */
+      tr, .blok-ttd {
         page-break-inside: avoid;
         page-break-after: auto;
       }
@@ -72,7 +72,7 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (SERVER GITHUB V12.7)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (SERVER GITHUB V12.8)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -142,7 +142,7 @@
         </table>
       </div>
 
-      <table class="w-full tabel-border-tegas text-xs text-left">
+      <table class="w-full tabel-border-tegas text-xs text-left mb-8">
         <thead>
           <tr class="bg-slate-50 text-center font-bold">
             <th class="p-2 w-10 text-center">No</th>
@@ -154,6 +154,23 @@
         <tbody id="bodyTabelRapor" class="divide-y divide-black font-normal">
           </tbody>
       </table>
+
+      <div class="blok-ttd grid grid-cols-3 text-center text-xs mt-12 gap-4 leading-relaxed">
+        <div>
+          <p class="mb-16">Mengetahui,<br>Orang Tua / Wali Murid</p>
+          <p class="font-bold border-b border-black w-44 mx-auto"></p>
+        </div>
+        <div>
+          <p class="mb-16"><br>Kepala Sekolah</p>
+          <p class="font-bold border-b border-black w-44 mx-auto"></p>
+          <p class="text-[11px] text-slate-600">NIP. ...................................</p>
+        </div>
+        <div>
+          <p class="mb-16">Pasuruan, ..... .................... 2026<br>Guru Kelas IV</p>
+          <p class="font-bold border-b border-black w-44 mx-auto"></p>
+          <p class="text-[11px] text-slate-600">NIP. ...................................</p>
+        </div>
+      </div>
       
     </div>
   </div>
@@ -179,7 +196,6 @@
           return response.json();
         })
         .then(responseObj => {
-          // Jika Apps Script mengembalikan objek utama di dalam properti 'data'
           if (responseObj.status === "SUCCESS") {
             const dataSiswa = responseObj.data ? responseObj.data : responseObj;
             renderDataKeRapor(dataSiswa);
@@ -212,9 +228,7 @@
       const tbody = document.getElementById('bodyTabelRapor');
       tbody.innerHTML = "";
       
-      // ============================================================
       // PEMETAAN AKURAT: Sesuai Struktur Kolom & Urutan Deskripsi Anda
-      // ============================================================
       const strukturRapor = [
         { no: 1,  tampil: "Agama",             keyNilai: "Agama",            keyDeskripsi: "Deskripsi_1" },
         { no: 2,  tampil: "Bahasa Indonesia",  keyNilai: "Bahasa Indonesia", keyDeskripsi: "Deskripsi_2" },
@@ -223,21 +237,18 @@
         { no: 5,  tampil: "IPAS",              keyNilai: "IPAS",             keyDeskripsi: "Deskripsi_5" },
         { no: 6,  tampil: "Kesenian",          keyNilai: "Kesenian",         keyDeskripsi: "Deskripsi_6" },
         { no: 7,  tampil: "PJOK",              keyNilai: "PJOK",             keyDeskripsi: "Deskripsi_7" },
-        { no: 8,  tampil: "Bahasa Inggris",    keyNilai: "Bahasa Inggris",   keyDeskripsi: "Deskripsi_8" }, // menangani typo kolom jika ada
+        { no: 8,  tampil: "Bahasa Inggris",    keyNilai: "Bahasa Inggris",   keyDeskripsi: "Deskripsi_8" }, 
         { no: 9,  tampil: "Bahasa Jawa",       keyNilai: "Bahasa Jawa",      keyDeskripsi: "Deskripsi_9" },
         { no: 10, tampil: "BTQ",               keyNilai: "BTQ",              keyDeskripsi: "Deskripsi_10" }
       ];
       
       strukturRapor.forEach(item => {
-        // Ambil Nilai Akhir (Mendukung pengecekan variasi spasi/tulisan kolom)
         let nilaiAkhir = res[item.keyNilai] !== undefined ? res[item.keyNilai] : "-";
         
-        // Atasi jika ada variasi nama kolom Bahasa Inggris di Apps Script Anda (Bahasa Ingrris vs Bahasa Inggris)
         if (item.keyNilai === "Bahasa Inggris" && nilaiAkhir === "-") {
           nilaiAkhir = res["Bahasa Ingrris"] !== undefined ? res["Bahasa Ingrris"] : "-";
         }
 
-        // Ambil Capaian Kompetensi dari kolom Deskripsi terkait
         let deskripsiCapaian = res[item.keyDeskripsi] || "Menunjukkan penguasaan kompetensi yang baik.";
 
         const tr = document.createElement('tr');
