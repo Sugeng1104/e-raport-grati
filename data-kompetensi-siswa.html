@@ -74,9 +74,15 @@
                         <span class="text-[10px] text-slate-400 mt-0.5">Mendukung format .xlsx / .xls</span>
                     </div>
 
-                    <button type="button" onclick="eksekusiKirimNilaiExcel()" id="btnKirimNilai" class="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow transition text-sm flex items-center justify-center space-x-2">
-                        <span>🚀</span> <span>Kirim Nilai</span>
-                    </button>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button type="button" onclick="eksekusiKirimNilaiExcel()" id="btnKirimNilai" class="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow transition text-sm flex items-center justify-center space-x-2">
+                            <span>🚀</span> <span>Kirim Berkas Excel</span>
+                        </button>
+                        
+                        <button type="button" onclick="eksekusiKirimNilaiTotal()" id="btnKirimTotal" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow transition text-sm flex items-center justify-center space-x-2">
+                            <span>📊</span> <span>Kirim Nilai Total (Rata-rata)</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -213,7 +219,7 @@
             const reader = new FileReader();
             
             btn.disabled = true;
-            btn.innerHTML = `<span>⏳</span> <span>Memproses & Menyinkronkan Nilai...</span>`;
+            btn.innerHTML = `<span>⏳</span> <span>Memproses...</span>`;
 
             reader.onload = async function(e) {
                 const base64Data = e.target.result.split(',')[1];
@@ -248,10 +254,10 @@
 
                 } catch (error) {
                     console.error("Fetch Error:", error);
-                    alert("Terjadi gangguan komunikasi data. Namun silakan periksa Google Sheet Anda beberapa saat lagi untuk memastikan apakah proses background berhasil.");
+                    alert("Terjadi gangguan komunikasi data.");
                 } finally {
                     btn.disabled = false;
-                    btn.innerHTML = `<span>🚀</span> <span>Kirim Nilai</span>`;
+                    btn.innerHTML = `<span>🚀</span> <span>Kirim Berkas Excel</span>`;
                 }
             };
 
@@ -259,7 +265,46 @@
         }
 
         // =========================================================================
-        // LOGIKA POP-UP INTERAKTIF UNTUK DAFTAR TAB SHEET (TERBARU)
+        // LOGIKA BARU: HITUNG OTOMATIS RATA-RATA DAN KIRIM KE SPREADSHEET RAPOR TOTAL
+        // =========================================================================
+        async function eksekusiKirimNilaiTotal() {
+            const btn = document.getElementById('btnKirimTotal');
+            if(!confirm("Apakah Anda ingin menghitung rata-rata nilai UH seluruh mapel dari database saat ini dan mengirimkannya ke Rekapitulasi Rapor Pusat?")) {
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<span>⏳</span> <span>Mengkalkulasi & Sinkronisasi...</span>`;
+
+            try {
+                const response = await fetch(API_SHEET_URL, {
+                    method: "POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8"
+                    },
+                    body: JSON.stringify({ tipe: "hitung_dan_kirim_total" })
+                });
+
+                const textResponse = await response.text();
+                const result = JSON.parse(textResponse);
+
+                if (result.status === "SUCCESS") {
+                    alert(`🎉 SINKRONISASI BERHASIL!\n\n${result.message}`);
+                } else {
+                    alert(`❌ GAGAL: ${result.message}`);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Terjadi masalah saat menghubungi server Google Apps Script.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>📊</span> <span>Kirim Nilai Total (Rata-rata)</span>`;
+            }
+        }
+
+        // =========================================================================
+        // LOGIKA POP-UP INTERAKTIF UNTUK DAFTAR TAB SHEET
         // =========================================================================
         async function bukaPreviewTab(namaTab) {
             const modal = document.getElementById('modalPreviewTab');
@@ -273,14 +318,12 @@
             const tHead = document.getElementById('modalTableHead');
             const tBody = document.getElementById('modalTableBody');
 
-            // Jalankan animasi pembukaan Modal
             modal.classList.remove('hidden');
             setTimeout(() => {
                 content.classList.remove('scale-95', 'opacity-0');
                 content.classList.add('scale-100', 'opacity-100');
             }, 25);
 
-            // Set tampilan awal status memuat data
             title.innerText = `Pratinjau Database: ${namaTab}`;
             subtitle.innerText = "Menghubungkan ke API Gateway...";
             loading.classList.remove('hidden');
@@ -290,7 +333,6 @@
             tBody.innerHTML = '';
 
             try {
-                // Request GET ke Apps Script memakai parameter action=getPreviewTab
                 const responServer = await fetch(`${API_SHEET_URL}?action=getPreviewTab&tabName=${namaTab}`);
                 const dataJson = await responServer.json();
 
@@ -302,7 +344,6 @@
                     if (dataJson.data.length === 0) {
                         emptyNotice.classList.remove('hidden');
                     } else {
-                        // Susun Header Kolom Tabel secara Dinamis
                         let barisHeaderHtml = '<tr>';
                         dataJson.headers.forEach(headKolom => {
                             barisHeaderHtml += `<th class="px-4 py-2.5 border-b border-slate-200 font-bold bg-slate-100 text-slate-800">${headKolom}</th>`;
@@ -310,7 +351,6 @@
                         barisHeaderHtml += '</tr>';
                         tHead.innerHTML = barisHeaderHtml;
 
-                        // Susun Seluruh Baris Sampel Data Nilai Siswa (Maksimal 5)
                         let barisDataHtml = '';
                         dataJson.data.forEach(itemBaris => {
                             barisDataHtml += '<tr class="hover:bg-slate-50/80 transition-colors">';
@@ -332,7 +372,7 @@
                 console.error("Gagal mendapatkan pratinjau tab:", err);
                 loading.classList.add('hidden');
                 subtitle.innerText = "Koneksi terputus.";
-                tBody.innerHTML = `<tr><td class="px-4 py-8 text-center text-red-500 font-bold text-xs">Gagal terhubung dengan server cloud. Mohon verifikasi apakah Web App Apps Script sudah dideploy dengan benar sebagai 'Anyone'.</td></tr>`;
+                tBody.innerHTML = `<tr><td class="px-4 py-8 text-center text-red-500 font-bold text-xs">Gagal terhubung dengan server cloud.</td></tr>`;
                 wrapper.classList.remove('hidden');
             }
         }
@@ -349,7 +389,6 @@
             }, 180);
         }
 
-        // Tutup otomatis jika admin mengklik area luar modal yang transparan
         window.onclick = function(e) {
             const modal = document.getElementById('modalPreviewTab');
             if (e.target === modal) {
