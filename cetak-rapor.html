@@ -27,7 +27,7 @@
 <body>
 
   <div class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md">
-    <div class="text-xs font-bold font-sans">📄 PRATINJAU DOKUMEN RAPOR ELEKTRONIK (UPT SDN RANUKLINDUNGAN I)</div>
+    <div class="text-xs font-bold font-sans">📄 PRATINJAU RAPOR ELEKTRONIK (UPT SDN RANUKLINDUNGAN I)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -37,6 +37,7 @@
     </div>
 
     <div id="coreRapor" class="hidden">
+      
       <div class="flex items-center justify-start gap-6 border-b-2 border-black pb-4 mb-6">
         <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Logo_Kabupaten_Pasuruan.png" class="w-20 h-auto object-contain" alt="Logo">
         <div class="text-center flex-1 pr-16">
@@ -108,24 +109,29 @@
   </div>
 
   <script>
-    // Tarik parameter noAbsen dari template backend
+    // Penangkapan No Absen secara Dinamis dari Server Template Engine (.gs)
     const currentNoAbsen = "<?= noAbsen ?>";
 
     window.addEventListener('DOMContentLoaded', function() {
-      if(!currentNoAbsen) return;
+      if(!currentNoAbsen) {
+        document.getElementById('loader').innerText = "Gagal memuat pratinjau: Parameter nomor absen tidak terdefinisi.";
+        return;
+      }
       
-      // Ambil data ter-bundling dari server Google Apps Script
+      // Panggil fungsi penarik data yang berada di backend Kode.gs
       google.script.run
         .withSuccessHandler(renderDataKeRapor)
         .withFailureHandler(handleErrorFetch)
         .getBundledDataRapor(currentNoAbsen);
     });
 
+    // Callback Sukses: Memetakan payload objek ke struktur HTML
     function renderDataKeRapor(res) {
+      // Sembunyikan loader dan tampilkan layout utama lembar rapor
       document.getElementById('loader').classList.add('hidden');
       document.getElementById('coreRapor').classList.remove('hidden');
       
-      // Pasang Meta Data Identitas
+      // Sinkronisasi data identitas siswa & sekolah
       document.getElementById('lblNama').innerText = res.profil.nama || "-";
       document.getElementById('lblNis').innerText = res.profil.nis || "-";
       document.getElementById('lblNisn').innerText = res.profil.nisn || "-";
@@ -133,28 +139,34 @@
       document.getElementById('lblFase').innerText = res.profil.fase || "-";
       document.getElementById('lblSemester').innerText = res.profil.semester || "-";
       
-      document.getElementById('lblSekolah').innerText = res.sekolah.nama_sekolah;
-      document.getElementById('lblAlamat').innerText = res.sekolah.alamat;
-      document.getElementById('lblTp').innerText = res.sekolah.tp;
+      document.getElementById('lblSekolah').innerText = res.sekolah.nama_sekolah || "UPT SDN Ranuklindungan I";
+      document.getElementById('lblAlamat').innerText = res.sekolah.alamat || "Ranuklindungan";
+      document.getElementById('lblTp').innerText = res.sekolah.tp || "2025/2026";
       
-      // Pasang Baris Tabel Nilai
+      // Pembuatan baris tabel nilai berkala
       const tbody = document.getElementById('bodyTabelRapor');
       tbody.innerHTML = "";
       
-      res.payloadNilai.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="p-2 text-center valign-top font-semibold">${item.no}</td>
-          <td class="p-2 font-semibold valign-top">${item.mapel}</td>
-          <td class="p-2 text-center font-bold valign-top text-sm">${item.nilai}</td>
-          <td class="p-2 text-justify leading-relaxed text-[11.5px]">${item.deskripsi}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+      if (res.payloadNilai && res.payloadNilai.length > 0) {
+        res.payloadNilai.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="p-2 text-center font-semibold border-r border-black align-top">${item.no}</td>
+            <td class="p-2 font-semibold border-r border-black align-top">${item.mapel}</td>
+            <td class="p-2 text-center font-bold text-sm border-r border-black align-top">${item.nilai}</td>
+            <td class="p-2 text-justify leading-relaxed text-[11.5px] align-top">${item.deskripsi}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } else {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500 font-bold">Data nilai raport siswa kosong atau belum digenerate.</td></tr>`;
+      }
     }
 
+    // Callback Gagal: Menampilkan log kesalahan system crash
     function handleErrorFetch(err) {
-      document.getElementById('loader').innerText = "Gagal memproses dokumen cetak: " + err.toString();
+      document.getElementById('loader').classList.remove('animate-pulse');
+      document.getElementById('loader').innerHTML = `<span class="text-red-600">Gagal memproses dokumen cetak: ${err.toString()}</span>`;
     }
   </script>
 </body>
