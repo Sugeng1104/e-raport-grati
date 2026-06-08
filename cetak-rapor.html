@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* ============================================================
-       PENGATURAN LAYOUT UTAMA & BAGIAN NON-CETAK
+       PENGATURAN LAYOUT UTAMA (MENDUKUNG MULTI-HALAMAN / MULTI-PAGE)
        ============================================================ */
     body { 
       font-family: 'Calibri', 'Arial', sans-serif; 
@@ -38,7 +38,7 @@
     }
 
     @media print {
-      /* Sembunyikan BAR NAVIGASI ATAS secara total dan paksa */
+      /* Sembunyikan BAR NAVIGASI ATAS secara total saat dicetak */
       .no-print, #navigasiAtas, [class*="no-print"] { 
         display: none !important; 
         height: 0 !important;
@@ -47,7 +47,7 @@
         visibility: hidden !important;
       }
       
-      /* Format lembar cetak agar nempel pas di kertas A4 */
+      /* Format agar cetakan memanjang alami sesuai kebutuhan data (Bisa sampai 5 halaman) */
       body { 
         background: #ffffff !important; 
         margin: 0 !important; 
@@ -56,11 +56,15 @@
       .lembar-rapor { 
         box-shadow: none !important; 
         margin: 0 auto !important; 
-        padding: 15mm 15mm 10mm 15mm !important; 
+        padding: 15mm 15mm 15mm 15mm !important; 
         width: 210mm !important; 
-        min-height: 297mm !important;
-        page-break-after: avoid;
-        page-break-before: avoid;
+        min-height: auto !important; /* Diubah ke auto agar tidak memaksa potong 1 halaman */
+      }
+      
+      /* Mencegah pemotongan baris tabel di tengah-tengah kalimat */
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
       }
     }
   </style>
@@ -68,7 +72,7 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (SERVER GITHUB V12.5)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (SERVER GITHUB V12.6)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -101,7 +105,7 @@
           <tr>
             <td class="py-0.5 font-medium">NIS / NISN</td>
             <td>:</td>
-            <td><span id="lblNis">-</span> / <span id="lblNisn">-</span></td>
+            <td><span id="lblMurniNis">-</span> / <span id="lblMurniNisn">-</span></td>
           </tr>
           <tr>
             <td class="py-0.5 font-medium">Nama Sekolah</td>
@@ -167,7 +171,7 @@
         return;
       }
       
-      // DISESUAIKAN: Menggunakan action=read agar dipahami oleh Google Script Anda
+      // Mengarahkan request data menuju endpoint action=read
       const targetApiUrl = `${dynamicAppsScriptUrl}?action=read&no_absen=${encodeURIComponent(currentNoAbsen)}`;
       
       fetch(targetApiUrl)
@@ -191,12 +195,12 @@
       document.getElementById('loader').classList.add('hidden');
       document.getElementById('coreRapor').classList.remove('hidden');
       
-      // Injeksi Biodata Pokok dari Response Server
+      // Injeksi Biodata Utama
       document.getElementById('lblNama').innerText = res.nama || "SISWA TIDAK TERDAFTAR";
-      document.getElementById('lblNis').innerText = res.nis || "-";
-      document.getElementById('lblNisn').innerText = res.nisn || "-";
+      document.getElementById('lblMurniNis').innerText = res.nis || "-";
+      document.getElementById('lblMurniNisn').innerText = res.nisn || "-";
       
-      // Ketentuan Statis sesuai Instruksi Khusus Anda
+      // Parameter Ketentuan Lembaga Sekolah Sesuai Instruksi
       document.getElementById('lblKelas').innerText = "IV"; 
       document.getElementById('lblFase').innerText = "B";
       document.getElementById('lblSemester').innerText = "II";
@@ -204,27 +208,37 @@
       document.getElementById('lblAlamat').innerText = "Bandilan, Ranuklindungan";
       document.getElementById('lblTp').innerText = "2025/2026";
       
-      // Injeksi Baris Nilai Rapor secara Dinamis
       const tbody = document.getElementById('bodyTabelRapor');
       tbody.innerHTML = "";
       
-      // Membaca susunan komponen mapel
+      // Daftar Struktur Mapel Resmi
       const mapelList = ["Agama", "Pancasila", "B. Indonesia", "Matematika", "IPAS", "PJOK", "Kesenian", "B. Jawa", "B. Inggris", "BTQ"];
       
       let nomor = 1;
       mapelList.forEach(m => {
-        // Mengambil Nilai Akhir (Menggunakan dataAsas/dataSumatif sebagai representasi, atau sesuaikan payload)
-        const nilaiAkhir = res.dataAsas && res.dataAsas[m] !== undefined && res.dataAsas[m] !== "" ? res.dataAsas[m] : "-";
-        
-        // Deskripsi Capaian Kompetensi bawaan placeholder pintar
-        const deskripsiKompetensi = `Menunjukkan pemahaman yang sangat baik dalam mempelajari materi ${m}. Serta mampu menyelesaikan tugas-tugas berbasis kompetensi yang diberikan sepanjang semester dengan hasil yang optimal.`;
+        let nilaiAkhirRapor = "-";
+        let deskripsiRapor = "Belum ada deskripsi capaian kompetensi.";
+
+        // PEMBACAAN DINAMIS: Mengambil dari payload khusus hasil kalkulasi sheet 'rapor_siswa'
+        if (res.dataRaporFinal && res.dataRaporFinal[m]) {
+          nilaiAkhirRapor = res.dataRaporFinal[m].nilai !== undefined ? res.dataRaporFinal[m].nilai : "-";
+          deskripsiRapor = res.dataRaporFinal[m].deskripsi || "Menunjukkan penguasaan materi yang baik.";
+        } else {
+          // Fallback Alternatif jika struktur nested JSON berbeda, membaca data murni
+          if (res.dataAsas && res.dataAsas[m] !== undefined) {
+            nilaiAkhirRapor = res.dataAsas[m];
+          }
+          if (res.dataDeskripsi && res.dataDeskripsi[m]) {
+            deskripsiRapor = res.dataDeskripsi[m];
+          }
+        }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="p-2 text-center font-semibold align-top">${nomor++}</td>
-          <td class="p-2 font-semibold align-top">${m}</td>
-          <td class="p-2 text-center font-bold text-sm align-top">${nilaiAkhir}</td>
-          <td class="p-2 text-justify leading-relaxed text-[11.5px] align-top">${deskripsiKompetensi}</td>
+          <td class="p-2.5 text-center font-semibold align-top">${nomor++}</td>
+          <td class="p-2.5 font-semibold align-top">${m}</td>
+          <td class="p-2.5 text-center font-bold text-sm align-top bg-slate-50">${nilaiAkhirRapor}</td>
+          <td class="p-2.5 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${deskripsiRapor}</td>
         `;
         tbody.appendChild(tr);
       });
