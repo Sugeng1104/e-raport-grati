@@ -84,7 +84,8 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbydH3Oe4KcSH7keRwH8KoBjzpBkJYf1QxIHy9-qz5FwokLrb13LVxv8CJ1RaFWv5lX_yw/exec";
+        // TARGET URL API APPS SCRIPT RESMI (ISOLATED ENGINE V12.5)
+        const API_URL = "https://script.google.com/macros/s/AKfycbwhmIfqdaDcv11KPNquST0b5x4L4Zu_oeYb12lV8_y_GlOwpIKw_40vKg9NwQICFv92/exec";
 
         // Otomatis muat daftar tabel status cetak saat aplikasi dibuka pertama kali
         window.addEventListener('DOMContentLoaded', muatStatusCetakSemuaSiswa);
@@ -189,7 +190,7 @@
         }
 
         // =========================================================================
-        // HUBUNGAN JEMBATAN OTOMATIS KE FILE CETAK-RAPOR.HTML GITHUB
+        // HUBUNGAN JEMBATAN OTOMATIS KE FILE CETAK-RAPOR.HTML GITHUB (JALUR PINTAS)
         // =========================================================================
         function aksiCetak(noAbsen) {
             // 1. Dapatkan URL dasar halaman saat ini secara otomatis (mengikuti struktur folder GitHub Anda)
@@ -199,8 +200,8 @@
             // 2. Rakit URL menuju file cetak-rapor.html yang berada dalam satu folder di GitHub
             const halamanCetakTarget = `${baseUrl}/cetak-rapor.html`;
             
-            // 3. Gabungkan parameter tanpa meng-hardcode url api di file cetak
-            const urlFinal = `${halamanCetakTarget}?no_absen=${encodeURIComponent(noAbsen)}&api_url=${encodeURIComponent(API_URL)}`;
+            // 3. Gabungkan parameter dengan tambahan penunjuk bypass page=cetak agar langsung terbaca di server Google
+            const urlFinal = `${halamanCetakTarget}?no_absen=${encodeURIComponent(noAbsen)}&page=cetak&api_url=${encodeURIComponent(API_URL)}`;
             
             // 4. Buka lembar cetak rapor resmi di tab baru browser
             window.open(urlFinal, '_blank');
