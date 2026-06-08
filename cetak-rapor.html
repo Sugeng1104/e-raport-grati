@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* ============================================================
-       PENGATURAN LAYOUT UTAMA (MENDUKUNG MULTI-HALAMAN / MULTI-PAGE)
+       LAYOUT ENGINE & MULTI-PAGE PRINT CONFIGURATION
        ============================================================ */
     body { 
       font-family: 'Calibri', 'Arial', sans-serif; 
@@ -19,7 +19,7 @@
     .lembar-rapor {
       background: white;
       width: 210mm;
-      min-height: 297mm;
+      min-height: 297mm; /* Standar Tinggi A4 */
       padding: 20mm 20mm 15mm 20mm;
       margin: 20px auto;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -30,15 +30,15 @@
     }
 
     /* ============================================================
-       ATURAN SAKRAL MODE CETAK (PRINT MODE)
+       MEDIA PRINT CONTROL (ANTI-DOWNTIME & CLEAN OUTPUT)
        ============================================================ */
     @page {
-      size: A4;           /* Memaksa kertas berukuran A4 */
-      margin: 0mm;        /* Menghilangkan header tanggal & title bawaan browser */
+      size: A4;           
+      margin: 0mm;        
     }
 
     @media print {
-      /* Sembunyikan BAR NAVIGASI ATAS secara total saat dicetak */
+      /* Hilangkan bar navigasi portal secara mutlak */
       .no-print, #navigasiAtas, [class*="no-print"] { 
         display: none !important; 
         height: 0 !important;
@@ -47,7 +47,7 @@
         visibility: hidden !important;
       }
       
-      /* Format agar cetakan memanjang alami sesuai kebutuhan data (Bisa sampai 5 halaman) */
+      /* Biarkan konten mengalir alami hingga 5 halaman tanpa terpotong */
       body { 
         background: #ffffff !important; 
         margin: 0 !important; 
@@ -61,8 +61,8 @@
         min-height: auto !important; 
       }
       
-      /* Mencegah pemotongan baris tabel atau area tanda tangan di tengah-tengah halaman */
-      tr, .blok-ttd {
+      /* Mengamankan row tabel agar tidak patah di tengah kalimat saat ganti halaman */
+      tr {
         page-break-inside: avoid;
         page-break-after: auto;
       }
@@ -71,19 +71,24 @@
 </head>
 <body>
 
+  <!-- CONTROL BAR NAVIGATION (DILINDUNGI CLASS NO-PRINT) -->
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (SERVER GITHUB V12.8)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (SERVER GITHUB V12.9)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
+  <!-- CONTAINER UTAMA RAPOR -->
   <div class="lembar-rapor" id="kontenRapor">
     
+    <!-- STATE LOADER INTERFACE -->
     <div id="loader" class="text-center text-slate-500 font-bold text-sm pt-20 animate-pulse font-sans">
-      🔄 Menghubungkan ke Cloud Storage database, menyusun dokumen hasil belajar...
+      🔄 Mengambil data entitas dari spreadsheet 'rapor_siswa', menyusun dokumen...
     </div>
 
+    <!-- DOCUMENT CORE RENDERER -->
     <div id="coreRapor" class="hidden">
       
+      <!-- HEADER / KOP LAPORAN -->
       <div class="flex items-center justify-start gap-6 border-b-2 border-black pb-4 mb-6">
         <img src="https://pasuruankab.go.id/assets/img/logo.png" 
              onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/d3/Logo_Kabupaten_Pasuruan.png';" 
@@ -95,6 +100,7 @@
         </div>
       </div>
 
+      <!-- METADATA BIODATA SISWA & LEMBAGA -->
       <div class="grid grid-cols-2 gap-x-8 text-[12.5px] leading-relaxed mb-6">
         <table class="w-full">
           <tr>
@@ -105,7 +111,7 @@
           <tr>
             <td class="py-0.5 font-medium">NIS / NISN</td>
             <td>:</td>
-            <td><span id="lblMurniNis">-</span> / <span id="lblMurniNisn">-</span></td>
+            <td>- / <span id="lblMurniNisn">-</span></td>
           </tr>
           <tr>
             <td class="py-0.5 font-medium">Nama Sekolah</td>
@@ -142,6 +148,7 @@
         </table>
       </div>
 
+      <!-- TABEL UTAMA CAPAIAN KOMPETENSI (DATA-DRIVEN) -->
       <table class="w-full tabel-border-tegas text-xs text-left mb-8">
         <thead>
           <tr class="bg-slate-50 text-center font-bold">
@@ -152,30 +159,15 @@
           </tr>
         </thead>
         <tbody id="bodyTabelRapor" class="divide-y divide-black font-normal">
-          </tbody>
+          <!-- Iterasi Row Data Masuk Disini -->
+        </tbody>
       </table>
-
-      <div class="blok-ttd grid grid-cols-3 text-center text-xs mt-12 gap-4 leading-relaxed">
-        <div>
-          <p class="mb-16">Mengetahui,<br>Orang Tua / Wali Murid</p>
-          <p class="font-bold border-b border-black w-44 mx-auto"></p>
-        </div>
-        <div>
-          <p class="mb-16"><br>Kepala Sekolah</p>
-          <p class="font-bold border-b border-black w-44 mx-auto"></p>
-          <p class="text-[11px] text-slate-600">NIP. ...................................</p>
-        </div>
-        <div>
-          <p class="mb-16">Pasuruan, ..... .................... 2026<br>Guru Kelas IV</p>
-          <p class="font-bold border-b border-black w-44 mx-auto"></p>
-          <p class="text-[11px] text-slate-600">NIP. ...................................</p>
-        </div>
-      </div>
       
     </div>
   </div>
 
   <script>
+    // PARSING URL PARAMETERS
     const urlParams = new URLSearchParams(window.location.search);
     const currentNoAbsen = urlParams.get('no_absen');
     const dynamicAppsScriptUrl = urlParams.get('api_url');
@@ -184,7 +176,7 @@
       if(!currentNoAbsen || !dynamicAppsScriptUrl) {
         document.getElementById('loader').removeAttribute('class');
         document.getElementById('loader').className = "text-center p-10 text-sm font-sans text-amber-600 font-bold bg-amber-50 rounded-xl border border-amber-200 m-5";
-        document.getElementById('loader').innerHTML = "⚠️ DATA PARAMETER UNTUK CETAK BELUM LENGKAP";
+        document.getElementById('loader').innerHTML = "⚠️ PARAMETER API URL ATAU NO ABSEN TIDAK TERDETEKSI";
         return;
       }
       
@@ -192,16 +184,19 @@
       
       fetch(targetApiUrl)
         .then(response => {
-          if (!response.ok) throw new Error("Respon jaringan internet bermasalah.");
+          if (!response.ok) throw new Error("Gagal melakukan kontak dengan Google Apps Script API.");
           return response.json();
         })
         .then(responseObj => {
-          if (responseObj.status === "SUCCESS") {
-            const dataSiswa = responseObj.data ? responseObj.data : responseObj;
-            renderDataKeRapor(dataSiswa);
-          } else {
-            tampilkanPesanGagal(responseObj.message);
+          // Kunci Perbaikan: Mengupas pembungkus data secara aman
+          let cleanPayload = responseObj;
+          if (responseObj.status === "SUCCESS" && responseObj.data) {
+            cleanPayload = responseObj.data;
+          } else if (responseObj.dataSiswa) {
+            cleanPayload = responseObj.dataSiswa;
           }
+          
+          renderDataKeRapor(cleanPayload);
         })
         .catch(err => {
           tampilkanPesanGagal(err.toString());
@@ -212,12 +207,11 @@
       document.getElementById('loader').classList.add('hidden');
       document.getElementById('coreRapor').classList.remove('hidden');
       
-      // Injeksi Biodata Pokok dari Kolom Sheet
-      document.getElementById('lblNama').innerText = res.Nama || res.nama || "SISWA TIDAK TERDAFTAR";
-      document.getElementById('lblMurniNis').innerText = res.NIS || "-";
+      // Sinkronisasi Data Atas Pokok Langsung dari Target Property JSON
+      document.getElementById('lblNama').innerText = res.Nama || res.nama || "SISWA TANPA NAMA";
       document.getElementById('lblMurniNisn').innerText = res.NISN || res.nisn || "-";
       
-      // Pengaturan Identitas Sekolah Sesuai Instruksi Anda
+      // Penguncian Data Identitas Statis Sesuai Instruksi Layar Rapor
       document.getElementById('lblKelas').innerText = "IV"; 
       document.getElementById('lblFase').innerText = "B";
       document.getElementById('lblSemester').innerText = "II";
@@ -228,35 +222,42 @@
       const tbody = document.getElementById('bodyTabelRapor');
       tbody.innerHTML = "";
       
-      // PEMETAAN AKURAT: Sesuai Struktur Kolom & Urutan Deskripsi Anda
-      const strukturRapor = [
-        { no: 1,  tampil: "Agama",             keyNilai: "Agama",            keyDeskripsi: "Deskripsi_1" },
-        { no: 2,  tampil: "Bahasa Indonesia",  keyNilai: "Bahasa Indonesia", keyDeskripsi: "Deskripsi_2" },
-        { no: 3,  tampil: "Pancasila",         keyNilai: "Pancasila",        keyDeskripsi: "Deskripsi_3" },
-        { no: 4,  tampil: "Matematika",        keyNilai: "Matematika",       keyDeskripsi: "Deskripsi_4" },
-        { no: 5,  tampil: "IPAS",              keyNilai: "IPAS",             keyDeskripsi: "Deskripsi_5" },
-        { no: 6,  tampil: "Kesenian",          keyNilai: "Kesenian",         keyDeskripsi: "Deskripsi_6" },
-        { no: 7,  tampil: "PJOK",              keyNilai: "PJOK",             keyDeskripsi: "Deskripsi_7" },
-        { no: 8,  tampil: "Bahasa Inggris",    keyNilai: "Bahasa Inggris",   keyDeskripsi: "Deskripsi_8" }, 
-        { no: 9,  tampil: "Bahasa Jawa",       keyNilai: "Bahasa Jawa",      keyDeskripsi: "Deskripsi_9" },
-        { no: 10, tampil: "BTQ",               keyNilai: "BTQ",              keyDeskripsi: "Deskripsi_10" }
+      // ARCHITECTURE MAPPING: Menyelaraskan String JSON Tepat dengan Skema Database
+      const skemaKolomRapor = [
+        { no: 1,  mapel: "Agama",             keyNilai: "Agama",            keyDesc: "Deskripsi_1" },
+        { no: 2,  mapel: "Bahasa Indonesia",  keyNilai: "Bahasa Indonesia", keyDesc: "Deskripsi_2" },
+        { no: 3,  mapel: "Pancasila",         keyNilai: "Pancasila",        keyDesc: "Deskripsi_3" },
+        { no: 4,  mapel: "Matematika",        keyNilai: "Matematika",       keyDesc: "Deskripsi_4" },
+        { no: 5,  mapel: "IPAS",              keyNilai: "IPAS",             keyDesc: "Deskripsi_5" },
+        { no: 6,  mapel: "Kesenian",          keyNilai: "Kesenian",         keyDesc: "Deskripsi_6" },
+        { no: 7,  mapel: "PJOK",              keyNilai: "PJOK",             keyDesc: "Deskripsi_7" },
+        { no: 8,  mapel: "Bahasa Inggris",    keyNilai: "Bahasa Inggris",   keyDesc: "Deskripsi_8" }, 
+        { no: 9,  mapel: "Bahasa Jawa",       keyNilai: "Bahasa Jawa",      keyDesc: "Deskripsi_9" },
+        { no: 10, mapel: "BTQ",               keyNilai: "BTQ",              keyDesc: "Deskripsi_10" }
       ];
       
-      strukturRapor.forEach(item => {
-        let nilaiAkhir = res[item.keyNilai] !== undefined ? res[item.keyNilai] : "-";
-        
-        if (item.keyNilai === "Bahasa Inggris" && nilaiAkhir === "-") {
-          nilaiAkhir = res["Bahasa Ingrris"] !== undefined ? res["Bahasa Ingrris"] : "-";
+      skemaKolomRapor.forEach(item => {
+        // Ekstraksi Nilai Akhir dengan Fallback Kompatibilitas Typo
+        let nilaiReal = "-";
+        if (res[item.keyNilai] !== undefined && res[item.keyNilai] !== null && res[item.keyNilai] !== "") {
+          nilaiReal = res[item.keyNilai];
+        } else if (item.keyNilai === "Bahasa Inggris" && res["Bahasa Ingrris"] !== undefined) {
+          nilaiReal = res["Bahasa Ingrris"]; // Mengatasi typo huruf 'r' ganda pada database
         }
 
-        let deskripsiCapaian = res[item.keyDeskripsi] || "Menunjukkan penguasaan kompetensi yang baik.";
+        // Ekstraksi Kalimat Capaian Kompetensi (Deskriptif) Asli
+        let deskripsiReal = "Belum mengisi uraian deskripsi capaian kompetensi.";
+        if (res[item.keyDesc] !== undefined && res[item.keyDesc] !== null && res[item.keyDesc] !== "") {
+          deskripsiReal = res[item.keyDesc];
+        }
 
+        // INJEKSI ROW BARIS KE TABEL HTML
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="p-2.5 text-center font-semibold align-top">${item.no}</td>
-          <td class="p-2.5 font-semibold align-top">${item.tampil}</td>
-          <td class="p-2.5 text-center font-bold text-sm align-top bg-slate-50">${nilaiAkhir}</td>
-          <td class="p-2.5 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${deskripsiCapaian}</td>
+          <td class="p-2.5 font-semibold align-top">${item.mapel}</td>
+          <td class="p-2.5 text-center font-bold text-sm align-top bg-slate-50">${nilaiReal}</td>
+          <td class="p-2.5 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${deskripsiReal}</td>
         `;
         tbody.appendChild(tr);
       });
