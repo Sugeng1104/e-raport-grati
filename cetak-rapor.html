@@ -60,7 +60,7 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (ISOLATED SYSTEM V14.0)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (ISOLATED SYSTEM V14.1)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -199,21 +199,24 @@
 
       <div class="blok-ttd-container text-xs mt-12 leading-relaxed">
         
-        <div class="grid grid-cols-2 text-center mb-12">
-          <div>
+        <div class="flex justify-between items-end text-center mb-16 px-4">
+          <div class="w-64">
             <p class="mb-20 font-medium text-sm">Orang Tua,</p>
             <div class="border-b border-black w-48 mx-auto"></div>
+            <p class="text-xs text-transparent select-none">NIP. -</p> 
           </div>
-          <div>
+          <div class="w-64">
             <p class="mb-20 font-medium text-sm"><span id="lblTempatTanggal">-</span><br>Wali Kelas 4 (empat)</p>
-            <p id="lblNamaGuru" class="font-bold underline text-sm">-</p>
+            <p id="lblNamaGuru" class="font-bold text-sm capitalize">-</p>
+            <div class="border-b border-black w-48 mx-auto my-0.5"></div>
             <p id="lblNipGuru" class="text-xs text-slate-700">-</p>
           </div>
         </div>
 
         <div class="text-center w-full">
           <p class="mb-20 font-medium text-sm">Mengetahui,<br>Kepala Sekolah</p>
-          <p id="lblNamaKepsek" class="font-bold underline text-sm">-</p>
+          <p id="lblNamaKepsek" class="font-bold text-sm capitalize">-</p>
+          <div class="border-b border-black w-56 mx-auto my-0.5"></div>
           <p id="lblNipKepsek" class="text-xs text-slate-700">-</p>
         </div>
 
