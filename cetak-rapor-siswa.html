@@ -52,7 +52,7 @@
             <div class="text-xs space-y-2 text-emerald-800 font-medium">
                 <p><strong>Nama Siswa:</strong> <span id="outNamaSiswa" class="font-bold text-slate-900 uppercase">-</span></p>
                 <p><strong>Status Sinkronisasi:</strong> <span class="px-2 py-0.5 bg-white border border-emerald-300 font-bold rounded text-emerald-700">SUKSES</span></p>
-                <p class="text-[11px] text-emerald-600 pt-1 font-normal">Seluruh nilai tiap mata pelajaran telah dihitung berdasarkan rumus <strong>(Harian + ASAS) / 2</strong>. Hasil nilai akhir beserta deskripsi otomatisnya telah berhasil di-posting langsung ke tab sheet <strong>rapor_siswa</strong>.</p>
+                <p class="text-[11px] text-emerald-600 pt-1 font-normal">Seluruh nilai tiap mata pelajaran telah dihitung berdasarkan rumus rentang nilai pada sheet <strong>kkm_kktp</strong> dan deskripsi berbasis kode mapel sheet <strong>tp</strong>. Hasilnya berhasil di-posting langsung ke tab sheet <strong>rapor_siswa</strong>.</p>
             </div>
         </div>
 
@@ -142,7 +142,8 @@
                     const tbody = document.getElementById('rowNilaiMurni');
                     tbody.innerHTML = "";
                     
-                    const mapelList = ["Agama", "B. Indonesia", "Pancasila", "Matematika", "IPAS", "PJOK", "Kesenian", "B. Jawa", "B. Inggris", "BTQ"];
+                    // STRUKTUR MAPPING BARU SINKRON DENGAN ENGINES V6.0
+                    const mapelList = ["Agama", "Pancasila", "B. Indonesia", "Matematika", "IPAS", "B. Inggris", "PJOK", "Kesenian", "KKA", "B. Jawa"];
                     
                     mapelList.forEach(m => {
                         const tr = document.createElement('tr');
