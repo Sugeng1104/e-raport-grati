@@ -3,224 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rapor Kurikulum Merdeka - UPT SDN Ranuklindungan I</title>
+    <title>Sistem Cetak Rapor Digital - UPT SDN Ranuklindungan I</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Pengaturan Cetak Standar Rapor Resmi (A4 Berwarna/Hitam Putih) */
+        /* Optimasi Engine Browser Saat Mencetak Dokumen (A4) */
         @media print {
             .no-print { display: none !important; }
-            body { background-color: #ffffff; color: #000000; font-family: 'Times New Roman', Times, serif; p-0; m-0; }
+            body { background-color: #ffffff; color: #000000; font-family: 'Times New Roman', Times, serif; }
             .print-container { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
             table { border-collapse: collapse; width: 100%; page-break-inside: auto; }
             tr { page-break-inside: avoid; page-break-after: auto; }
-            th, td { border: 1px solid #000000 !important; padding: 5px 8px !important; color: #000000 !important; }
-            .dashed-line { border-bottom: 1px dashed #000000 !important; }
+            th, td { border: 1px solid #000000 !important; padding: 6px 8px !important; color: #000000 !important; }
         }
     </style>
 </head>
-<body class="bg-slate-100 font-sans min-h-screen text-slate-800 p-4 md:p-8">
+<body class="bg-slate-50 font-sans min-h-screen text-slate-800 p-4 md:p-8">
 
+    <!-- CONTROL PANEL NAVIGASI (Hanya Muncul di Layar) -->
     <div class="max-w-4xl mx-auto bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6 no-print flex flex-col sm:flex-row justify-between items-center gap-4">
         <div class="flex items-center space-x-3">
-            <a href="data-kompetensi-siswa.html" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm transition">⬅️ Kembali</a>
+            <div class="p-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-lg">🏫</div>
             <div>
-                <h1 class="font-bold text-sm text-slate-900">Aplikasi Rapor Kurikulum Merdeka</h1>
-                <p class="text-[11px] text-slate-500">UPT SDN Ranuklindungan I — Pasuruan</p>
+                <h1 class="font-bold text-sm text-slate-900">Modul Administrasi Rapor Siswa</h1>
+                <p class="text-[11px] text-slate-500">UPT SDN Ranuklindungan I</p>
             </div>
         </div>
         <div class="flex items-center space-x-2 w-full sm:w-auto">
-            <input type="number" id="inputNoAbsen" placeholder="No. Absen" class="w-full sm:w-28 px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button onclick="muatDataRaporSiswa()" id="btnCariRapor" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition whitespace-nowrap">🔍 Cari Data</button>
-            <button onclick="window.print()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition whitespace-nowrap">🖨️ Cetak Rapor</button>
+            <input type="number" id="inputNoAbsen" placeholder="No. Absen" class="w-full sm:w-28 px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <button onclick="fetchDataRapor()" id="btnCari" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm transition">🔍 Cari Data</button>
+            <button onclick="window.print()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition">🖨️ Cetak</button>
         </div>
     </div>
 
-    <div class="max-w-4xl mx-auto bg-white border border-slate-300 shadow-xl p-8 md:p-12 print-container hidden" id="kontenRapor">
+    <!-- AREA NOTIFIKASI / STATUS ENGINE -->
+    <div id="statusNotice" class="max-w-4xl mx-auto bg-white border border-slate-200 rounded-2xl p-12 text-center text-slate-400 font-medium text-sm shadow-sm no-print">
+        💡 Masukkan Nomor Absen siswa, kemudian klik tombol <strong>Cari Data</strong>.
+    </div>
+
+    <!-- DOKUMEN RAPOR UTAMA (Halaman Hasil Belajar Kurikulum Merdeka) -->
+    <div id="kontenRapor" class="max-w-4xl mx-auto bg-white border border-slate-300 shadow-xl p-8 md:p-12 print-container hidden">
         
+        <!-- HEADER KOP RAPOR -->
         <div class="text-center font-bold uppercase tracking-wide space-y-1 text-sm md:text-base border-b-2 border-black pb-4 mb-6 text-black">
             <h2>LAPORAN HASIL BELAJAR</h2>
             <h2>(RAPOR)</h2>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1.5 text-xs font-semibold mb-6 text-black">
-            <div class="space-y-1.5">
-                <div class="flex"><span class="w-32 flex-shrink-0">Nama Peserta Didik</span><span class="mr-2">:</span><span id="txtNamaSiswa" class="dashed-line border-b border-dashed border-slate-400 flex-1 uppercase font-bold">-</span></div>
-                <div class="flex"><span class="w-32 flex-shrink-0">NISN / NIS</span><span class="mr-2">:</span><span id="txtNisnisn" class="dashed-line border-b border-dashed border-slate-400 flex-1">-</span></div>
-                <div class="flex"><span class="w-32 flex-shrink-0">Nama Sekolah</span><span class="mr-2">:</span><span id="txtNamaSekolah" class="dashed-line border-b border-dashed border-slate-400 flex-1">-</span></div>
-                <div class="flex"><span class="w-32 flex-shrink-0">Alamat Sekolah</span><span class="mr-2">:</span><span id="txtAlamatSekolah" class="dashed-line border-b border-dashed border-slate-400 flex-1">-</span></div>
+        <!-- METADATA IDENTITAS SISWA & SEKOLAH -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-xs font-semibold mb-6 text-black">
+            <div class="space-y-2">
+                <div class="flex"><span class="w-32 flex-shrink-0">Nama Peserta Didik</span><span class="mr-2">:</span><span id="txtNama" class="border-b border-dashed border-black flex-1 uppercase font-bold">-</span></div>
+                <div class="flex"><span class="w-32 flex-shrink-0">NISN / NIS</span><span class="mr-2">:</span><span id="txtNis" class="border-b border-dashed border-black flex-1">-</span></div>
+                <div class="flex"><span class="w-32 flex-shrink-0">Nama Sekolah</span><span class="mr-2">:</span><span id="txtSekolah" class="border-b border-dashed border-black flex-1">-</span></div>
+                <div class="flex"><span class="w-32 flex-shrink-0">Alamat Sekolah</span><span class="mr-2">:</span><span id="txtAlamat" class="border-b border-dashed border-black flex-1">-</span></div>
             </div>
-            <div class="space-y-1.5 mt-1.5 md:mt-0">
-                <div class="flex"><span class="w-32 flex-shrink-0">Kelas</span><span class="mr-2">:</span><span id="txtKelas" class="dashed-line border-b border-dashed border-slate-400 flex-1">-</span></div>
-                <div class="flex"><span class="w-32 flex-shrink-0">Fase</span><span class="mr-2">:</span><span id="txtFase" class="dashed-line border-b border-dashed border-slate-400 flex-1">-</span></div>
-                <div class="flex"><span class="w-32 flex-shrink-0">Semester</span><span class="mr-2">:</span><span id="txtSemester" class="dashed-line border-b border-dashed border-slate-400 flex-1">-</span></div>
-                <div class="flex"><span class="w-32 flex-shrink-0">Tahun Ajaran</span><span class="mr-2">:</span><span id="txtTahunAjaran" class="dashed-line border-b border-dashed border-slate-400 flex-1">-</span></div>
+            <div class="space-y-2">
+                <div class="flex"><span class="w-32 flex-shrink-0">Kelas</span><span class="mr-2">:</span><span id="txtKelas" class="border-b border-dashed border-black flex-1">-</span></div>
+                <div class="flex"><span class="w-32 flex-shrink-0">Fase</span><span class="mr-2">:</span><span id="txtFase" class="border-b border-dashed border-black flex-1">-</span></div>
+                <div class="flex"><span class="w-32 flex-shrink-0">Semester</span><span class="mr-2">:</span><span id="txtSemester" class="border-b border-dashed border-black flex-1">-</span></div>
+                <div class="flex"><span class="w-32 flex-shrink-0">Tahun Ajaran</span><span class="mr-2">:</span><span id="txtTA" class="border-b border-dashed border-black flex-1">-</span></div>
             </div>
         </div>
 
+        <!-- TABEL CAPAIAN AKADEMIK -->
         <table class="w-full text-left text-xs border border-black mb-6 text-black">
             <thead>
-                <tr class="bg-slate-100 font-bold border-b border-black text-center">
-                    <th class="border-r border-black p-2 w-10 text-center">No</th>
-                    <th class="border-r border-black p-2 w-56 text-left">Mata Pelajaran</th>
-                    <th class="border-r border-black p-2 w-20 text-center">Nilai Akhir</th>
-                    <th class="p-2 text-left">Capaian Kompetensi</th>
+                <tr class="bg-slate-100 font-bold text-center">
+                    <th class="p-2.5 w-10 text-center">No</th>
+                    <th class="p-2.5 w-60 text-left">Mata Pelajaran</th>
+                    <th class="p-2.5 w-24 text-center">Nilai Akhir</th>
+                    <th class="p-2.5 text-left">Capaian Kompetensi</th>
                 </tr>
             </thead>
-            <tbody id="bodyTabelNilai" class="divide-y divide-black">
-                </tbody>
-        </table>
-
-        <div class="font-bold text-xs mb-1.5 text-black uppercase tracking-wider">A. Ekstrakurikuler</div>
-        <table class="w-full text-left text-xs border border-black mb-6 text-black">
-            <thead>
-                <tr class="bg-slate-100 font-bold border-b border-black text-center">
-                    <th class="border-r border-black p-2 w-10">No</th>
-                    <th class="border-r border-black p-2 w-64 text-left">Kegiatan Ekstrakurikuler</th>
-                    <th class="p-2 text-left">Keterangan</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-black">
-                <tr><td class="border-r border-black p-2 text-center">1</td><td class="border-r border-black p-2 font-medium">Praja Muda Karana (Pramuka)</td><td class="p-2">Sangat aktif dalam kegiatan kepramukaan, menunjukkan jiwa kepemimpinan serta kemandirian yang tinggi.</td></tr>
-                <tr><td class="border-r border-black p-2 text-center">2</td><td class="border-r border-black p-2 font-medium">Keagamaan / BTQ</td><td class="p-2">Menunjukkan kefasihan serta perkembangan yang baik dalam tajwid pembacaan ayat-ayat pendek.</td></tr>
+            <tbody id="tabelNilaiBody" class="divide-y divide-black">
+                <!-- Injeksi Data Otomatis -->
             </tbody>
         </table>
 
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 text-xs mb-6 text-black">
-            <div class="md:col-span-4 flex flex-col">
-                <div class="font-bold mb-1.5 uppercase tracking-wider">B. Ketidakhadiran</div>
-                <table class="w-full border border-black flex-1">
-                    <tbody class="divide-y divide-black">
-                        <tr><td class="p-2 font-semibold border-r border-black bg-slate-50 w-28">Sakit</td><td class="p-2 text-center font-bold">0 hari</td></tr>
-                        <tr><td class="p-2 font-semibold border-r border-black bg-slate-50 w-28">Izin</td><td class="p-2 text-center font-bold">1 hari</td></tr>
-                        <tr><td class="p-2 font-semibold border-r border-black bg-slate-50 w-28">Tanpa Keterangan</td><td class="p-2 text-center font-bold">0 hari</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="md:col-span-8 flex flex-col">
-                <div class="font-bold mb-1.5 uppercase tracking-wider">C. Catatan Wali Kelas</div>
-                <div class="border border-black p-3 text-justify leading-relaxed flex-1 italic bg-white h-full min-h-[95px]">
-                    "Selamat atas capaian belajarmu di semester ini. Pertahankan kemampuan berpikir kritis di kelas, tingkatkan lagi manajemen waktu belajar di rumah agar prestasimu di tingkat kelas berikutnya semakin bersinar."
-                </div>
-            </div>
-        </div>
+        <!-- DATA TAMBAHAN (EKSTRAKURIKULER & ABSENSI) -->
+        <div class="font-bold text-xs mb-1.5 uppercase text-black">A. Ekstrakurikuler</div>
+        <table class="w-full text-left text-xs border border-black mb-6 text-black">
+            <thead>
+                <tr class="bg-slate-100 font-bold text-center">
+                    <th class="p-2 w-10">No</th>
+                    <th class="p-2 w-64 text-left">Kegiatan Ekstrakurikuler</th>
+                    <th class="p-2 text-left">Keterangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-t border-black"><td class="p-2 text-center">1</td><td class="p-2 font-medium">Pramuka</td><td class="p-2">Sangat baik dalam mengikuti aktivitas kepramukaan dan mandiri.</td></tr>
+            </tbody>
+        </table>
 
-        <div class="font-bold text-xs mb-1.5 text-black uppercase tracking-wider">D. Tanggapan Orang Tua / Wali Murid</div>
-        <div class="border border-black p-8 bg-white mb-8 min-h-[70px]">&nbsp;</div>
-
-        <div class="text-xs font-semibold pt-4 text-black">
-            <div class="flex justify-between mb-12">
-                <div class="text-center w-64 space-y-16">
-                    <p>Mengetahui<br>Orang Tua / Wali Murid</p>
-                    <p class="border-b border-black w-48 mx-auto"></p>
-                </div>
-                <div class="text-center w-64 space-y-16">
-                    <p>Pasuruan, 21 Juni 2026<br>Wali Kelas</p>
-                    <div>
-                        <p class="font-bold border-b border-black w-48 mx-auto"></p>
-                        <p class="text-[10px] text-left pl-8 mt-0.5 font-normal">NIP.</p>
-                    </div>
-                </div>
+        <!-- FOOTER TANDA TANGAN VALIDASI -->
+        <div class="text-xs font-semibold pt-6 text-black grid grid-cols-2 text-center gap-y-16">
+            <div>
+                <p>Mengetahui<br>Orang Tua / Wali Murid</p>
+                <div class="h-16"></div>
+                <p class="border-b border-black w-48 mx-auto"></p>
             </div>
-            <div class="text-center space-y-16">
+            <div>
+                <p>Pasuruan, 22 Juni 2026<br>Wali Kelas</p>
+                <div class="h-16"></div>
+                <p class="border-b border-black w-48 mx-auto"></p>
+                <p class="text-[10px] text-left pl-14 font-normal">NIP. </p>
+            </div>
+            <div class="col-span-2 mx-auto">
                 <p>Mengetahui,<br>Kepala Sekolah</p>
-                <div>
-                    <p class="font-bold border-b border-black w-56 mx-auto">SITI AMINAH, S.Pd.</p>
-                    <p class="text-[10px] w-56 mx-auto text-left font-normal">NIP. 19780512 200501 2 003</p>
-                </div>
+                <div class="h-16"></div>
+                <p class="font-bold border-b border-black w-56 mx-auto">SITI AMINAH, S.Pd.</p>
+                <p class="text-[10px] text-left pl-4 font-normal">NIP. 19780512 200501 2 003</p>
             </div>
         </div>
-
     </div>
 
-    <div id="statusNotice" class="max-w-4xl mx-auto bg-white border border-slate-200 rounded-2xl p-12 text-center text-slate-400 font-medium text-sm shadow-sm no-print">
-        👋 Silakan masukkan Nomor Absen siswa pada panel di atas lalu klik <strong>Cari Data</strong> untuk menampilkan lembar rapor Kurikulum Merdeka.
-    </div>
-
+    <!-- STATE MANAGEMENT & CONSUMING API CORE -->
     <script>
-        // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT DATABASE NILAI_ASAS_SMT2 ANDA DI SINI
-        const API_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+        // PENTING: Ganti dengan URL Web App Apps Script yang didapatkan setelah Deploy Ulang
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
-        async function muatDataRaporSiswa() {
+        async function fetchDataRapor() {
             const noAbsen = document.getElementById('inputNoAbsen').value.trim();
-            const btn = document.getElementById('btnCariRapor');
+            const btnCari = document.getElementById('btnCari');
             const notice = document.getElementById('statusNotice');
             const raporArea = document.getElementById('kontenRapor');
 
             if (!noAbsen) {
-                alert("Mohon masukkan nomor absen terlebih dahulu.");
+                alert("Silakan isi nomor absen siswa terlebih dahulu.");
                 return;
             }
 
-            // Set state tombol loading
-            btn.disabled = true;
-            btn.innerText = "⏳ Memuat...";
-            notice.innerHTML = `<span>⏳</span> Sedang mengompilasi data nilai rata-rata UH siswa dari cloud database...`;
+            // Set UI State ke Loading
+            btnCari.disabled = true;
+            btnCari.innerText = "⏳ Memuat...";
+            notice.innerHTML = `<span>⏳</span> Sedang mengompilasi data relasional dari Cloud Server...`;
             notice.classList.remove('hidden');
             raporArea.classList.add('hidden');
 
             try {
-                // Request aman dengan parameter action tersemat bawaan
-                const response = await fetch(`${API_URL}?action=read&no_absen=${noAbsen}`);
+                // Fetching data langsung ke endpoint router tanpa parameter action yang memicu eror
+                const response = await fetch(`${WEB_APP_URL}?no_absen=${noAbsen}`);
                 
-                if (!response.ok) {
-                    throw new Error(`Koneksi HTTP Gagal dengan status ${response.status}`);
-                }
+                if (!response.ok) throw new Error("Gagal terhubung ke gateway API server.");
                 
-                const data = await response.json();
+                const result = await response.json();
 
-                if (data.status === "SUCCESS") {
-                    // 1. Memetakan Informasi Profil Sekolah & Rapor
-                    document.getElementById('txtNamaSekolah').innerText = data.sekolah.namaSekolah || "UPT SDN Ranuklindungan I";
-                    document.getElementById('txtAlamatSekolah').innerText = data.sekolah.alamat || "Ranuklindungan, Pasuruan";
-                    document.getElementById('txtKelas').innerText = data.sekolah.kelas || "IV (Empat)";
-                    document.getElementById('txtFase').innerText = data.sekolah.fase || "B";
-                    document.getElementById('txtSemester').innerText = data.sekolah.semester || "2 (Dua)";
-                    document.getElementById('txtTahunAjaran').innerText = data.sekolah.tahunAjaran || "2025/2026";
-                    
-                    // 2. Memetakan Identitas Siswa Terpilih
-                    document.getElementById('txtNamaSiswa').innerText = data.siswa.nama;
-                    document.getElementById('txtNisnisn').innerText = ` - / ${data.siswa.nisn}`;
+                if (result.status === "SUCCESS") {
+                    // Mapping Data Profil Sekolah
+                    document.getElementById('txtSekolah').innerText = result.sekolah.namaSekolah;
+                    document.getElementById('txtAlamat').innerText = result.sekolah.alamat;
+                    document.getElementById('txtKelas').innerText = result.sekolah.kelas;
+                    document.getElementById('txtFase').innerText = result.sekolah.fase;
+                    document.getElementById('txtSemester').innerText = result.sekolah.semester;
+                    document.getElementById('txtTA').innerText = result.sekolah.tahunAjaran;
 
-                    // 3. Merender Baris Tabel Kompilasi Nilai Akhir & Narasi Capaian
-                    const tbodyNilai = document.getElementById('bodyTabelNilai');
-                    tbodyNilai.innerHTML = "";
-                    
-                    data.nilai.forEach((item, index) => {
-                        const row = document.createElement('tr');
-                        row.className = "text-black";
-                        row.innerHTML = `
-                            <td class="border-r border-black p-2 text-center font-bold">${index + 1}</td>
-                            <td class="border-r border-black p-2 font-medium">${item.namaMapel}</td>
-                            <td class="border-r border-black p-2 text-center font-bold bg-slate-50/30">${item.nilaiAkhir}</td>
-                            <td class="p-2 text-justify leading-relaxed">${item.capaian}</td>
-                        `;
-                        tbodyNilai.appendChild(row);
-                    });
+                    // Mapping Data Personal Siswa
+                    document.getElementById('txtNama').innerText = result.siswa.nama;
+                    document.getElementById('txtNis').innerText = result.siswa.nisn;
 
-                    // Tampilkan Rapor secara utuh ke layar
+                    // Mapping Baris Nilai Rapor
+                    const tbody = document.getElementById('tabelNilaiBody');
+                    tbody.innerHTML = "";
+
+                    if (result.nilai.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center italic text-slate-400">Data nilai untuk siswa ini kosong pada sheet rekap_asas.</td></tr>`;
+                    } else {
+                        result.nilai.forEach((item, index) => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td class="p-2 text-center font-bold">${index + 1}</td>
+                                <td class="p-2 font-medium">${item.namaMapel}</td>
+                                <td class="p-2 text-center font-bold bg-slate-50">${item.nilaiAkhir}</td>
+                                <td class="p-2 text-justify leading-relaxed">${item.capaian}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+
+                    // Tampilkan dokumen rapor ke layar
                     notice.classList.add('hidden');
                     raporArea.classList.remove('hidden');
 
                 } else {
-                    notice.innerHTML = `❌ <span class="text-red-500 font-bold">${data.message}</span>`;
+                    notice.innerHTML = `❌ <span class="text-red-500 font-bold">${result.message}</span>`;
                 }
+
             } catch (err) {
-                console.error("Eror Pembacaan Rapor:", err);
+                console.error(err);
                 notice.innerHTML = `
-                    <div class="text-left bg-red-50 p-4 rounded-xl border border-red-200 text-xs text-red-700 max-w-xl mx-auto">
-                        <p class="font-bold mb-1">🚨 Hubungan Sinkronisasi Terputus:</p>
-                        <p class="italic mb-2">${err.message}</p>
-                        <p class="text-[11px] text-slate-500 font-normal leading-relaxed">
-                            <strong>Solusi Perbaikan:</strong><br>
-                            1. Pastikan Anda menyalin kode Google Apps Script terbaru ke spreadsheet target.<br>
-                            2. Wajib klik <strong>Deploy (New Version)</strong> kembali di Apps Script jika ada perubahan.<br>
-                            3. Jalankan halaman HTML ini di <strong>Tab Penyamaran Baru (Incognito Window)</strong> agar tidak terhalang cache browser lama.
-                        </p>
+                    <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs max-w-lg mx-auto text-left">
+                        <p class="font-bold mb-1">🚨 Hubungan Sinkronisasi Mengalami Kendala:</p>
+                        <p class="italic">${err.message}</p>
+                        <p class="mt-2 text-[10px] text-slate-500 font-normal">Pastikan URL Apps Script yang dimasukkan sudah benar, status telah di-deploy ulang sebagai 'New Version', dan jalankan halaman ini melalui Incognito Mode (Tab Penyamaran) untuk menghindari proteksi cache lokal browser.</p>
                     </div>
                 `;
             } finally {
-                btn.disabled = false;
-                btn.innerText = "🔍 Cari Data";
+                btnCari.disabled = false;
+                btnCari.innerText = "🔍 Cari Data";
             }
         }
     </script>
