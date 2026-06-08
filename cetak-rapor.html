@@ -6,9 +6,6 @@
   <title>Pratinjau Rapor Resmi - UPT SDN Ranuklindungan I</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* ============================================================
-       LAYOUT ENGINE & MULTI-PAGE PRINT CONFIGURATION
-       ============================================================ */
     body { 
       font-family: 'Calibri', 'Arial', sans-serif; 
       background-color: #f1f5f9; 
@@ -19,7 +16,7 @@
     .lembar-rapor {
       background: white;
       width: 210mm;
-      min-height: 297mm; /* Standar Tinggi A4 */
+      min-height: 297mm;
       padding: 20mm 20mm 15mm 20mm;
       margin: 20px auto;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -29,16 +26,12 @@
       border: 1.5px solid #000000 !important;
     }
 
-    /* ============================================================
-       MEDIA PRINT CONTROL (ANTI-DOWNTIME & CLEAN OUTPUT)
-       ============================================================ */
     @page {
       size: A4;           
       margin: 0mm;        
     }
 
     @media print {
-      /* Hilangkan bar navigasi portal secara mutlak */
       .no-print, #navigasiAtas, [class*="no-print"] { 
         display: none !important; 
         height: 0 !important;
@@ -46,8 +39,6 @@
         margin: 0 !important;
         visibility: hidden !important;
       }
-      
-      /* Biarkan konten mengalir alami hingga 5 halaman tanpa terpotong */
       body { 
         background: #ffffff !important; 
         margin: 0 !important; 
@@ -58,11 +49,9 @@
         margin: 0 auto !important; 
         padding: 15mm 15mm 15mm 15mm !important; 
         width: 210mm !important; 
-        min-height: auto !important; 
+        min-height: auto !important; /* Membuka proteksi agar bisa mengalir sampai 5 halaman murni */
       }
-      
-      /* Mengamankan row tabel agar tidak patah di tengah kalimat saat ganti halaman */
-      tr {
+      tr, .blok-ttd {
         page-break-inside: avoid;
         page-break-after: auto;
       }
@@ -71,24 +60,19 @@
 </head>
 <body>
 
-  <!-- CONTROL BAR NAVIGATION (DILINDUNGI CLASS NO-PRINT) -->
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (SERVER GITHUB V12.9)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (CORE SYSTEM ENGINE V12.3)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
-  <!-- CONTAINER UTAMA RAPOR -->
   <div class="lembar-rapor" id="kontenRapor">
     
-    <!-- STATE LOADER INTERFACE -->
     <div id="loader" class="text-center text-slate-500 font-bold text-sm pt-20 animate-pulse font-sans">
-      🔄 Mengambil data entitas dari spreadsheet 'rapor_siswa', menyusun dokumen...
+      🔄 Membaca bundle data 'rapor_siswa' melalui gerbang API, memetakan deskripsi...
     </div>
 
-    <!-- DOCUMENT CORE RENDERER -->
     <div id="coreRapor" class="hidden">
       
-      <!-- HEADER / KOP LAPORAN -->
       <div class="flex items-center justify-start gap-6 border-b-2 border-black pb-4 mb-6">
         <img src="https://pasuruankab.go.id/assets/img/logo.png" 
              onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/d3/Logo_Kabupaten_Pasuruan.png';" 
@@ -100,7 +84,6 @@
         </div>
       </div>
 
-      <!-- METADATA BIODATA SISWA & LEMBAGA -->
       <div class="grid grid-cols-2 gap-x-8 text-[12.5px] leading-relaxed mb-6">
         <table class="w-full">
           <tr>
@@ -111,7 +94,7 @@
           <tr>
             <td class="py-0.5 font-medium">NIS / NISN</td>
             <td>:</td>
-            <td>- / <span id="lblMurniNisn">-</span></td>
+            <td><span id="lblMurniNis">-</span> / <span id="lblMurniNisn">-</span></td>
           </tr>
           <tr>
             <td class="py-0.5 font-medium">Nama Sekolah</td>
@@ -148,7 +131,6 @@
         </table>
       </div>
 
-      <!-- TABEL UTAMA CAPAIAN KOMPETENSI (DATA-DRIVEN) -->
       <table class="w-full tabel-border-tegas text-xs text-left mb-8">
         <thead>
           <tr class="bg-slate-50 text-center font-bold">
@@ -159,105 +141,93 @@
           </tr>
         </thead>
         <tbody id="bodyTabelRapor" class="divide-y divide-black font-normal">
-          <!-- Iterasi Row Data Masuk Disini -->
-        </tbody>
+          </tbody>
       </table>
+
+      <div class="blok-ttd grid grid-cols-3 text-center text-xs mt-12 gap-4 leading-relaxed">
+        <div>
+          <p class="mb-16">Mengetahui,<br>Orang Tua / Wali Murid</p>
+          <div class="border-b border-black w-40 mx-auto"></div>
+        </div>
+        <div>
+          <p class="mb-16"><br>Kepala Sekolah</p>
+          <div class="border-b border-black w-40 mx-auto"></div>
+          <p class="text-[10px] text-slate-500 mt-1" id="nipKepsek">NIP. ...................................</p>
+        </div>
+        <div>
+          <p class="mb-16">Pasuruan, <span id="lblTanggalCetak">..... .................... 2026</span><br>Guru Kelas IV</p>
+          <div class="border-b border-black w-40 mx-auto"></div>
+          <p class="text-[10px] text-slate-500 mt-1">NIP. ...................................</p>
+        </div>
+      </div>
       
     </div>
   </div>
 
   <script>
-    // PARSING URL PARAMETERS
     const urlParams = new URLSearchParams(window.location.search);
     const currentNoAbsen = urlParams.get('no_absen');
     const dynamicAppsScriptUrl = urlParams.get('api_url');
 
     window.addEventListener('DOMContentLoaded', function() {
       if(!currentNoAbsen || !dynamicAppsScriptUrl) {
-        document.getElementById('loader').removeAttribute('class');
         document.getElementById('loader').className = "text-center p-10 text-sm font-sans text-amber-600 font-bold bg-amber-50 rounded-xl border border-amber-200 m-5";
-        document.getElementById('loader').innerHTML = "⚠️ PARAMETER API URL ATAU NO ABSEN TIDAK TERDETEKSI";
+        document.getElementById('loader').innerHTML = "⚠️ PARAMETER DOKUMEN BELUM LENGKAP.";
         return;
       }
       
+      // Mengirim request terpadu menuju sistem pemetaan bundle
       const targetApiUrl = `${dynamicAppsScriptUrl}?action=read&no_absen=${encodeURIComponent(currentNoAbsen)}`;
       
       fetch(targetApiUrl)
         .then(response => {
-          if (!response.ok) throw new Error("Gagal melakukan kontak dengan Google Apps Script API.");
+          if (!response.ok) throw new Error("Terjadi gangguan transmisi data API.");
           return response.json();
         })
         .then(responseObj => {
-          // Kunci Perbaikan: Mengupas pembungkus data secara aman
-          let cleanPayload = responseObj;
           if (responseObj.status === "SUCCESS" && responseObj.data) {
-            cleanPayload = responseObj.data;
-          } else if (responseObj.dataSiswa) {
-            cleanPayload = responseObj.dataSiswa;
+            renderBundleKeRapor(responseObj.data);
+          } else {
+            tampilkanPesanGagal(responseObj.message || "Gagal menarik struktur paket data.");
           }
-          
-          renderDataKeRapor(cleanPayload);
         })
         .catch(err => {
           tampilkanPesanGagal(err.toString());
         });
     });
 
-    function renderDataKeRapor(res) {
+    function renderBundleKeRapor(bundle) {
       document.getElementById('loader').classList.add('hidden');
       document.getElementById('coreRapor').classList.remove('hidden');
       
-      // Sinkronisasi Data Atas Pokok Langsung dari Target Property JSON
-      document.getElementById('lblNama').innerText = res.Nama || res.nama || "SISWA TANPA NAMA";
-      document.getElementById('lblMurniNisn').innerText = res.NISN || res.nisn || "-";
+      // 1. Sinkronisasi Data Profil Siswa
+      document.getElementById('lblNama').innerText = bundle.profil.nama || "-";
+      document.getElementById('lblMurniNis').innerText = bundle.profil.nis || "-";
+      document.getElementById('lblMurniNisn').innerText = bundle.profil.nisn || "-";
+      document.getElementById('lblKelas').innerText = bundle.profil.kelas || "IV";
+      document.getElementById('lblFase').innerText = bundle.profil.fase || "B";
+      document.getElementById('lblSemester').innerText = bundle.profil.semester || "II";
       
-      // Penguncian Data Identitas Statis Sesuai Instruksi Layar Rapor
-      document.getElementById('lblKelas').innerText = "IV"; 
-      document.getElementById('lblFase').innerText = "B";
-      document.getElementById('lblSemester').innerText = "II";
-      document.getElementById('lblSekolah').innerText = "UPT SDN Ranuklindungan I";
-      document.getElementById('lblAlamat').innerText = "Bandilan, Ranuklindungan";
-      document.getElementById('lblTp').innerText = "2025/2026";
+      // 2. Sinkronisasi Data Sekolah Dinamis Dari Spreadsheet Tab 'identitas_sekolah'
+      document.getElementById('lblSekolah').innerText = bundle.sekolah.nama_sekolah || "UPT SDN Ranuklindungan I";
+      document.getElementById('lblAlamat').innerText = bundle.sekolah.alamat || "Bandilan, Ranuklindungan";
+      document.getElementById('lblTp').innerText = bundle.sekolah.tp || "2025/2026";
       
+      // Set otomatis tanggal lokal hari ini di lembar rapor
+      const opsiTanggal = { year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('lblTanggalCetak').innerText = new Date().toLocaleDateString('id-ID', opsiTanggal);
+
+      // 3. Injeksi Row Nilai Dan Deskripsi Asli Secara Berurutan
       const tbody = document.getElementById('bodyTabelRapor');
       tbody.innerHTML = "";
       
-      // ARCHITECTURE MAPPING: Menyelaraskan String JSON Tepat dengan Skema Database
-      const skemaKolomRapor = [
-        { no: 1,  mapel: "Agama",             keyNilai: "Agama",            keyDesc: "Deskripsi_1" },
-        { no: 2,  mapel: "Bahasa Indonesia",  keyNilai: "Bahasa Indonesia", keyDesc: "Deskripsi_2" },
-        { no: 3,  mapel: "Pancasila",         keyNilai: "Pancasila",        keyDesc: "Deskripsi_3" },
-        { no: 4,  mapel: "Matematika",        keyNilai: "Matematika",       keyDesc: "Deskripsi_4" },
-        { no: 5,  mapel: "IPAS",              keyNilai: "IPAS",             keyDesc: "Deskripsi_5" },
-        { no: 6,  mapel: "Kesenian",          keyNilai: "Kesenian",         keyDesc: "Deskripsi_6" },
-        { no: 7,  mapel: "PJOK",              keyNilai: "PJOK",             keyDesc: "Deskripsi_7" },
-        { no: 8,  mapel: "Bahasa Inggris",    keyNilai: "Bahasa Inggris",   keyDesc: "Deskripsi_8" }, 
-        { no: 9,  mapel: "Bahasa Jawa",       keyNilai: "Bahasa Jawa",      keyDesc: "Deskripsi_9" },
-        { no: 10, mapel: "BTQ",               keyNilai: "BTQ",              keyDesc: "Deskripsi_10" }
-      ];
-      
-      skemaKolomRapor.forEach(item => {
-        // Ekstraksi Nilai Akhir dengan Fallback Kompatibilitas Typo
-        let nilaiReal = "-";
-        if (res[item.keyNilai] !== undefined && res[item.keyNilai] !== null && res[item.keyNilai] !== "") {
-          nilaiReal = res[item.keyNilai];
-        } else if (item.keyNilai === "Bahasa Inggris" && res["Bahasa Ingrris"] !== undefined) {
-          nilaiReal = res["Bahasa Ingrris"]; // Mengatasi typo huruf 'r' ganda pada database
-        }
-
-        // Ekstraksi Kalimat Capaian Kompetensi (Deskriptif) Asli
-        let deskripsiReal = "Belum mengisi uraian deskripsi capaian kompetensi.";
-        if (res[item.keyDesc] !== undefined && res[item.keyDesc] !== null && res[item.keyDesc] !== "") {
-          deskripsiReal = res[item.keyDesc];
-        }
-
-        // INJEKSI ROW BARIS KE TABEL HTML
+      bundle.payloadNilai.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="p-2.5 text-center font-semibold align-top">${item.no}</td>
           <td class="p-2.5 font-semibold align-top">${item.mapel}</td>
-          <td class="p-2.5 text-center font-bold text-sm align-top bg-slate-50">${nilaiReal}</td>
-          <td class="p-2.5 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${deskripsiReal}</td>
+          <td class="p-2.5 text-center font-bold text-sm align-top bg-slate-50">${item.nilai}</td>
+          <td class="p-2.5 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${item.deskripsi}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -266,7 +236,7 @@
     function tampilkanPesanGagal(pesanError) {
       document.getElementById('loader').removeAttribute('class');
       document.getElementById('loader').className = "text-center p-8 text-sm font-sans text-red-600 font-bold bg-red-50 rounded-xl border border-red-200 m-5";
-      document.getElementById('loader').innerHTML = `🛑 KONEKSI DATABASE GAGAL:<br><span class='font-normal text-xs text-slate-600 block my-2'>${pesanError}</span>`;
+      document.getElementById('loader').innerHTML = `🛑 GAGAL MEMUAT BLOK RAPOR:<br><span class='font-normal text-xs text-slate-600 block my-2'>${pesanError}</span>`;
     }
   </script>
 </body>
