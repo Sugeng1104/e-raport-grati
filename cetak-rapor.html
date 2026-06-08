@@ -58,7 +58,7 @@
         margin: 0 auto !important; 
         padding: 15mm 15mm 15mm 15mm !important; 
         width: 210mm !important; 
-        min-height: auto !important; /* Diubah ke auto agar tidak memaksa potong 1 halaman */
+        min-height: auto !important; 
       }
       
       /* Mencegah pemotongan baris tabel di tengah-tengah kalimat */
@@ -72,7 +72,7 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (SERVER GITHUB V12.6)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (SERVER GITHUB V12.7)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -171,7 +171,6 @@
         return;
       }
       
-      // Mengarahkan request data menuju endpoint action=read
       const targetApiUrl = `${dynamicAppsScriptUrl}?action=read&no_absen=${encodeURIComponent(currentNoAbsen)}`;
       
       fetch(targetApiUrl)
@@ -180,8 +179,10 @@
           return response.json();
         })
         .then(responseObj => {
+          // Jika Apps Script mengembalikan objek utama di dalam properti 'data'
           if (responseObj.status === "SUCCESS") {
-            renderDataKeRapor(responseObj);
+            const dataSiswa = responseObj.data ? responseObj.data : responseObj;
+            renderDataKeRapor(dataSiswa);
           } else {
             tampilkanPesanGagal(responseObj.message);
           }
@@ -195,12 +196,12 @@
       document.getElementById('loader').classList.add('hidden');
       document.getElementById('coreRapor').classList.remove('hidden');
       
-      // Injeksi Biodata Utama
-      document.getElementById('lblNama').innerText = res.nama || "SISWA TIDAK TERDAFTAR";
-      document.getElementById('lblMurniNis').innerText = res.nis || "-";
-      document.getElementById('lblMurniNisn').innerText = res.nisn || "-";
+      // Injeksi Biodata Pokok dari Kolom Sheet
+      document.getElementById('lblNama').innerText = res.Nama || res.nama || "SISWA TIDAK TERDAFTAR";
+      document.getElementById('lblMurniNis').innerText = res.NIS || "-";
+      document.getElementById('lblMurniNisn').innerText = res.NISN || res.nisn || "-";
       
-      // Parameter Ketentuan Lembaga Sekolah Sesuai Instruksi
+      // Pengaturan Identitas Sekolah Sesuai Instruksi Anda
       document.getElementById('lblKelas').innerText = "IV"; 
       document.getElementById('lblFase').innerText = "B";
       document.getElementById('lblSemester').innerText = "II";
@@ -211,34 +212,40 @@
       const tbody = document.getElementById('bodyTabelRapor');
       tbody.innerHTML = "";
       
-      // Daftar Struktur Mapel Resmi
-      const mapelList = ["Agama", "Pancasila", "B. Indonesia", "Matematika", "IPAS", "PJOK", "Kesenian", "B. Jawa", "B. Inggris", "BTQ"];
+      // ============================================================
+      // PEMETAAN AKURAT: Sesuai Struktur Kolom & Urutan Deskripsi Anda
+      // ============================================================
+      const strukturRapor = [
+        { no: 1,  tampil: "Agama",             keyNilai: "Agama",            keyDeskripsi: "Deskripsi_1" },
+        { no: 2,  tampil: "Bahasa Indonesia",  keyNilai: "Bahasa Indonesia", keyDeskripsi: "Deskripsi_2" },
+        { no: 3,  tampil: "Pancasila",         keyNilai: "Pancasila",        keyDeskripsi: "Deskripsi_3" },
+        { no: 4,  tampil: "Matematika",        keyNilai: "Matematika",       keyDeskripsi: "Deskripsi_4" },
+        { no: 5,  tampil: "IPAS",              keyNilai: "IPAS",             keyDeskripsi: "Deskripsi_5" },
+        { no: 6,  tampil: "Kesenian",          keyNilai: "Kesenian",         keyDeskripsi: "Deskripsi_6" },
+        { no: 7,  tampil: "PJOK",              keyNilai: "PJOK",             keyDeskripsi: "Deskripsi_7" },
+        { no: 8,  tampil: "Bahasa Inggris",    keyNilai: "Bahasa Inggris",   keyDeskripsi: "Deskripsi_8" }, // menangani typo kolom jika ada
+        { no: 9,  tampil: "Bahasa Jawa",       keyNilai: "Bahasa Jawa",      keyDeskripsi: "Deskripsi_9" },
+        { no: 10, tampil: "BTQ",               keyNilai: "BTQ",              keyDeskripsi: "Deskripsi_10" }
+      ];
       
-      let nomor = 1;
-      mapelList.forEach(m => {
-        let nilaiAkhirRapor = "-";
-        let deskripsiRapor = "Belum ada deskripsi capaian kompetensi.";
-
-        // PEMBACAAN DINAMIS: Mengambil dari payload khusus hasil kalkulasi sheet 'rapor_siswa'
-        if (res.dataRaporFinal && res.dataRaporFinal[m]) {
-          nilaiAkhirRapor = res.dataRaporFinal[m].nilai !== undefined ? res.dataRaporFinal[m].nilai : "-";
-          deskripsiRapor = res.dataRaporFinal[m].deskripsi || "Menunjukkan penguasaan materi yang baik.";
-        } else {
-          // Fallback Alternatif jika struktur nested JSON berbeda, membaca data murni
-          if (res.dataAsas && res.dataAsas[m] !== undefined) {
-            nilaiAkhirRapor = res.dataAsas[m];
-          }
-          if (res.dataDeskripsi && res.dataDeskripsi[m]) {
-            deskripsiRapor = res.dataDeskripsi[m];
-          }
+      strukturRapor.forEach(item => {
+        // Ambil Nilai Akhir (Mendukung pengecekan variasi spasi/tulisan kolom)
+        let nilaiAkhir = res[item.keyNilai] !== undefined ? res[item.keyNilai] : "-";
+        
+        // Atasi jika ada variasi nama kolom Bahasa Inggris di Apps Script Anda (Bahasa Ingrris vs Bahasa Inggris)
+        if (item.keyNilai === "Bahasa Inggris" && nilaiAkhir === "-") {
+          nilaiAkhir = res["Bahasa Ingrris"] !== undefined ? res["Bahasa Ingrris"] : "-";
         }
+
+        // Ambil Capaian Kompetensi dari kolom Deskripsi terkait
+        let deskripsiCapaian = res[item.keyDeskripsi] || "Menunjukkan penguasaan kompetensi yang baik.";
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="p-2.5 text-center font-semibold align-top">${nomor++}</td>
-          <td class="p-2.5 font-semibold align-top">${m}</td>
-          <td class="p-2.5 text-center font-bold text-sm align-top bg-slate-50">${nilaiAkhirRapor}</td>
-          <td class="p-2.5 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${deskripsiRapor}</td>
+          <td class="p-2.5 text-center font-semibold align-top">${item.no}</td>
+          <td class="p-2.5 font-semibold align-top">${item.tampil}</td>
+          <td class="p-2.5 text-center font-bold text-sm align-top bg-slate-50">${nilaiAkhir}</td>
+          <td class="p-2.5 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${deskripsiCapaian}</td>
         `;
         tbody.appendChild(tr);
       });
