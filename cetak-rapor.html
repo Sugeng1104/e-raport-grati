@@ -32,14 +32,13 @@
   </div>
 
   <div class="lembar-rapor" id="kontenRapor">
-    <div id="loader" class="text-center text-slate-400 font-bold text-sm pt-20 animate-pulse font-sans">
-      Menghubungkan ke Cloud Storage database, menyusun dokumen hasil belajar...
+    <div id="loader" class="text-center text-slate-500 font-bold text-sm pt-20 animate-pulse font-sans">
+      🔄 Menghubungkan ke Cloud Storage database, menyusun dokumen hasil belajar...
     </div>
 
     <div id="coreRapor" class="hidden">
-      
       <div class="flex items-center justify-start gap-6 border-b-2 border-black pb-4 mb-6">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Logo_Kabupaten_Pasuruan.png" class="w-20 h-auto object-contain" alt="Logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Logo_Kabupaten_Pasuruan.png" class="w-16 h-auto object-contain" alt="Logo">
         <div class="text-center flex-1 pr-16">
           <h1 class="text-xl font-bold tracking-wide">LAPORAN HASIL BELAJAR</h1>
           <h2 class="text-lg font-bold tracking-wider">(RAPOR)</h2>
@@ -103,35 +102,37 @@
           </tr>
         </thead>
         <tbody id="bodyTabelRapor" class="divide-y divide-black font-normal">
-          </tbody>
+        </tbody>
       </table>
     </div>
   </div>
 
   <script>
-    // Penangkapan No Absen secara Dinamis dari Server Template Engine (.gs)
+    // Ambil No Absen yang dikirim dari Backend
     const currentNoAbsen = "<?= noAbsen ?>";
 
     window.addEventListener('DOMContentLoaded', function() {
-      if(!currentNoAbsen) {
-        document.getElementById('loader').innerText = "Gagal memuat pratinjau: Parameter nomor absen tidak terdefinisi.";
+      if(!currentNoAbsen || currentNoAbsen.includes("=" + "==")) {
+        document.getElementById('loader').innerHTML = "<span class='text-red-500'>❌ Gagal Memuat: Nomor absen siswa tidak terbaca dari URL browser.</span>";
         return;
       }
       
-      // Panggil fungsi penarik data yang berada di backend Kode.gs
+      // Jalankan jembatan data ke Spreadsheet
       google.script.run
         .withSuccessHandler(renderDataKeRapor)
         .withFailureHandler(handleErrorFetch)
         .getBundledDataRapor(currentNoAbsen);
     });
 
-    // Callback Sukses: Memetakan payload objek ke struktur HTML
     function renderDataKeRapor(res) {
-      // Sembunyikan loader dan tampilkan layout utama lembar rapor
+      if (!res) {
+        document.getElementById('loader').innerHTML = "<span class='text-red-500'>❌ Gagal: Respons dari server kosong.</span>";
+        return;
+      }
+      
       document.getElementById('loader').classList.add('hidden');
       document.getElementById('coreRapor').classList.remove('hidden');
       
-      // Sinkronisasi data identitas siswa & sekolah
       document.getElementById('lblNama').innerText = res.profil.nama || "-";
       document.getElementById('lblNis').innerText = res.profil.nis || "-";
       document.getElementById('lblNisn').innerText = res.profil.nisn || "-";
@@ -139,34 +140,29 @@
       document.getElementById('lblFase').innerText = res.profil.fase || "-";
       document.getElementById('lblSemester').innerText = res.profil.semester || "-";
       
-      document.getElementById('lblSekolah').innerText = res.sekolah.nama_sekolah || "UPT SDN Ranuklindungan I";
-      document.getElementById('lblAlamat').innerText = res.sekolah.alamat || "Ranuklindungan";
-      document.getElementById('lblTp').innerText = res.sekolah.tp || "2025/2026";
+      document.getElementById('lblSekolah').innerText = res.sekolah.nama_sekolah;
+      document.getElementById('lblAlamat').innerText = res.sekolah.alamat;
+      document.getElementById('lblTp').innerText = res.sekolah.tp;
       
-      // Pembuatan baris tabel nilai berkala
       const tbody = document.getElementById('bodyTabelRapor');
       tbody.innerHTML = "";
       
-      if (res.payloadNilai && res.payloadNilai.length > 0) {
-        res.payloadNilai.forEach(item => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td class="p-2 text-center font-semibold border-r border-black align-top">${item.no}</td>
-            <td class="p-2 font-semibold border-r border-black align-top">${item.mapel}</td>
-            <td class="p-2 text-center font-bold text-sm border-r border-black align-top">${item.nilai}</td>
-            <td class="p-2 text-justify leading-relaxed text-[11.5px] align-top">${item.deskripsi}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      } else {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500 font-bold">Data nilai raport siswa kosong atau belum digenerate.</td></tr>`;
-      }
+      res.payloadNilai.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-2 text-center font-semibold align-top">${item.no}</td>
+          <td class="p-2 font-semibold align-top">${item.mapel}</td>
+          <td class="p-2 text-center font-bold text-sm align-top">${item.nilai}</td>
+          <td class="p-2 text-justify leading-relaxed text-[11.5px] align-top">${item.deskripsi}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    // Callback Gagal: Menampilkan log kesalahan system crash
     function handleErrorFetch(err) {
-      document.getElementById('loader').classList.remove('animate-pulse');
-      document.getElementById('loader').innerHTML = `<span class="text-red-600">Gagal memproses dokumen cetak: ${err.toString()}</span>`;
+      document.getElementById('loader').removeAttribute('class');
+      document.getElementById('loader').className = "text-center p-10 text-sm font-sans text-red-600 font-bold bg-red-50 rounded-xl border border-red-200 m-5";
+      document.getElementById('loader').innerHTML = "🛑 KONEKSI SPREADSHEET GAGAL:<br><span class='font-normal text-xs text-slate-600'>" + err.toString() + "</span><br><br><span class='text-xs font-normal text-blue-600 block mt-2'>Tips: Pastikan Anda sudah memberikan izin akses Spreadsheet saat melakukan Deploy baru.</span>";
     }
   </script>
 </body>
