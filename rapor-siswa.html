@@ -142,7 +142,6 @@
                     const tbody = document.getElementById('rowNilaiMurni');
                     tbody.innerHTML = "";
                     
-                    // DISESUAIKAN PERSIS DENGAN HEADERS FOTO PERTAMA ANDA KAK!
                     const mapelList = ["Agama", "Pancasila", "B. Indonesia", "Matematika", "IPAS", "PJOK", "Kesenian", "B. Jawa", "B. Inggris", "BTQ"];
                     
                     mapelList.forEach(m => {
@@ -180,7 +179,6 @@
                     document.getElementById('outNamaSiswa').innerText = data.nama;
                     document.getElementById('outputGenerator').classList.remove('hidden');
                     alert("Berhasil! Nilai Komparasi Rapor & Deskripsi Tersebar Otomatis ke tab sheet rapor_siswa.");
-                    // Segarkan kembali status tabel monitor bawah agar langsung berubah jadi hijau
                     muatStatusCetakSemuaSiswa();
                 } else {
                     alert(data.message);
@@ -190,8 +188,22 @@
             }
         }
 
+        // =========================================================================
+        // HUBUNGAN JEMBATAN OTOMATIS KE FILE CETAK-RAPOR.HTML GITHUB
+        // =========================================================================
         function aksiCetak(noAbsen) {
-            alert("Membuka Dokumen Cetak Rapor Elektronik untuk Siswa dengan Nomor Absen: " + noAbsen);
+            // 1. Dapatkan URL dasar halaman saat ini secara otomatis (mengikuti struktur folder GitHub Anda)
+            const currentUrl = window.location.href;
+            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
+            
+            // 2. Rakit URL menuju file cetak-rapor.html yang berada dalam satu folder di GitHub
+            const halamanCetakTarget = `${baseUrl}/cetak-rapor.html`;
+            
+            // 3. Gabungkan parameter tanpa meng-hardcode url api di file cetak
+            const urlFinal = `${halamanCetakTarget}?no_absen=${encodeURIComponent(noAbsen)}&api_url=${encodeURIComponent(API_URL)}`;
+            
+            // 4. Buka lembar cetak rapor resmi di tab baru browser
+            window.open(urlFinal, '_blank');
         }
     </script>
 </body>
