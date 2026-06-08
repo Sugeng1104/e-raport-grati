@@ -61,7 +61,7 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (ISOLATED SYSTEM V13.0)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (ISOLATED SYSTEM V13.1)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -261,7 +261,7 @@
       document.getElementById('lblFase').innerText = bundle.profil.fase || "B";
       document.getElementById('lblSemester').innerText = bundle.profil.semester || "II";
       
-      document.getElementById('lblSekolah').innerText = bundle.sekolah.nama_sekolah || "SDN RANUKLINDUNGAN I";
+      document.getElementById('lblSekolah').innerText = bundle.sekolah.nama_sekolah || "UPT SDN RANUKLINDUNGAN I";
       document.getElementById('lblAlamat').innerText = bundle.sekolah.alamat || "Bandilan, Ranuklindungan";
       document.getElementById('lblTp').innerText = bundle.sekolah.tp || "2025/2026";
       
@@ -304,20 +304,26 @@
         tbodyMulok.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Tidak ada data Muatan Lokal.</td></tr>`;
       }
 
-      // 4. Render Tabel C: Ekstrakurikuler
+      // 4. Render Tabel C: Ekstrakurikuler (Membaca data Pramuka & Keterangan)
       const tbodyEkstra = document.getElementById('bodyTabelEkstra');
       tbodyEkstra.innerHTML = "";
-      if (bundle.ekstra) {
+      if (bundle.ekstra && bundle.ekstra.predikat !== "-") {
         const trEx = document.createElement('tr');
         trEx.innerHTML = `
           <td class="p-2 text-center font-semibold align-top">1</td>
-          <td class="p-2 font-semibold align-top">${bundle.ekstra.nama || "-"}</td>
-          <td class="p-2 text-center font-bold text-sm align-top bg-slate-50">${bundle.ekstra.predikat || "-"}</td>
-          <td class="p-2 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${bundle.ekstra.keterangan || "-"}</td>
+          <td class="p-2 font-semibold align-top">${bundle.ekstra.nama}</td>
+          <td class="p-2 text-center font-bold text-sm align-top bg-slate-50">${bundle.ekstra.predikat}</td>
+          <td class="p-2 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${bundle.ekstra.keterangan}</td>
         `;
         tbodyEkstra.appendChild(trEx);
       } else {
-        tbodyEkstra.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Data ekstrakurikuler tidak tersedia.</td></tr>`;
+        tbodyEkstra.innerHTML = `
+          <tr>
+            <td class="p-2 text-center align-top">1</td>
+            <td class="p-2 font-semibold align-top">Pramuka</td>
+            <td class="p-2 text-center align-top bg-slate-50">-</td>
+            <td class="p-2 text-slate-400 italic text-[11px] align-top">Siswa tidak mengikuti kegiatan ekstrakurikuler / Data belum diisi.</td>
+          </tr>`;
       }
 
       // 5. Render Tabel D: Rekap Ketidakhadiran (Absensi)
