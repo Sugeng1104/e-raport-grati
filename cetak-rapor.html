@@ -51,8 +51,10 @@
         width: 210mm !important; 
         min-height: auto !important; 
       }
-      .blok-ttd-container {
+      /* PENGUNCI ELEMEN AGAR TIDAK TERBELAH HALAMAN SAAT DICETAK */
+      .blok-anti-pisah {
         page-break-inside: avoid !important;
+        break-inside: avoid !important;
       }
     }
   </style>
@@ -60,7 +62,7 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (ISOLATED SYSTEM V14.2)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (ISOLATED SYSTEM V14.4)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -76,11 +78,11 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Logo_Kabupaten_Pasuruan.png/480px-Logo_Kabupaten_Pasuruan.png" 
              class="w-16 h-auto object-contain" 
              alt="Logo Kabupaten Pasuruan">
-      <div class="text-center flex-1 pr-16">
-        <h1 class="text-lg font-bold tracking-wide">LAPORAN HASIL BELAJAR</h1>
-        <h2 class="text-base font-bold tracking-wider">(RAPOR)</h2>
+        <div class="text-center flex-1 pr-16">
+          <h1 class="text-lg font-bold tracking-wide">LAPORAN HASIL BELAJAR</h1>
+          <h2 class="text-base font-bold tracking-wider">(RAPOR)</h2>
+        </div>
       </div>
-   </div>
 
       <div class="grid grid-cols-2 gap-x-8 text-[12.5px] leading-relaxed mb-4">
         <table class="w-full">
@@ -158,7 +160,7 @@
         </table>
       </div>
 
-      <div class="mt-12 mb-5">
+      <div class="mt-12 mb-5 blok-anti-pisah">
         <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">EKSTRAKURIKULER</h3>
         <table class="w-full tabel-border-tegas text-xs text-left">
           <thead>
@@ -173,7 +175,7 @@
         </table>
       </div>
 
-      <div class="mb-6 w-[260px]">
+      <div class="mb-6 w-[260px] blok-anti-pisah">
         <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">KETIDAKHADIRAN</h3>
         <table class="w-full tabel-border-tegas text-xs text-left">
           <tbody>
@@ -196,7 +198,7 @@
         </table>
       </div>
 
-      <div class="blok-ttd-container text-xs mt-12 leading-relaxed">
+      <div class="blok-anti-pisah text-xs mt-12 leading-relaxed">
         
         <div class="flex justify-between items-end text-center mb-16 px-4">
           <div class="w-64">
