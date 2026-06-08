@@ -51,7 +51,7 @@
         width: 210mm !important; 
         min-height: auto !important; 
       }
-      /* PENGUNCI ELEMEN AGAR TIDAK TERBELAH HALAMAN SAAT DICETAK */
+      /* Arsitektur Pencegahan Dokumen Terpotong Tengah */
       .blok-anti-pisah {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
@@ -62,7 +62,7 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (ISOLATED SYSTEM V14.4)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 RAPOR ELEKTRONIK (ISOLATED CHARIVA SYSTEM V14.5)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -74,16 +74,18 @@
 
     <div id="coreRapor" class="hidden">
       
+      <!-- HEADER RAPOR -->
       <div class="flex items-center justify-start gap-6 border-b-2 border-black pb-4 mb-4">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Logo_Kabupaten_Pasuruan.png/480px-Logo_Kabupaten_Pasuruan.png" 
-             class="w-16 h-auto object-contain" 
-             alt="Logo Kabupaten Pasuruan">
-        <div class="text-center flex-1 pr-16">
-          <h1 class="text-lg font-bold tracking-wide">LAPORAN HASIL BELAJAR</h1>
-          <h2 class="text-base font-bold tracking-wider">(RAPOR)</h2>
-        </div>
+       <img src="logo-sd.png" 
+            class="w-16 h-auto object-contain" 
+            alt="Logo SDN Ranuklindungan I">
+       <div class="text-center flex-1 pr-16">
+         <h1 class="text-lg font-bold tracking-wide">LAPORAN HASIL BELAJAR</h1>
+         <h2 class="text-base font-bold tracking-wider">(RAPOR)</h2>
+       </div>
       </div>
 
+      <!-- BIODATA / IDENTITAS SISWA -->
       <div class="grid grid-cols-2 gap-x-8 text-[12.5px] leading-relaxed mb-4">
         <table class="w-full">
           <tr>
@@ -131,6 +133,7 @@
         </table>
       </div>
 
+      <!-- TABEL A: MATAPELAJARAN UTAMA -->
       <div class="mb-4">
         <table class="w-full tabel-border-tegas text-xs text-left">
           <thead>
@@ -145,6 +148,7 @@
         </table>
       </div>
 
+      <!-- TABEL B: MUATAN LOKAL -->
       <div class="mb-5">
         <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">MUATAN LOKAL</h3>
         <table class="w-full tabel-border-tegas text-xs text-left">
@@ -160,7 +164,8 @@
         </table>
       </div>
 
-      <div class="mt-12 mb-5 blok-anti-pisah">
+      <!-- TABEL C: EKSTRAKURIKULER (TURUN 5 BARIS DENGAN MT-20 & REGISTER ANTI-PISAH) -->
+      <div class="mt-20 mb-5 blok-anti-pisah">
         <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">EKSTRAKURIKULER</h3>
         <table class="w-full tabel-border-tegas text-xs text-left">
           <thead>
@@ -175,6 +180,7 @@
         </table>
       </div>
 
+      <!-- TABEL D: KETIDAKHADIRAN -->
       <div class="mb-6 w-[260px] blok-anti-pisah">
         <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">KETIDAKHADIRAN</h3>
         <table class="w-full tabel-border-tegas text-xs text-left">
@@ -198,6 +204,7 @@
         </table>
       </div>
 
+      <!-- BLOK TANDA TANGAN (AUTOMATICALLY SEJALUR) -->
       <div class="blok-anti-pisah text-xs mt-12 leading-relaxed">
         
         <div class="flex justify-between items-end text-center mb-16 px-4">
