@@ -61,7 +61,7 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (ISOLATED SYSTEM V13.1)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (ISOLATED SYSTEM V13.2)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -304,27 +304,22 @@
         tbodyMulok.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Tidak ada data Muatan Lokal.</td></tr>`;
       }
 
-      // 4. Render Tabel C: Ekstrakurikuler (Membaca data Pramuka & Keterangan)
+      // 4. Render Tabel C: Ekstrakurikuler (Aman Tanpa Filter Ketat)
       const tbodyEkstra = document.getElementById('bodyTabelEkstra');
       tbodyEkstra.innerHTML = "";
-      if (bundle.ekstra && bundle.ekstra.predikat !== "-") {
-        const trEx = document.createElement('tr');
-        trEx.innerHTML = `
-          <td class="p-2 text-center font-semibold align-top">1</td>
-          <td class="p-2 font-semibold align-top">${bundle.ekstra.nama}</td>
-          <td class="p-2 text-center font-bold text-sm align-top bg-slate-50">${bundle.ekstra.predikat}</td>
-          <td class="p-2 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${bundle.ekstra.keterangan}</td>
-        `;
-        tbodyEkstra.appendChild(trEx);
-      } else {
-        tbodyEkstra.innerHTML = `
-          <tr>
-            <td class="p-2 text-center align-top">1</td>
-            <td class="p-2 font-semibold align-top">Pramuka</td>
-            <td class="p-2 text-center align-top bg-slate-50">-</td>
-            <td class="p-2 text-slate-400 italic text-[11px] align-top">Siswa tidak mengikuti kegiatan ekstrakurikuler / Data belum diisi.</td>
-          </tr>`;
-      }
+      
+      const namaEkskul = (bundle.ekstra && bundle.ekstra.nama) ? bundle.ekstra.nama : "Pramuka";
+      const predikatEkskul = (bundle.ekstra && bundle.ekstra.predikat) ? bundle.ekstra.predikat : "-";
+      const keteranganEkskul = (bundle.ekstra && bundle.ekstra.keterangan) ? bundle.ekstra.keterangan : "-";
+
+      const trEx = document.createElement('tr');
+      trEx.innerHTML = `
+        <td class="p-2 text-center font-semibold align-top">1</td>
+        <td class="p-2 font-semibold align-top">${namaEkskul}</td>
+        <td class="p-2 text-center font-bold text-sm align-top bg-slate-50">${predikatEkskul}</td>
+        <td class="p-2 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${keteranganEkskul}</td>
+      `;
+      tbodyEkstra.appendChild(trEx);
 
       // 5. Render Tabel D: Rekap Ketidakhadiran (Absensi)
       if (bundle.kehadiran) {
