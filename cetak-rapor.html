@@ -6,29 +6,69 @@
   <title>Pratinjau Rapor Resmi - UPT SDN Ranuklindungan I</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: 'Calibri', 'Arial', sans-serif; background-color: #f1f5f9; color: #000; }
+    /* ============================================================
+       PENGATURAN LAYOUT UTAMA & BAGIAN NON-CETAK
+       ============================================================ */
+    body { 
+      font-family: 'Calibri', 'Arial', sans-serif; 
+      background-color: #f1f5f9; 
+      color: #000; 
+      margin: 0;
+      padding: 0;
+    }
     .lembar-rapor {
       background: white;
       width: 210mm;
       min-height: 297mm;
-      padding: 15mm 20mm;
+      padding: 20mm 20mm 15mm 20mm;
       margin: 20px auto;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
     }
     .tabel-border-tegas, .tabel-border-tegas th, .tabel-border-tegas td {
       border: 1.5px solid #000000 !important;
     }
+
+    /* ============================================================
+       ATURAN SAKRAL MODE CETAK (PRINT MODE) - MENJAWAB KELUHAN ANDA
+       ============================================================ */
+    @page {
+      size: A4;           /* Memaksa kertas berukuran A4 */
+      margin: 0mm;        /* Menghilangkan header tanggal & title bawaan browser */
+    }
+
     @media print {
-      body { background: white; margin: 0; padding: 0; }
-      .lembar-rapor { box-shadow: none; margin: 0; padding: 10mm; width: 100%; }
-      .no-print { display: none; }
+      /* 1. Sembunyikan BAR NAVIGASI ATAS secara total dan paksa (Anti-Gagal) */
+      .no-print, #navigasiAtas, [class*="no-print"] { 
+        display: none !important; 
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        visibility: hidden !important;
+      }
+      
+      /* 2. Format lembar cetak agar nempel pas di kertas A4 */
+      body { 
+        background: #ffffff !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+      }
+      .lembar-rapor { 
+        box-shadow: none !important; 
+        margin: 0 auto !important; 
+        padding: 15mm 15mm 10mm 15mm !important; 
+        width: 210mm !important; 
+        min-height: 297mm !important;
+        page-break-after: avoid;
+        page-break-before: avoid;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (SERVER GITHUB V12.2)</div>
+  <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
+    <div class="text-xs font-bold font-sans tracking-wide">📄 PORTAL RAPOR ELEKTRONIK (SERVER GITHUB V12.4)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
@@ -41,7 +81,10 @@
     <div id="coreRapor" class="hidden">
       
       <div class="flex items-center justify-start gap-6 border-b-2 border-black pb-4 mb-6">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Logo_Kabupaten_Pasuruan.png" class="w-14 h-auto object-contain" alt="Logo Kabupaten Pasuruan">
+        <img src="https://pasuruankab.go.id/assets/img/logo.png" 
+             onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/d3/Logo_Kabupaten_Pasuruan.png';" 
+             class="w-14 h-auto object-contain" 
+             alt="Logo">
         <div class="text-center flex-1 pr-14">
           <h1 class="text-lg font-bold tracking-wide">LAPORAN HASIL BELAJAR</h1>
           <h2 class="text-base font-bold tracking-wider">(RAPOR)</h2>
@@ -112,26 +155,20 @@
   </div>
 
   <script>
-    // 1. Ekstrak otomatis nomor absen yang dikirim dari URL browser (Contoh: ?no_absen=5)
     const urlParams = new URLSearchParams(window.location.search);
     const currentNoAbsen = urlParams.get('no_absen');
-
-    // Alamat Gerbang Web App Apps Script Anda (V12.2 CORS Enabled)
-    const GOOGLE_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzADck4Yk-3KmSPgNRdEU37wSIne8Lz1YH7fYGgO0ah9EGQKkJmt7w_IBEMNf2_p1vg/exec";
+    const dynamicAppsScriptUrl = urlParams.get('api_url');
 
     window.addEventListener('DOMContentLoaded', function() {
-      // Validasi awal agar tidak mengirim request kosong ke Google Server
-      if(!currentNoAbsen || currentNoAbsen.trim() === "") {
+      if(!currentNoAbsen || !dynamicAppsScriptUrl) {
         document.getElementById('loader').removeAttribute('class');
         document.getElementById('loader').className = "text-center p-10 text-sm font-sans text-amber-600 font-bold bg-amber-50 rounded-xl border border-amber-200 m-5";
-        document.getElementById('loader').innerHTML = "⚠️ PARAMETER DITOLAK:<br><span class='font-normal text-xs text-slate-600'>Halaman cetak diakses tanpa membawa identitas siswa. Silakan klik tombol 'Cetak' kembali melalui Dashboard Utama Anda.</span>";
+        document.getElementById('loader').innerHTML = "⚠️ DATA PARAMETER UNTUK CETAK BELUM LENGKAP";
         return;
       }
       
-      // Ambil Link Eksekusi Data Menggunakan Method Get Terbuka
-      const targetApiUrl = `${GOOGLE_WEBAPP_URL}?page=cetak&no_absen=${encodeURIComponent(currentNoAbsen)}`;
+      const targetApiUrl = `${dynamicAppsScriptUrl}?page=cetak&no_absen=${encodeURIComponent(currentNoAbsen)}`;
       
-      // Jalankan Eksekusi Fetching Lintas Server
       fetch(targetApiUrl)
         .then(response => {
           if (!response.ok) throw new Error("Respon jaringan internet bermasalah.");
@@ -139,57 +176,34 @@
         })
         .then(responseObj => {
           if (responseObj.status === "SUCCESS") {
-            // Jika berhasil terhubung, panggil fungsi pengisi data
             renderDataKeRapor(responseObj.data);
           } else {
-            // Jika ditolak internal server Google Apps Script
             tampilkanPesanGagal(responseObj.message);
           }
         })
         .catch(err => {
-          // Jika terjadi kendala jaringan total / salah deployment URL
           tampilkanPesanGagal(err.toString());
         });
     });
 
-    // FUNGSI INJEKSI DATA SPREADSHEET KE STRUKTUR HTML TAMPILAN
     function renderDataKeRapor(res) {
-      // Sembunyikan Animasi Loading, Tampilkan Area Cetak Rapor
       document.getElementById('loader').classList.add('hidden');
       document.getElementById('coreRapor').classList.remove('hidden');
       
-      // ============================================================
-      // PERBAIKAN PEMETAAN BIODATA SISWA (MENGATASI KESALAHAN GESER DATA)
-      // ============================================================
+      // Injeksi Biodata Pokok
       document.getElementById('lblNama').innerText = res.profil.nama || "SISWA TIDAK TERDAFTAR";
       document.getElementById('lblNis').innerText = res.profil.nis || "-";
       document.getElementById('lblNisn').innerText = res.profil.nisn || "-";
       
-      // Memperbaiki "Kelas" yang sebelumnya salah mengambil data "Pasuruan"
+      // Injeksi Identitas yang Sudah Diperbaiki Manual Sesuai Instruksi Anda
       document.getElementById('lblKelas').innerText = "IV"; 
-      
-      // Memperbaiki "Fase" yang sebelumnya salah mengambil data string tanggal ISO
       document.getElementById('lblFase').innerText = "B";
-      
-      // Memperbaiki "Semester" yang sebelumnya salah mengambil data "P"
       document.getElementById('lblSemester').innerText = "II";
-      
-      // ============================================================
-      // PERBAIKAN IDENTITAS LEMBAGA SEKOLAH & ALAMAT
-      // ============================================================
-      
-      // Memperbaiki "Nama Sekolah" menjadi UPT SDN Ranuklindungan I
       document.getElementById('lblSekolah').innerText = "UPT SDN Ranuklindungan I";
-      
-      // Memperbaiki "Alamat" menjadi Bandilan, Ranuklindungan (Baris 5 isi_identitas)
       document.getElementById('lblAlamat').innerText = "Bandilan, Ranuklindungan";
-      
-      // Memperbaiki "Tahun Pelajaran" menjadi 2025/2026 (Baris 20)
       document.getElementById('lblTp').innerText = "2025/2026";
       
-      // ============================================================
-      // INJEKSI BARIS NILAI RAPORT SISWA
-      // ============================================================
+      // Injeksi Baris Nilai Rapor
       const tbody = document.getElementById('bodyTabelRapor');
       tbody.innerHTML = "";
       
@@ -209,20 +223,10 @@
       }
     }
 
-    // FUNGSI HANDLER UNTUK MENANGKAP ERROR AGAR TIDAK STUCK BLANK LOADING
     function tampilkanPesanGagal(pesanError) {
       document.getElementById('loader').removeAttribute('class');
       document.getElementById('loader').className = "text-center p-8 text-sm font-sans text-red-600 font-bold bg-red-50 rounded-xl border border-red-200 m-5";
-      document.getElementById('loader').innerHTML = `
-        🛑 KONEKSI CLOUD SPREADSHEET GAGAL:<br>
-        <span class='font-normal text-xs text-slate-600 block my-2'>${pesanError}</span>
-        <div class='text-left font-normal text-xs text-slate-500 mt-4 border-t pt-2 space-y-1'>
-          <b>💡 Solusi Pemecahan Masalah:</b><br>
-          1. Pastikan Anda telah melakukan <b>Deploy -> Versi Baru (New Version)</b> di Google Apps Script setelah update Kode.gs kemarin.<br>
-          2. Pastikan nomor absen siswa sudah di-generate nilainya melalui Dashboard Utama.<br>
-          3. Cek kembali apakah URL Web App Google Script Anda sudah sesuai.
-        </div>
-      `;
+      document.getElementById('loader').innerHTML = `🛑 KONEKSI DATABASE GAGAL:<br><span class='font-normal text-xs text-slate-600 block my-2'>${pesanError}</span>`;
     }
   </script>
 </body>
