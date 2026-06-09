@@ -1,180 +1,161 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Rapor & TKA Hub - UPT SDN Ranuklindungan I</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Rapor & TKA Hub - UPT SDN Ranuklindungan I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 font-sans min-h-screen text-slate-800">
 
-    <header class="bg-gradient-to-r from-blue-700 via-[#1e6ca8] to-indigo-700 text-white shadow-lg relative overflow-hidden">
-        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
-        
-        <div class="max-w-7xl mx-auto px-6 py-8 md:py-12 relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="space-y-2 text-center md:text-left">
-                <div class="inline-flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
-                    <span>🏫</span> <span>Sistem Informasi Sekolah Terintegrasi</span>
-                </div>
-                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight" id="namaSekolahHub">UPT SDN Ranuklindungan I</h1>
-                <p class="text-blue-100 max-w-xl text-sm md:text-base font-medium">Selamat datang di Pusat Kontrol Administrasi, E-Rapor Digital, dan Platform Tes Kemampuan Akademik (TKA) Siswa.</p>
-            </div>
-            <div class="flex items-center space-x-3 bg-white/10 p-4 rounded-2xl border border-white/20 backdrop-blur-md shadow-inner text-center md:text-left">
-                <span class="text-4xl">🗓️</span>
-                <div>
-                    <p class="text-xs font-bold text-blue-200 uppercase tracking-wide">Hari & Tanggal</p>
-                    <p id="liveTanggal" class="text-sm font-bold mt-0.5">Memuat Waktu...</p>
-                </div>
-            </div>
-        </div>
-    </header>
+    <header class="bg-gradient-to-r from-blue-700 via-[#1e6ca8] to-indigo-700 text-white shadow-lg relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 py-8 md:py-12 relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="space-y-2 text-center md:text-left">
+                <div class="inline-flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
+                    <span>🏫</span> <span>Sistem Informasi Sekolah Terintegrasi</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight" id="namaSekolahHub">UPT SDN Ranuklindungan I</h1>
+                <p class="text-blue-100 max-w-xl text-sm md:text-base font-medium">Selamat datang di Pusat Kontrol Administrasi, E-Rapor Digital, dan Platform Tes Kemampuan Akademik (TKA) Siswa.</p>
+            </div>
+            <div class="flex items-center space-x-3 bg-white/10 p-4 rounded-2xl border border-white/20 backdrop-blur-md shadow-inner text-center md:text-left">
+                <span class="text-4xl">🗓️</span>
+                <div>
+                    <p class="text-xs font-bold text-blue-200 uppercase tracking-wide">Hari & Tanggal</p>
+                    <p id="liveTanggal" class="text-sm font-bold mt-0.5">Memuat Waktu...</p>
+                </div>
+            </div>
+        </div>
+    </header>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
-        
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
-                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl text-2xl">👨‍🎓</div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Siswa</p>
-                    <p class="text-xl font-extrabold text-slate-800 tracking-tight" id="summarySiswa">...</p>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
-                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl text-2xl">📚</div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mata Pelajaran</p>
-                    <p class="text-xl font-extrabold text-slate-800 tracking-tight" id="summaryMapel">...</p>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
-                <div class="p-3 bg-amber-50 text-amber-600 rounded-xl text-2xl">🏅</div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ekstrakurikuler</p>
-                    <p class="text-xl font-extrabold text-slate-800 tracking-tight" id="summaryEkskul">...</p>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
-                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-2xl">🔄</div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Koneksi Server</p>
-                    <p id="statusKoneksi" class="text-xs font-bold text-amber-600 flex items-center space-x-1 mt-1">
-                        <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                        <span>MENYINGKRONKAN...</span>
-                    </p>
-                </div>
-            </div>
-        </div>
+    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+        
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
+                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl text-2xl">👨‍🎓</div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Siswa</p>
+                    <p class="text-xl font-extrabold text-slate-800 tracking-tight" id="summarySiswa">...</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
+                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl text-2xl">📚</div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mata Pelajaran</p>
+                    <p class="text-xl font-extrabold text-slate-800 tracking-tight" id="summaryMapel">...</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
+                <div class="p-3 bg-amber-50 text-amber-600 rounded-xl text-2xl">🏅</div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ekstrakurikuler</p>
+                    <p class="text-xl font-extrabold text-slate-800 tracking-tight" id="summaryEkskul">...</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 transition-all hover:shadow-md">
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-2xl">🔄</div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Koneksi Server</p>
+                    <p class="text-xs font-bold text-emerald-600 flex items-center space-x-1 mt-1">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>TERHUBUNG</span>
+                    </p>
+                </div>
+            </div>
+        </div>
 
-        <div class="space-y-4">
-            <h2 class="text-lg font-extrabold text-slate-900 tracking-wide flex items-center space-x-2">
-                <span class="text-blue-600">🚀</span> <span>Akses Cepat Modul Sistem</span>
-            </h2>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
-                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
-                    <div class="space-y-2">
-                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold">🏛️</div>
-                        <h3 class="font-bold text-lg text-slate-900">Modul Administrasi & E-Rapor</h3>
-                        <p class="text-slate-500 text-xs leading-relaxed">Kelola identitas legalitas sekolah secara dinamis, manajemen profil dan personalia pendidik, kontrol database induk peserta didik, serta pemetaan capaian kompetensi dasar siswa.</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-4 border-t border-slate-100">
-                        <a href="identitas-sekolah.html" class="p-3 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-center rounded-xl border border-slate-200 transition font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm">
-                            <span class="text-lg">📋</span> <span>Identitas Sekolah</span>
-                        </a>
-                        <a href="data-siswa.html" class="p-3 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-center rounded-xl border border-slate-200 transition font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm">
-                            <span class="text-lg">👥</span> <span>Data Induk Siswa</span>
-                        </a>
-                        <a href="data-kompetensi-siswa.html" class="p-3 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-center rounded-xl border border-blue-200/60 bg-blue-50/20 transition font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm">
-                            <span class="text-lg">🎯</span> <span class="text-blue-700">Kompetensi Siswa</span>
-                        </a>
-                    </div>
-                </div>
+        <div class="space-y-4">
+            <h2 class="text-lg font-extrabold text-slate-900 tracking-wide flex items-center space-x-2">
+                <span class="text-blue-600">🚀</span> <span>Akses Cepat Modul Sistem</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div class="space-y-2">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold">🏛️</div>
+                        <h3 class="font-bold text-lg text-slate-900">Modul Administrasi & E-Rapor</h3>
+                        <p class="text-slate-500 text-xs leading-relaxed">Kelola identitas legalitas sekolah secara dinamis, manajemen profil dan personalia pendidik, kontrol database induk peserta didik, serta pemetaan capaian kompetensi dasar siswa.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-4 border-t border-slate-100">
+                        <a href="identitas-sekolah.html" class="p-3 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-center rounded-xl border border-slate-200 transition font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm">
+                            <span class="text-lg">📋</span> <span>Identitas Sekolah</span>
+                        </a>
+                        <a href="data-siswa.html" class="p-3 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-center rounded-xl border border-slate-200 transition font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm">
+                            <span class="text-lg">👥</span> <span>Data Induk Siswa</span>
+                        </a>
+                        <a href="data-kompetensi-siswa.html" class="p-3 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-center rounded-xl border border-blue-200/60 bg-blue-50/20 transition font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm">
+                            <span class="text-lg">🎯</span> <span class="text-blue-700">Kompetensi Siswa</span>
+                        </a>
+                    </div>
+                </div>
 
-                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
-                    <div class="space-y-2">
-                        <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold">🧠</div>
-                        <h3 class="font-bold text-lg text-slate-900">Platform Ujian & TKA</h3>
-                        <p class="text-slate-500 text-xs leading-relaxed">Kelola bank soal ujian, pengaturan sistem pengacakan (*shuffling algorithm*), durasi waktu pengerjaan, dan pantau grafik hasil analisis kompetensi kognitif anak.</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 pt-4 border-t border-slate-100">
-                        <a href="#bank-soal" class="opacity-60 cursor-not-allowed p-3 bg-slate-50 text-center rounded-xl border border-slate-200 font-bold text-xs flex flex-col items-center justify-center gap-1">
-                            <span class="text-lg">🗂️</span> <span>Bank Soal (Soon)</span>
-                        </a>
-                        <a href="#dashboard-hasil" class="opacity-60 cursor-not-allowed p-3 bg-slate-50 text-center rounded-xl border border-slate-200 font-bold text-xs flex flex-col items-center justify-center gap-1">
-                            <span class="text-lg">📊</span> <span>Hasil Ujian (Soon)</span>
-                        </a>
-                    </div>
-                </div>
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div class="space-y-2">
+                        <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold">🧠</div>
+                        <h3 class="font-bold text-lg text-slate-900">Platform Ujian & TKA</h3>
+                        <p class="text-slate-500 text-xs leading-relaxed">Kelola bank soal ujian, pengaturan sistem pengacakan (*shuffling algorithm*), durasi waktu pengerjaan, dan pantau grafik hasil analisis kompetensi kognitif anak.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-4 border-t border-slate-100">
+                        <a href="#bank-soal" class="opacity-60 cursor-not-allowed p-3 bg-slate-50 text-center rounded-xl border border-slate-200 font-bold text-xs flex flex-col items-center justify-center gap-1">
+                            <span class="text-lg">🗂️</span> <span>Bank Soal (Soon)</span>
+                        </a>
+                        <a href="#dashboard-hasil" class="opacity-60 cursor-not-allowed p-3 bg-slate-50 text-center rounded-xl border border-slate-200 font-bold text-xs flex flex-col items-center justify-center gap-1">
+                            <span class="text-lg">📊</span> <span>Hasil Ujian (Soon)</span>
+                        </a>
+                    </div>
+                </div>
 
-            </div>
-        </div>
-    </main>
+            </div>
+        </div>
+    </main>
 
-    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
-        <div class="max-w-7xl mx-auto px-6 text-center space-y-1">
-            <p class="text-xs font-bold text-slate-500">© 2026 E-Rapor & TKA Engine • Created by Sugeng Hidayat EduTech</p>
-            <p class="text-[10px] text-slate-400 font-medium">Dibuat khusus untuk efisiensi administrasi guru UPT SDN Ranuklindungan I</p>
-        </div>
-    </footer>
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-6 text-center space-y-1">
+            <p class="text-xs font-bold text-slate-500">© 2026 E-Rapor & TKA Engine • Created by Sugeng Hidayat EduTech</p>
+            <p class="text-[10px] text-slate-400 font-medium">Dibuat khusus untuk efisiensi administrasi guru UPT SDN Ranuklindungan I</p>
+        </div>
+    </footer>
 
-    <script>
-        // Gunakan URL Web App rilis terbaru Anda yang valid dari Google Apps Script
-        const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+    <script>
+        const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
-        function jalankanLiveTanggal() {
-            const opsi = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const hariIni = new Date();
-            document.getElementById('liveTanggal').innerText = hariIni.toLocaleDateString('id-ID', opsi);
-        }
+        function jalankanLiveTanggal() {
+            const opsi = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const hariIni = new Date();
+            document.getElementById('liveTanggal').innerText = hariIni.toLocaleDateString('id-ID', opsi);
+        }
 
-        async function sinkronisasiDataHub() {
-            try {
-                // Cache buster ditambahkan agar browser tidak menyimpan respon error yang lama
-                const cacheBuster = new Date().getTime();
-                const urlTarget = `${API_SHEET_URL}?action=getDashboardSummary&_=${cacheBuster}`;
-                
-                const respon = await fetch(urlTarget, {
-                    method: "GET",
-                    redirect: "follow"
-                });
-                
-                if (!respon.ok) {
-                    throw new Error("Respon jaringan server tidak bernilai OK.");
-                }
+        async function sinkronisasiDataHub() {
+            try {
+                const respon = await fetch(`${API_SHEET_URL}?action=getDashboardSummary`, {
+                    method: "GET",
+                    mode: "cors",
+                    redirect: "follow"
+                });
+                const json = await respon.json();
 
-                const json = await respon.json();
+                if (json.status === "SUCCESS") {
+                    const data = json.summary;
+                    document.getElementById('namaSekolahHub').innerText = data.namaSekolah;
+                    document.getElementById('summarySiswa').innerText = data.totalSiswa + " Anak";
+                    document.getElementById('summaryMapel').innerText = data.totalMapel + " Pelajaran";
+                    document.getElementById('summaryEkskul').innerText = data.totalEkskul + " Kegiatan";
+                }
+            } catch (error) {
+                console.error("Gagal terhubung ke pipeline API:", error);
+                document.getElementById('summarySiswa').innerText = "Err";
+                document.getElementById('summaryMapel').innerText = "Err";
+                document.getElementById('summaryEkskul').innerText = "Err";
+            }
+        }
 
-                if (json && json.status === "SUCCESS" && json.summary) {
-                    const data = json.summary;
-                    document.getElementById('namaSekolahHub').innerText = data.namaSekolah || "UPT SDN Ranuklindungan I";
-                    document.getElementById('summarySiswa').innerText = (data.totalSiswa || 0) + " Anak";
-                    document.getElementById('summaryMapel').innerText = (data.totalMapel || 0) + " Pelajaran";
-                    document.getElementById('summaryEkskul').innerText = (data.totalEkskul || 0) + " Kegiatan";
-                    
-                    // Perbarui indikator koneksi menjadi sukses terhubung
-                    document.getElementById('statusKoneksi').className = "text-xs font-bold text-emerald-600 flex items-center space-x-1 mt-1";
-                    document.getElementById('statusKoneksi').innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>TERHUBUNG</span>`;
-                } else {
-                    throw new Error(json.message || "Gagal mengekstrak struktur objek rangkuman database.");
-                }
-            } catch (error) {
-                console.error("Gagal terhubung ke pipeline API:", error);
-                document.getElementById('summarySiswa').innerText = "Err";
-                document.getElementById('summaryMapel').innerText = "Err";
-                document.getElementById('summaryEkskul').innerText = "Err";
-                
-                // Set indikator status koneksi ke Gagal
-                document.getElementById('statusKoneksi').className = "text-xs font-bold text-red-600 flex items-center space-x-1 mt-1";
-                document.getElementById('statusKoneksi').innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-red-500"></span><span>PUTUS (Cek Log)</span>`;
-            }
-        }
-
-        window.onload = function() {
-            jalankanLiveTanggal();
-            sinkronisasiDataHub();
-        };
-    </script>
+        window.onload = function() {
+            jalankanLiveTanggal();
+            sinkronisasiDataHub();
+        };
+    </script>
 </body>
 </html>
