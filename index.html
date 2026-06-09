@@ -57,9 +57,9 @@
                 <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-2xl">🔄</div>
                 <div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Koneksi Server</p>
-                    <p class="text-xs font-bold text-emerald-600 flex items-center space-x-1 mt-1">
-                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span>TERHUBUNG</span>
+                    <p id="statusKoneksi" class="text-xs font-bold text-amber-600 flex items-center space-x-1 mt-1">
+                        <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span>MENYINGKRONKAN...</span>
                     </p>
                 </div>
             </div>
@@ -120,6 +120,7 @@
     </footer>
 
     <script>
+        // Gunakan URL Web App rilis terbaru Anda yang valid dari Google Apps Script
         const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
 
         function jalankanLiveTanggal() {
@@ -130,25 +131,43 @@
 
         async function sinkronisasiDataHub() {
             try {
-                const respon = await fetch(`${API_SHEET_URL}?action=getDashboardSummary`, {
+                // Cache buster ditambahkan agar browser tidak menyimpan respon error yang lama
+                const cacheBuster = new Date().getTime();
+                const urlTarget = `${API_SHEET_URL}?action=getDashboardSummary&_=${cacheBuster}`;
+                
+                const respon = await fetch(urlTarget, {
                     method: "GET",
-                    mode: "cors",
                     redirect: "follow"
                 });
+                
+                if (!respon.ok) {
+                    throw new Error("Respon jaringan server tidak bernilai OK.");
+                }
+
                 const json = await respon.json();
 
-                if (json.status === "SUCCESS") {
+                if (json && json.status === "SUCCESS" && json.summary) {
                     const data = json.summary;
-                    document.getElementById('namaSekolahHub').innerText = data.namaSekolah;
-                    document.getElementById('summarySiswa').innerText = data.totalSiswa + " Anak";
-                    document.getElementById('summaryMapel').innerText = data.totalMapel + " Pelajaran";
-                    document.getElementById('summaryEkskul').innerText = data.totalEkskul + " Kegiatan";
+                    document.getElementById('namaSekolahHub').innerText = data.namaSekolah || "UPT SDN Ranuklindungan I";
+                    document.getElementById('summarySiswa').innerText = (data.totalSiswa || 0) + " Anak";
+                    document.getElementById('summaryMapel').innerText = (data.totalMapel || 0) + " Pelajaran";
+                    document.getElementById('summaryEkskul').innerText = (data.totalEkskul || 0) + " Kegiatan";
+                    
+                    // Perbarui indikator koneksi menjadi sukses terhubung
+                    document.getElementById('statusKoneksi').className = "text-xs font-bold text-emerald-600 flex items-center space-x-1 mt-1";
+                    document.getElementById('statusKoneksi').innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>TERHUBUNG</span>`;
+                } else {
+                    throw new Error(json.message || "Gagal mengekstrak struktur objek rangkuman database.");
                 }
             } catch (error) {
                 console.error("Gagal terhubung ke pipeline API:", error);
                 document.getElementById('summarySiswa').innerText = "Err";
                 document.getElementById('summaryMapel').innerText = "Err";
                 document.getElementById('summaryEkskul').innerText = "Err";
+                
+                // Set indikator status koneksi ke Gagal
+                document.getElementById('statusKoneksi').className = "text-xs font-bold text-red-600 flex items-center space-x-1 mt-1";
+                document.getElementById('statusKoneksi').innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-red-500"></span><span>PUTUS (Cek Log)</span>`;
             }
         }
 
