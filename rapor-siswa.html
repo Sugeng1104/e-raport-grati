@@ -42,7 +42,13 @@
                             <th class="p-3 text-center">Nilai Murni ASAS</th>
                         </tr>
                     </thead>
-                    <tbody id="rowNilaiMurni" class="divide-y divide-slate-100 font-semibold text-slate-700"></tbody>
+                    <tbody id="rowNilaiMurni" class="divide-y divide-slate-100 font-semibold text-slate-700">
+                        </tbody>
+                    <tfoot>
+                        <tr class="bg-amber-50/70 font-black text-slate-900 border-t border-slate-200">
+                            <td colspan="3" class="p-3 text-left tracking-wide">📋 Sub Judul Capaian 8 (Delapan) Profil Lulusan Murid</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -77,12 +83,6 @@
                             <td colspan="4" class="p-4 text-center text-slate-400 font-medium animate-pulse">Sedang memuat status data siswa dari server...</td>
                         </tr>
                     </tbody>
-                    <tfoot>
-                        <tr class="bg-slate-50 border-t border-hitam font-black text-slate-900">
-                            <td colspan="3" class="p-3 text-left tracking-wide bg-amber-50/50">📋 Sub Judul Capaian 8 (Delapan) Profil Lulusan Murid</td>
-                            <td class="p-3 text-center text-slate-400 font-medium bg-amber-50/50">-</td>
-                        </tr>
-                    </tfoot>
                 </table>
             </div>
         </div>
@@ -110,10 +110,8 @@
                         let tombolStatus = "";
                         
                         if (siswa.isLengkap) {
-                            // JIKA LENGKAP -> TOMBOL HIJAU
                             tombolStatus = `<button onclick="aksiCetak('${siswa.no_absen}')" class="w-full px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold text-[11px] rounded-lg shadow-sm transition">🟢 Cetak Rapor</button>`;
                         } else {
-                            // JIKA ADA YANG KOSONG -> TOMBOL MERAH
                             tombolStatus = `<button onclick="alert('Data nilai Ananda ${siswa.nama} belum lengkap! Silakan klik tombol Ambil Data dilanjutkan Buat Rapor terlebih dahulu.')" class="w-full px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] rounded-lg shadow-sm transition">🔴 Belum Lengkap</button>`;
                         }
                         
@@ -149,9 +147,10 @@
                     const tbody = document.getElementById('rowNilaiMurni');
                     tbody.innerHTML = "";
                     
-                    const mapelList = ["Agama", "Pancasila", "Bahasa Indonesia", "Matematika", "IPAS", "PJOK", "Kesenian", "Bahasa Jawa", "Bahasa Inggris", "BTQ"];
+                    // DISERASIKAN DENGAN STRUCT DATABASE BARU ANDA (TERMASUK TYPO "Bahasa Ingrris")
+                    const mapelList = ["Agama", "Bahasa Indonesia", "Pancasila", "Matematika", "IPAS", "Kesenian", "PJOK", "Bahasa Ingrris", "Bahasa Jawa", "BTQ"];
                     
-                    // Fungsi internal cerdas penemu key objek (Abaikan spasi, singkatan titik, dan kapitalisasi)
+                    // Fungsi pencarian toleran cerdas (mengabaikan spasi ganda & perbedaan kata mikro)
                     function dapatkanNilaiToleran(objekData, namaMapel) {
                         if (!objekData) return "-";
                         const cleanCari = namaMapel.toLowerCase().replace(/[\s_.]+/g, "");
@@ -168,12 +167,15 @@
                     mapelList.forEach(m => {
                         const tr = document.createElement('tr');
                         
-                        // Eksekusi penarikan data menggunakan engine toleran anti-mismatch
                         const nSumatif = dapatkanNilaiToleran(data.dataSumatif, m);
                         const nAsas = dapatkanNilaiToleran(data.dataAsas, m);
                         
+                        // Tampilan label khusus agar di layar user tetap rapi dibaca "Bahasa Inggris"
+                        let namaDisplayMapel = m;
+                        if (m === "Bahasa Ingrris") namaDisplayMapel = "Bahasa Inggris";
+                        
                         tr.innerHTML = `
-                            <td class="p-3 font-bold">${m}</td>
+                            <td class="p-3 font-bold">${namaDisplayMapel}</td>
                             <td class="p-3 text-center text-emerald-600 font-black text-sm">${nSumatif}</td>
                             <td class="p-3 text-center text-blue-600 font-black text-sm">${nAsas}</td>
                         `;
