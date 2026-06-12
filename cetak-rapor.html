@@ -27,12 +27,12 @@
     }
     /* Warna Hijau Muda Transparan untuk Header & Kolom Nilai */
     .bg-hijau-rapor {
-      background-color: rgba(220, 252, 231, 0.75) !important; /* Hijau muda transparan sejenis emerald-100 */
+      background-color: rgba(220, 252, 231, 0.75) !important;
     }
     /* Style Tabel Kenaikan Kelas (Biru Laut Garis Putus-putus) */
     .tabel-kenaikan {
-      border: 2px dashed #0284c7 !important; /* Garis putus-putus biru laut */
-      background-color: rgba(240, 249, 255, 0.85) !important; /* Background biru laut sangat muda */
+      border: 2px dashed #0284c7 !important;
+      background-color: rgba(240, 249, 255, 0.85) !important;
     }
 
     @page {
@@ -70,22 +70,20 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 RAPOR ELEKTRONIK (ISOLATED CHARIVA SYSTEM V14.5)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 RAPOR ELEKTRONIK (ISOLATED CHARIVA SYSTEM V14.6)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
   <div class="lembar-rapor" id="kontenRapor">
     
     <div id="loader" class="text-center text-slate-500 font-bold text-sm pt-20 animate-pulse font-sans">
-      🔄 Mengakses jalur data terisolasi 'cetak_github'... Memetakan lembar rapor...
+      🔄 Mengakses jalur data terisolasi 'identitas_sekolah'... Memetakan lembar rapor...
     </div>
 
     <div id="coreRapor" class="hidden">
       
       <div class="flex items-center justify-start gap-6 border-b-2 border-black pb-4 mb-4">
-        <img src="img/Logo_SD_Ranu_1.png" 
-             class="w-16 h-auto object-contain" 
-             alt="Logo SDN Ranuklindungan I">
+        <img src="img/Logo_SD_Ranu_1.png" class="w-16 h-auto object-contain" alt="Logo SDN Ranuklindungan I">
         <div class="text-center flex-1 pr-16">
           <h1 class="text-lg font-bold tracking-wide">LAPORAN HASIL BELAJAR</h1>
           <h2 class="text-base font-bold tracking-wider">(RAPOR)</h2>
@@ -235,7 +233,6 @@
             </tbody>
           </table>
         </div>
-
       </div>
 
       <div class="blok-anti-pisah text-xs mt-12 leading-relaxed">
@@ -291,7 +288,7 @@
           if (responseObj.status === "SUCCESS" && responseObj.data) {
             renderBundleKeRapor(responseObj.data);
           } else {
-            throw new Error(responseObj.message || "Gagal menarik data melalui parameter cetak_github.");
+            throw new Error(responseObj.message || "Gagal menarik data.");
           }
         })
         .catch(err => {
@@ -303,11 +300,10 @@
       document.getElementById('loader').classList.add('hidden');
       document.getElementById('coreRapor').classList.remove('hidden');
       
-      // Variable penampung hitung rata-rata
       let totalNilai = 0;
       let jumlahMapel = 0;
       
-      // 1. Injeksi Data Identitas Utama
+      // 1. Injeksi Data Identitas Siswa
       const namaSiswa = bundle.profil.nama || "-";
       document.getElementById('lblNama').innerText = namaSiswa;
       document.getElementById('lblMurniNis').innerText = bundle.profil.nis || "-";
@@ -316,6 +312,7 @@
       document.getElementById('lblFase').innerText = bundle.profil.fase || "B";
       document.getElementById('lblSemester').innerText = bundle.profil.semester || "II";
       
+      // Pemetaan Sekolah Dasar dari properti terikat
       document.getElementById('lblSekolah').innerText = bundle.sekolah.nama_sekolah || "UPT SDN RANUKLINDUNGAN I";
       document.getElementById('lblAlamat').innerText = bundle.sekolah.alamat || "Bandilan, Ranuklindungan";
       document.getElementById('lblTp').innerText = bundle.sekolah.tp || "2025/2026";
@@ -362,9 +359,9 @@
         });
       }
 
-      // LOGIKA KEPUTUSAN KENAIKAN KELAS BERDASARKAN RATA-RATA
+      // Logika Penentuan Kenaikan Kelas otomatis berbasis rata-rata rapor
       const rataRapor = jumlahMapel > 0 ? (totalNilai / jumlahMapel) : 0;
-      const kriteriaKenaikan = 65; // Standar rata-rata minimum Kriteria Kenaikan Kelas IV
+      const kriteriaKenaikan = 65; 
       const containerKenaikan = document.getElementById('lblKeputusanKenaikan');
 
       if (rataRapor >= kriteriaKenaikan) {
@@ -376,7 +373,6 @@
       // 4. Render Tabel C: Ekstrakurikuler
       const tbodyEkstra = document.getElementById('bodyTabelEkstra');
       tbodyEkstra.innerHTML = "";
-      
       if (bundle.ekstrakurikuler && bundle.ekstrakurikuler.length > 0) {
         bundle.ekstrakurikuler.forEach(item => {
           const trEx = document.createElement('tr');
@@ -394,20 +390,20 @@
         tbodyEkstra.appendChild(trEx);
       }
 
-      // 5. Render Tabel D: Rekap Ketidakhadiran (Absensi)
+      // 5. Render Tabel D: Rekap Ketidakhadiran
       if (bundle.kehadiran) {
         document.getElementById('lblSakit').innerText = bundle.kehadiran.sakit !== "" ? bundle.kehadiran.sakit : "0";
         document.getElementById('lblIzin').innerText = bundle.kehadiran.izin !== "" ? bundle.kehadiran.izin : "0";
         document.getElementById('lblAlfa').innerText = bundle.kehadiran.alfa !== "" ? bundle.kehadiran.alfa : "0";
       }
 
-      // 6. Injeksi Dinamis Blok Tanda Tangan
-      if (bundle.ttd) {
-        document.getElementById('lblTempatTanggal').innerText = bundle.ttd.tanggal_cetak || "Pasuruan, .........................";
-        document.getElementById('lblNamaGuru').innerText = bundle.ttd.guru_kelas || "-";
-        document.getElementById('lblNipGuru').innerText = bundle.ttd.nip_guru ? "NIP. " + bundle.ttd.nip_guru : "NIP. ...........................";
-        document.getElementById('lblNamaKepsek').innerText = bundle.ttd.kepala_sekolah || "-";
-        document.getElementById('lblNipKepsek').innerText = bundle.ttd.nip_kepala ? "NIP. " + bundle.ttd.nip_kepala : "NIP. ...........................";
+      // 6. PERBAIKAN: Penarikan Data TTD dari objek bundle.sekolah sesuai isi_identitas
+      if (bundle.sekolah) {
+        document.getElementById('lblTempatTanggal').innerText = bundle.sekolah.tanggal_cetak || "Pasuruan, .........................";
+        document.getElementById('lblNamaGuru').innerText = bundle.sekolah.guru_kelas || "-";
+        document.getElementById('lblNipGuru').innerText = bundle.sekolah.nip_guru ? "NIP. " + bundle.sekolah.nip_guru : "NIP. ...........................";
+        document.getElementById('lblNamaKepsek').innerText = bundle.sekolah.kepala_sekolah || "-";
+        document.getElementById('lblNipKepsek').innerText = bundle.sekolah.nip_kepala ? "NIP. " + bundle.sekolah.nip_kepala : "NIP. ...........................";
       }
     }
 
