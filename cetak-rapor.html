@@ -68,14 +68,14 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 RAPOR ELEKTRONIK (ISOLATED CHARIVA SYSTEM V14.7)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 RAPOR ELEKTRONIK (ISOLATED CHARIVA SYSTEM V14.8)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
   <div class="lembar-rapor" id="kontenRapor">
     
     <div id="loader" class="text-center text-slate-500 font-bold text-sm pt-20 animate-pulse font-sans">
-      🔄 Menghubungkan ke Jalur DB_UTAMA... Memetakan Kunci Identitas...
+      🔄 Menghubungkan ke Jalur DB_UTAMA berdasarkan indeks baris fisik...
     </div>
 
     <div id="coreRapor" class="hidden">
@@ -312,7 +312,7 @@
       
       document.getElementById('lblDplMurid').innerText = bundle.profil.dpl_murid || "-";
       
-      // 2. Render Tabel A: Muatan Pelajaran Utama
+      // 2. Render Tabel A: Matapelajaran Utama
       const tbodyUtama = document.getElementById('bodyTabelRapor');
       tbodyUtama.innerHTML = "";
       if (bundle.payloadNilai && bundle.payloadNilai.length > 0) {
@@ -352,7 +352,7 @@
         });
       }
 
-      // Logika Penentuan Kenaikan Kelas otomatis berbasis rata-rata rapor
+      // Logika Kenaikan Kelas otomatis
       const rataRapor = jumlahMapel > 0 ? (totalNilai / jumlahMapel) : 0;
       const kriteriaKenaikan = 65; 
       const containerKenaikan = document.getElementById('lblKeputusanKenaikan');
@@ -390,33 +390,30 @@
         document.getElementById('lblAlfa').innerText = bundle.kehadiran.alfa !== "" ? bundle.kehadiran.alfa : "0";
       }
 
-      // 6. PERBAIKAN STRUKTUR UTAMA: Membaca Array dari identitas_sekolah (Key & Value)
+      // 6. TEMBAK LANGSUNG BERDASARKAN INDEKS BARIS DATA REEKS (ARRAY SPREADSHEET INDEKS BARIS 0)
       if (bundle.identitas_sekolah && Array.isArray(bundle.identitas_sekolah)) {
-        
-        // Fungsi pembantu mencari data berdasarkan kolom 'identitas'
-        const ambilDataIdentitas = (kunci) => {
-          const baris = bundle.identitas_sekolah.find(item => item.identitas && item.identitas.trim().toLowerCase() === kunci.toLowerCase());
-          return baris ? baris.isi_identitas : null;
-        };
+        try {
+          // Mengambil nilai kolom 'isi_identitas' dari index baris spesifik (Baris Fisik - 1)
+          const namaKepsek = bundle.identitas_sekolah[11] ? bundle.identitas_sekolah[11].isi_identitas : "-";
+          const nipKepsek  = bundle.identitas_sekolah[12] ? bundle.identitas_sekolah[12].isi_identitas : "";
+          const namaWali   = bundle.identitas_sekolah[13] ? bundle.identitas_sekolah[13].isi_identitas : "-";
+          const nipWali    = bundle.identitas_sekolah[14] ? bundle.identitas_sekolah[14].isi_identitas : "";
+          const tanggal    = bundle.identitas_sekolah[19] ? bundle.identitas_sekolah[19].isi_identitas : "Pasuruan, .........................";
 
-        // Pemetaan data identitas umum sekolah
-        document.getElementById('lblSekolah').innerText = ambilDataIdentitas("Nama Sekolah") || "UPT SDN RANUKLINDUNGAN I";
-        document.getElementById('lblAlamat').innerText = ambilDataIdentitas("Alamat Sekolah") || "Bandilan, Ranuklindungan";
-        document.getElementById('lblTp').innerText = ambilDataIdentitas("Tahun Pelajaran") || "2025/2026";
+          // Header umum sekolah (Baris 1, 2, 4 di spreadsheet biasanya)
+          document.getElementById('lblSekolah').innerText = bundle.identitas_sekolah[0] ? bundle.identitas_sekolah[0].isi_identitas : "UPT SDN RANUKLINDUNGAN I";
+          document.getElementById('lblAlamat').innerText  = bundle.identitas_sekolah[3] ? bundle.identitas_sekolah[3].isi_identitas : "Bandilan, Ranuklindungan";
+          document.getElementById('lblTp').innerText      = bundle.identitas_sekolah[4] ? bundle.identitas_sekolah[4].isi_identitas : "2025/2026";
 
-        // Pemetaan data tanda tangan dinamis dari DB_UTAMA
-        const tanggalCetak = ambilDataIdentitas("Tanggal") || "Pasuruan, .........................";
-        const namaWali = ambilDataIdentitas("Nama Wali Kelas IV") || "-";
-        const nipWali = ambilDataIdentitas("NIP Wali Kelas 4") || "";
-        const namaKepsek = ambilDataIdentitas("Nama Kepala Sekolah") || "-";
-        const nipKepsek = ambilDataIdentitas("NIP Kepala Sekolah") || "";
-
-        // Tembakkan langsung ke elemen ID HTML masing-masing
-        document.getElementById('lblTempatTanggal').innerText = tanggalCetak;
-        document.getElementById('lblNamaGuru').innerText = namaWali;
-        document.getElementById('lblNipGuru').innerText = nipWali ? "NIP. " + nipWali : "NIP. ...........................";
-        document.getElementById('lblNamaKepsek').innerText = namaKepsek;
-        document.getElementById('lblNipKepsek').innerText = nipKepsek ? "NIP. " + nipKepsek : "NIP. ...........................";
+          // Tembak Data TTD Dinamis dari DB_UTAMA
+          document.getElementById('lblTempatTanggal').innerText = tanggal;
+          document.getElementById('lblNamaGuru').innerText = namaWali;
+          document.getElementById('lblNipGuru').innerText = nipWali ? "NIP. " + nipWali : "NIP. ...........................";
+          document.getElementById('lblNamaKepsek').innerText = namaKepsek;
+          document.getElementById('lblNipKepsek').innerText = nipKepsek ? "NIP. " + nipKepsek : "NIP. ...........................";
+        } catch(e) {
+          console.log("Gagal memetakan array index identitas: ", e);
+        }
       }
     }
 
