@@ -441,7 +441,7 @@
         </div>
         <div class="meta-item">
           <i class="fa-solid fa-chalkboard-user"></i>
-          <span id="lblNamaGuru">Wali Kelas: UPT SDN Ranuklindungan I</span>
+          <span id="lblNamaGuru">Wali Kelas: Memuat Wali Kelas...</span>
         </div>
       </div>
       
@@ -510,12 +510,10 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
-    // TARGET URL API APPS SCRIPT TERPUSAT (SINKRON DENGAN MONITOR UTAMA)
+    // URL API APPS SCRIPT YANG SUDAH DIKUNCI SINKRON DENGAN REKAP UTAMA
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
     
     const urlParams = new URLSearchParams(window.location.search);
-    const dbId = urlParams.get('dbId') || localStorage.getItem("dbIdAktif") || "";
-    const raporId = urlParams.get('raporId') || localStorage.getItem("raporIdAktif") || "";
     const namaSekolah = urlParams.get('namaSekolah') || localStorage.getItem("namaSekolahAktif") || "";
 
     let cacheDataSiswaGlobal = [];
@@ -524,13 +522,14 @@
       const namaSekolahBersih = decodeURIComponent(namaSekolah || "UPT SDN RANUKLINDUNGAN I");
       document.getElementById('lblNamaSekolah').innerText = namaSekolahBersih;
 
-      const btnKembali = document.getElementById('btnKembaliHub');
-      btnKembali.href = `rapor-siswa.html`; // Langsung diarahkan kembali ke panel utama pencetakan
+      // Kembali langsung ke halaman panel kontrol rapor utama
+      document.getElementById('btnKembaliHub').href = "rapor-siswa.html";
 
       muatDaftarSiswaDanGuru();
     });
 
     function muatDaftarSiswaDanGuru() {
+      // Langsung fetch terpusat tanpa memerlukan parameter pengecekan ID rapor
       const urlTarget = `${APPS_SCRIPT_URL}?action=get_status_cetak`;
       
       fetch(urlTarget)
@@ -540,7 +539,7 @@
             if(res.nama_pendaftar) {
               document.getElementById('lblNamaGuru').innerText = `Wali Kelas: ${res.nama_pendaftar}`;
             } else {
-              document.getElementById('lblNamaGuru').innerText = `Wali Kelas: UPT SDN Ranuklindungan I`;
+              document.getElementById('lblNamaGuru').innerText = `Wali Kelas: Tidak Terdata`;
             }
 
             cacheDataSiswaGlobal = res.dataSiswa || [];
@@ -575,7 +574,7 @@
         for (let i = 1; i <= 8; i++) {
           const tdControl = document.createElement("td");
           
-          // Ambil nilai bawaan yang sudah tersimpan sebelumnya agar otomatis terpilih (jika ada)
+          // Ambil nilai bawaan dpl jika memang sudah terisi di server cloud
           const nilaiExisting = siswa[`dpl_${i}`] || siswa[`DPL_${i}`] || "";
           const isSavedClass = nilaiExisting ? "saved-success" : "";
 
@@ -643,7 +642,7 @@
     }
 
     /* =========================================================================
-       LOGIKA DOWNLOAD TEMPLATE EXCEL (STRUKTUR DIKUNCI)
+       LOGIKA DOWNLOAD TEMPLATE EXCEL
        ========================================================================= */
     function unduhTemplateDplMassal() {
       if(cacheDataSiswaGlobal.length === 0) {
