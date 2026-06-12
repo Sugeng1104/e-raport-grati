@@ -25,11 +25,9 @@
     .tabel-border-tegas, .tabel-border-tegas th, .tabel-border-tegas td {
       border: 1.5px solid #000000 !important;
     }
-    /* Warna Hijau Muda Transparan untuk Header & Kolom Nilai */
     .bg-hijau-rapor {
       background-color: rgba(220, 252, 231, 0.75) !important;
     }
-    /* Style Tabel Kenaikan Kelas (Biru Laut Garis Putus-putus) */
     .tabel-kenaikan {
       border: 2px dashed #0284c7 !important;
       background-color: rgba(240, 249, 255, 0.85) !important;
@@ -70,14 +68,14 @@
 <body>
 
   <div id="navigasiAtas" class="no-print bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 shadow-md z-50">
-    <div class="text-xs font-bold font-sans tracking-wide">📄 RAPOR ELEKTRONIK (ISOLATED CHARIVA SYSTEM V14.6)</div>
+    <div class="text-xs font-bold font-sans tracking-wide">📄 RAPOR ELEKTRONIK (ISOLATED CHARIVA SYSTEM V14.7)</div>
     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">🖨️ Cetak Lembaran Rapor</button>
   </div>
 
   <div class="lembar-rapor" id="kontenRapor">
     
     <div id="loader" class="text-center text-slate-500 font-bold text-sm pt-20 animate-pulse font-sans">
-      🔄 Mengakses jalur data terisolasi 'identitas_sekolah'... Memetakan lembar rapor...
+      🔄 Menghubungkan ke Jalur DB_UTAMA... Memetakan Kunci Identitas...
     </div>
 
     <div id="coreRapor" class="hidden">
@@ -312,11 +310,6 @@
       document.getElementById('lblFase').innerText = bundle.profil.fase || "B";
       document.getElementById('lblSemester').innerText = bundle.profil.semester || "II";
       
-      // Pemetaan Sekolah Dasar dari properti terikat
-      document.getElementById('lblSekolah').innerText = bundle.sekolah.nama_sekolah || "UPT SDN RANUKLINDUNGAN I";
-      document.getElementById('lblAlamat').innerText = bundle.sekolah.alamat || "Bandilan, Ranuklindungan";
-      document.getElementById('lblTp').innerText = bundle.sekolah.tp || "2025/2026";
-      
       document.getElementById('lblDplMurid').innerText = bundle.profil.dpl_murid || "-";
       
       // 2. Render Tabel A: Muatan Pelajaran Utama
@@ -397,13 +390,33 @@
         document.getElementById('lblAlfa').innerText = bundle.kehadiran.alfa !== "" ? bundle.kehadiran.alfa : "0";
       }
 
-      // 6. PERBAIKAN: Penarikan Data TTD dari objek bundle.sekolah sesuai isi_identitas
-      if (bundle.sekolah) {
-        document.getElementById('lblTempatTanggal').innerText = bundle.sekolah.tanggal_cetak || "Pasuruan, .........................";
-        document.getElementById('lblNamaGuru').innerText = bundle.sekolah.guru_kelas || "-";
-        document.getElementById('lblNipGuru').innerText = bundle.sekolah.nip_guru ? "NIP. " + bundle.sekolah.nip_guru : "NIP. ...........................";
-        document.getElementById('lblNamaKepsek').innerText = bundle.sekolah.kepala_sekolah || "-";
-        document.getElementById('lblNipKepsek').innerText = bundle.sekolah.nip_kepala ? "NIP. " + bundle.sekolah.nip_kepala : "NIP. ...........................";
+      // 6. PERBAIKAN STRUKTUR UTAMA: Membaca Array dari identitas_sekolah (Key & Value)
+      if (bundle.identitas_sekolah && Array.isArray(bundle.identitas_sekolah)) {
+        
+        // Fungsi pembantu mencari data berdasarkan kolom 'identitas'
+        const ambilDataIdentitas = (kunci) => {
+          const baris = bundle.identitas_sekolah.find(item => item.identitas && item.identitas.trim().toLowerCase() === kunci.toLowerCase());
+          return baris ? baris.isi_identitas : null;
+        };
+
+        // Pemetaan data identitas umum sekolah
+        document.getElementById('lblSekolah').innerText = ambilDataIdentitas("Nama Sekolah") || "UPT SDN RANUKLINDUNGAN I";
+        document.getElementById('lblAlamat').innerText = ambilDataIdentitas("Alamat Sekolah") || "Bandilan, Ranuklindungan";
+        document.getElementById('lblTp').innerText = ambilDataIdentitas("Tahun Pelajaran") || "2025/2026";
+
+        // Pemetaan data tanda tangan dinamis dari DB_UTAMA
+        const tanggalCetak = ambilDataIdentitas("Tanggal") || "Pasuruan, .........................";
+        const namaWali = ambilDataIdentitas("Nama Wali Kelas IV") || "-";
+        const nipWali = ambilDataIdentitas("NIP Wali Kelas 4") || "";
+        const namaKepsek = ambilDataIdentitas("Nama Kepala Sekolah") || "-";
+        const nipKepsek = ambilDataIdentitas("NIP Kepala Sekolah") || "";
+
+        // Tembakkan langsung ke elemen ID HTML masing-masing
+        document.getElementById('lblTempatTanggal').innerText = tanggalCetak;
+        document.getElementById('lblNamaGuru').innerText = namaWali;
+        document.getElementById('lblNipGuru').innerText = nipWali ? "NIP. " + nipWali : "NIP. ...........................";
+        document.getElementById('lblNamaKepsek').innerText = namaKepsek;
+        document.getElementById('lblNipKepsek').innerText = nipKepsek ? "NIP. " + nipKepsek : "NIP. ...........................";
       }
     }
 
