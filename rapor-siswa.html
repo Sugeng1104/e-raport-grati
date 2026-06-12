@@ -77,6 +77,12 @@
                             <td colspan="4" class="p-4 text-center text-slate-400 font-medium animate-pulse">Sedang memuat status data siswa dari server...</td>
                         </tr>
                     </tbody>
+                    <tfoot>
+                        <tr class="bg-slate-50 border-t border-hitam font-black text-slate-900">
+                            <td colspan="3" class="p-3 text-left tracking-wide bg-amber-50/50">📋 Sub Judul Capaian 8 (Delapan) Profil Lulusan Murid</td>
+                            <td class="p-3 text-center text-slate-400 font-medium bg-amber-50/50">-</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -145,10 +151,26 @@
                     
                     const mapelList = ["Agama", "Pancasila", "Bahasa Indonesia", "Matematika", "IPAS", "PJOK", "Kesenian", "Bahasa Jawa", "Bahasa Inggris", "BTQ"];
                     
+                    // Fungsi internal cerdas penemu key objek (Abaikan spasi, singkatan titik, dan kapitalisasi)
+                    function dapatkanNilaiToleran(objekData, namaMapel) {
+                        if (!objekData) return "-";
+                        const cleanCari = namaMapel.toLowerCase().replace(/[\s_.]+/g, "");
+                        
+                        for (let key in objekData) {
+                            const cleanKey = key.toLowerCase().replace(/[\s_.]+/g, "");
+                            if (cleanKey === cleanCari || cleanKey.includes(cleanCari) || cleanCari.includes(cleanKey)) {
+                                return (objekData[key] !== undefined && objekData[key] !== "") ? objekData[key] : "-";
+                            }
+                        }
+                        return "-";
+                    }
+                    
                     mapelList.forEach(m => {
                         const tr = document.createElement('tr');
-                        const nSumatif = data.dataSumatif[m] !== undefined && data.dataSumatif[m] !== "" ? data.dataSumatif[m] : "-";
-                        const nAsas = data.dataAsas[m] !== undefined && data.dataAsas[m] !== "" ? data.dataAsas[m] : "-";
+                        
+                        // Eksekusi penarikan data menggunakan engine toleran anti-mismatch
+                        const nSumatif = dapatkanNilaiToleran(data.dataSumatif, m);
+                        const nAsas = dapatkanNilaiToleran(data.dataAsas, m);
                         
                         tr.innerHTML = `
                             <td class="p-3 font-bold">${m}</td>
@@ -189,21 +211,11 @@
             }
         }
 
-        // =========================================================================
-        // HUBUNGAN JEMBATAN OTOMATIS KE FILE CETAK-RAPOR.HTML GITHUB (JALUR PINTAS)
-        // =========================================================================
         function aksiCetak(noAbsen) {
-            // 1. Dapatkan URL dasar halaman saat ini secara otomatis (mengikuti struktur folder GitHub Anda)
             const currentUrl = window.location.href;
             const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
-            
-            // 2. Rakit URL menuju file cetak-rapor.html yang berada dalam satu folder di GitHub
             const halamanCetakTarget = `${baseUrl}/cetak-rapor.html`;
-            
-            // 3. Gabungkan parameter dengan tambahan penunjuk bypass page=cetak agar langsung terbaca di server Google
             const urlFinal = `${halamanCetakTarget}?no_absen=${encodeURIComponent(noAbsen)}&page=cetak&api_url=${encodeURIComponent(API_URL)}`;
-            
-            // 4. Buka lembar cetak rapor resmi di tab baru browser
             window.open(urlFinal, '_blank');
         }
     </script>
