@@ -124,7 +124,7 @@
     }
 
     /* =========================================================================
-       MASS INTEGRATION UTILITY PANEL (BARU)
+       MASS INTEGRATION UTILITY PANEL
        ========================================================================= */
     .utility-panel {
       background: rgba(15, 23, 42, 0.6);
@@ -358,14 +358,21 @@
       cursor: pointer;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 5px;
       transition: all 0.3s;
+      width: 32px;
+      height: 28px;
     }
 
     .btn-simpan.loading {
       background: #854d0e !important;
       color: #e2e8f0;
       pointer-events: none;
+    }
+
+    .btn-simpan.loading i {
+      animation: putarSpiner 0.8s linear infinite;
     }
 
     @keyframes putarSpiner {
@@ -434,7 +441,7 @@
         </div>
         <div class="meta-item">
           <i class="fa-solid fa-chalkboard-user"></i>
-          <span id="lblNamaGuru">Wali Kelas: Memuat Data Wali Kelas...</span>
+          <span id="lblNamaGuru">Wali Kelas: UPT SDN Ranuklindungan I</span>
         </div>
       </div>
       
@@ -503,7 +510,8 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwEpRt1PizUVTq3zatgbEX8gnce2LILCoPjEsf0FertTGfCwuhFps0wVYguPyF8XRyo/exec";
+    // TARGET URL API APPS SCRIPT TERPUSAT (SINKRON DENGAN MONITOR UTAMA)
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
     
     const urlParams = new URLSearchParams(window.location.search);
     const dbId = urlParams.get('dbId') || localStorage.getItem("dbIdAktif") || "";
@@ -513,27 +521,17 @@
     let cacheDataSiswaGlobal = [];
 
     document.addEventListener("DOMContentLoaded", function() {
-      const namaSekolahBersih = decodeURIComponent(namaSekolah || "SEKOLAH TERDAFTAR");
+      const namaSekolahBersih = decodeURIComponent(namaSekolah || "UPT SDN RANUKLINDUNGAN I");
       document.getElementById('lblNamaSekolah').innerText = namaSekolahBersih;
 
       const btnKembali = document.getElementById('btnKembaliHub');
-      if (dbId && raporId) {
-        btnKembali.href = `dashboard.html?dbId=${dbId}&raporId=${raporId}&namaSekolah=${encodeURIComponent(namaSekolahBersih)}`;
-      } else {
-        btnKembali.href = `dashboard.html`;
-      }
+      btnKembali.href = `rapor-siswa.html`; // Langsung diarahkan kembali ke panel utama pencetakan
 
       muatDaftarSiswaDanGuru();
     });
 
     function muatDaftarSiswaDanGuru() {
-      if(!raporId) {
-        tampilkanToast("ID Rapor tidak terdeteksi!", "error");
-        document.getElementById("loaderData").innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:#ef4444; animation:none;"></i> Gagal memuat data.`;
-        return;
-      }
-
-      const urlTarget = `${APPS_SCRIPT_URL}?action=get_status_cetak&raporId=${raporId}`;
+      const urlTarget = `${APPS_SCRIPT_URL}?action=get_status_cetak`;
       
       fetch(urlTarget)
         .then(response => response.json())
@@ -542,7 +540,7 @@
             if(res.nama_pendaftar) {
               document.getElementById('lblNamaGuru').innerText = `Wali Kelas: ${res.nama_pendaftar}`;
             } else {
-              document.getElementById('lblNamaGuru').innerText = `Wali Kelas: (Belum Terdata)`;
+              document.getElementById('lblNamaGuru').innerText = `Wali Kelas: UPT SDN Ranuklindungan I`;
             }
 
             cacheDataSiswaGlobal = res.dataSiswa || [];
@@ -571,19 +569,24 @@
         tr.innerHTML = `
           <td class="sticky-col" style="font-weight:600; text-align:center;">${siswa.no_absen}</td>
           <td style="color:#94a3b8;">${siswa.nisn || '-'}</td>
-          <td style="font-weight:500;">${siswa.nama}</td>
+          <td style="font-weight:500;" class="uppercase">${siswa.nama}</td>
         `;
 
         for (let i = 1; i <= 8; i++) {
           const tdControl = document.createElement("td");
+          
+          // Ambil nilai bawaan yang sudah tersimpan sebelumnya agar otomatis terpilih (jika ada)
+          const nilaiExisting = siswa[`dpl_${i}`] || siswa[`DPL_${i}`] || "";
+          const isSavedClass = nilaiExisting ? "saved-success" : "";
+
           tdControl.innerHTML = `
             <div class="control-cell">
-              <select class="select-predikat" id="sel_${siswa.no_absen}_dpl${i}" onchange="this.classList.remove('saved-success')">
+              <select class="select-predikat ${isSavedClass}" id="sel_${siswa.no_absen}_dpl${i}" onchange="this.classList.remove('saved-success')">
                 <option value="">- Pilih -</option>
-                <option value="Sangat Baik">Sangat Baik</option>
-                <option value="Baik">Baik</option>
-                <option value="Cukup">Cukup</option>
-                <option value="Perlu bimbingan">Perlu bimbingan</option>
+                <option value="Sangat Baik" ${nilaiExisting === "Sangat Baik" ? "selected" : ""}>Sangat Baik</option>
+                <option value="Baik" ${nilaiExisting === "Baik" ? "selected" : ""}>Baik</option>
+                <option value="Cukup" ${nilaiExisting === "Cukup" ? "selected" : ""}>Cukup</option>
+                <option value="Perlu bimbingan" ${nilaiExisting === "Perlu bimbingan" ? "selected" : ""}>Perlu bimbingan</option>
               </select>
               <button class="btn-simpan" onclick="simpanPredikatKomponen(this, '${siswa.no_absen}', 'dpl_${i}')">
                 <i class="fa-solid fa-floppy-disk"></i>
@@ -610,10 +613,10 @@
       }
 
       btnElement.classList.add("loading");
+      btnElement.innerHTML = `<i class="fa-solid fa-circle-notch"></i>`;
 
       const payloadData = {
         action: "update_predikat_dpl_satuan",
-        raporId: raporId,
         no_absen: noAbsen,
         komponen: namaKomponenDpl,
         predikat: nilaiPredikatDipilih
@@ -627,18 +630,20 @@
       .then(() => {
         setTimeout(() => {
           btnElement.classList.remove("loading");
+          btnElement.innerHTML = `<i class="fa-solid fa-floppy-disk"></i>`;
           selectElement.classList.add("saved-success");
           tampilkanToast(`Nilai ${namaKomponenDpl.toUpperCase()} Absen ${noAbsen} Berhasil Disimpan!`, "success");
-        }, 500);
+        }, 400);
       })
       .catch(() => {
         btnElement.classList.remove("loading");
+        btnElement.innerHTML = `<i class="fa-solid fa-floppy-disk"></i>`;
         tampilkanToast("Gagal menyimpan ke server.", "error");
       });
     }
 
     /* =========================================================================
-       LOGIKA DINAMIS DOWNLOAD TEMPLATE EXCEL (PERSIS TAB PREDIKAT_DPL)
+       LOGIKA DOWNLOAD TEMPLATE EXCEL (STRUKTUR DIKUNCI)
        ========================================================================= */
     function unduhTemplateDplMassal() {
       if(cacheDataSiswaGlobal.length === 0) {
@@ -646,20 +651,18 @@
         return;
       }
 
-      // Membentuk baris judul kolom persis struktur tabel predikat_dpl
       const barisHeader = ["No Absen", "NISN", "Nama Siswa", "dpl_1", "dpl_2", "dpl_3", "dpl_4", "dpl_5", "dpl_6", "dpl_7", "dpl_8"];
       const dataSpreedsheetArr = [barisHeader];
 
       cacheDataSiswaGlobal.forEach(s => {
-        dataSpreedsheetArr.push([s.no_absen, s.nisn || "", s.nama, "", "", "", "", "", "", "", ""]);
+        dataSpreedsheetArr.push([s.no_absen, s.nisn || "", s.nama, s.dpl_1 || "", s.dpl_2 || "", s.dpl_3 || "", s.dpl_4 || "", s.dpl_5 || "", s.dpl_6 || "", s.dpl_7 || "", s.dpl_8 || ""]);
       });
 
       const lembarKerja = XLSX.utils.aoa_to_sheet(dataSpreedsheetArr);
       const fileBuku = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(fileBuku, lembarKerja, "predikat_dpl");
 
-      // Pembuatan berkas fisik Excel (.xlsx) untuk diunduh langsung
-      XLSX.writeFile(fileBuku, `Template_Predikat_DPL_${decodeURIComponent(namaSekolah || 'Sekolah')}.xlsx`);
+      XLSX.writeFile(fileBuku, `Template_Predikat_DPL_SDN_Ranuklindungan_I.xlsx`);
       tampilkanToast("Template predikat_dpl berhasil diunduh!", "success");
     }
 
@@ -670,7 +673,7 @@
     }
 
     /* =========================================================================
-       LOGIKA SINKRONISASI MASS UPLOAD KEMBALI KE SPREADSHEET
+       LOGIKA SINKRONISASI MASS UPLOAD KEMBALI KE GOOGLE SHEETS
        ========================================================================= */
     function prosesUnggahMassalExcel() {
       const fileInput = document.getElementById("fileExcelInput");
@@ -698,7 +701,6 @@
             throw new Error("Berkas kosong atau format kolom rusak.");
           }
 
-          // Kirim struktur data array hasil ekstraksi Excel ke cloud backend Apps Script
           kirimArrayMassalKeServer(sheetData);
 
         } catch (err) {
@@ -716,8 +718,7 @@
       const btnProses = document.getElementById("btnProsesUnggah");
 
       const paketPayload = {
-        action: "update_predikat_dpl_massal", // Pastikan fungsi penanganan massal ini terdaftar di GS Anda
-        raporId: raporId,
+        action: "update_predikat_dpl_massal",
         dataPayload: dataArrayExcel
       };
 
@@ -727,7 +728,6 @@
         mode: "no-cors"
       })
       .then(() => {
-        // Melakukan pemetaan visual balik ke komponen input select di UI web agar otomatis terisi sesuai Excel
         dataArrayExcel.forEach(baris => {
           const absen = baris["No Absen"] || baris["no_absen"];
           if(absen) {
