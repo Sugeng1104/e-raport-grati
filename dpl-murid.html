@@ -490,14 +490,14 @@
               <th class="sticky-col">No Absen</th>
               <th>NISN</th>
               <th>Nama Siswa</th>
-              <th>DPL_1</th>
-              <th>DPL_2</th>
-              <th>DPL_3</th>
-              <th>DPL_4</th>
-              <th>DPL_5</th>
-              <th>DPL_6</th>
-              <th>DPL_7</th>
-              <th>DPL_8</th>
+              <th>dpl1</th>
+              <th>dpl2</th>
+              <th>dpl3</th>
+              <th>dpl4</th>
+              <th>dpl5</th>
+              <th>dpl6</th>
+              <th>dpl7</th>
+              <th>dpl8</th>
             </tr>
           </thead>
           <tbody id="bodyDataSiswa"></tbody>
@@ -529,7 +529,6 @@
     });
 
     function muatDaftarSiswaDanGuru() {
-      // Langsung fetch terpusat tanpa memerlukan parameter pengecekan ID rapor
       const urlTarget = `${APPS_SCRIPT_URL}?action=get_status_cetak`;
       
       fetch(urlTarget)
@@ -574,8 +573,8 @@
         for (let i = 1; i <= 8; i++) {
           const tdControl = document.createElement("td");
           
-          // Ambil nilai bawaan dpl jika memang sudah terisi di server cloud
-          const nilaiExisting = siswa[`dpl_${i}`] || siswa[`DPL_${i}`] || "";
+          // Penamaan properti diganti tanpa underscore sesuai struktur baru (dpl1 s.d dpl8)
+          const nilaiExisting = siswa[`dpl${i}`] || siswa[`DPL${i}`] || "";
           const isSavedClass = nilaiExisting ? "saved-success" : "";
 
           tdControl.innerHTML = `
@@ -587,7 +586,7 @@
                 <option value="Cukup" ${nilaiExisting === "Cukup" ? "selected" : ""}>Cukup</option>
                 <option value="Perlu bimbingan" ${nilaiExisting === "Perlu bimbingan" ? "selected" : ""}>Perlu bimbingan</option>
               </select>
-              <button class="btn-simpan" onclick="simpanPredikatKomponen(this, '${siswa.no_absen}', 'dpl_${i}')">
+              <button class="btn-simpan" onclick="simpanPredikatKomponen(this, '${siswa.no_absen}', 'dpl${i}')">
                 <i class="fa-solid fa-floppy-disk"></i>
               </button>
             </div>
@@ -617,7 +616,7 @@
       const payloadData = {
         action: "update_predikat_dpl_satuan",
         no_absen: noAbsen,
-        komponen: namaKomponenDpl,
+        komponen: namaKomponenDpl, // Dikirim sebagai 'dpl1', 'dpl2', dst
         predikat: nilaiPredikatDipilih
       };
 
@@ -642,7 +641,7 @@
     }
 
     /* =========================================================================
-       LOGIKA DOWNLOAD TEMPLATE EXCEL
+       LOGIKA DOWNLOAD TEMPLATE EXCEL (STRUKTUR BARU DIKUNCI)
        ========================================================================= */
     function unduhTemplateDplMassal() {
       if(cacheDataSiswaGlobal.length === 0) {
@@ -650,11 +649,24 @@
         return;
       }
 
-      const barisHeader = ["No Absen", "NISN", "Nama Siswa", "dpl_1", "dpl_2", "dpl_3", "dpl_4", "dpl_5", "dpl_6", "dpl_7", "dpl_8"];
+      // Baris header disesuaikan persis tanpa menggunakan garis bawah (_)
+      const barisHeader = ["No Absen", "NISN", "Nama Siswa", "dpl1", "dpl2", "dpl3", "dpl4", "dpl5", "dpl6", "dpl7", "dpl8"];
       const dataSpreedsheetArr = [barisHeader];
 
       cacheDataSiswaGlobal.forEach(s => {
-        dataSpreedsheetArr.push([s.no_absen, s.nisn || "", s.nama, s.dpl_1 || "", s.dpl_2 || "", s.dpl_3 || "", s.dpl_4 || "", s.dpl_5 || "", s.dpl_6 || "", s.dpl_7 || "", s.dpl_8 || ""]);
+        dataSpreedsheetArr.push([
+          s.no_absen, 
+          s.nisn || "", 
+          s.nama, 
+          s.dpl1 || "", 
+          s.dpl2 || "", 
+          s.dpl3 || "", 
+          s.dpl4 || "", 
+          s.dpl5 || "", 
+          s.dpl6 || "", 
+          s.dpl7 || "", 
+          s.dpl8 || ""
+        ]);
       });
 
       const lembarKerja = XLSX.utils.aoa_to_sheet(dataSpreedsheetArr);
@@ -731,7 +743,8 @@
           const absen = baris["No Absen"] || baris["no_absen"];
           if(absen) {
             for(let i=1; i<=8; i++) {
-              const valDpl = baris[`dpl_${i}`] || baris[`DPL_${i}`];
+              // Deteksi pembacaan tanpa garis bawah
+              const valDpl = baris[`dpl${i}`] || baris[`DPL${i}`];
               const selectEl = document.getElementById(`sel_${absen}_dpl${i}`);
               if(selectEl && valDpl) {
                 selectEl.value = valDpl;
