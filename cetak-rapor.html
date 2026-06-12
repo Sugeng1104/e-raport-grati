@@ -34,7 +34,7 @@
     }
 
     @page {
-      size: A4;           
+      size: A4;            
       margin: 0mm;        
     }
 
@@ -173,7 +173,7 @@
           </thead>
           <tbody>
             <tr>
-              <td id="lblDplMurid" class="p-3 text-justify leading-relaxed whitespace-pre-line text-[11.5px]">-</td>
+              <td id="lblDplMurid" class="p-3 text-justify leading-relaxed whitespace-pre-line text-[11.5px]-">-</td>
             </tr>
           </tbody>
         </table>
@@ -235,7 +235,7 @@
 
       <div class="blok-anti-pisah text-xs mt-12 leading-relaxed">
         
-        <div class="flex justify-between items-end text-center mb-12 px-4">
+        <div class="flex justify-between items-end text-center mb-12 px-4 relative">
           <div class="w-64">
             <p class="mb-20 font-medium text-sm">Orang Tua,</p>
             <div class="border-b border-black w-48 mx-auto"></div>
@@ -244,7 +244,7 @@
           
           <div class="w-64 relative">
             <p id="lblTempatTanggal" class="absolute -top-7 left-0 right-0 mx-auto font-medium text-xs text-center text-slate-800">-</p>
-            <p class="mb-20 font-medium text-sm">Wali Kelas 4 (empat)</p>
+            <p class="mb-20 font-medium text-sm">Wali Kelas IV (empat)</p>
             <p id="lblNamaGuru" class="font-bold text-sm capitalize">-</p>
             <div class="border-b border-black w-48 mx-auto my-0.5"></div>
             <p id="lblNipGuru" class="text-xs text-slate-700">-</p>
@@ -301,15 +301,14 @@
       let totalNilai = 0;
       let jumlahMapel = 0;
       
-      // 1. Injeksi Data Identitas Siswa
+      // 1. Injeksi Data Profil Dasar Siswa
       const namaSiswa = bundle.profil.nama || "-";
       document.getElementById('lblNama').innerText = namaSiswa;
       document.getElementById('lblMurniNis').innerText = bundle.profil.nis || "-";
       document.getElementById('lblMurniNisn').innerText = bundle.profil.nisn || "-";
-      document.getElementById('lblKelas').innerText = bundle.profil.kelas || "IV";
+      document.getElementById('lblKelas').innerText = bundle.profil.kelas || "IV (Empat)";
       document.getElementById('lblFase').innerText = bundle.profil.fase || "B";
-      document.getElementById('lblSemester').innerText = bundle.profil.semester || "II";
-      
+      document.getElementById('lblSemester').innerText = bundle.profil.semester || "II (Dua)";
       document.getElementById('lblDplMurid').innerText = bundle.profil.dpl_murid || "-";
       
       // 2. Render Tabel A: Matapelajaran Utama
@@ -390,29 +389,27 @@
         document.getElementById('lblAlfa').innerText = bundle.kehadiran.alfa !== "" ? bundle.kehadiran.alfa : "0";
       }
 
-      // 6. TEMBAK LANGSUNG BERDASARKAN INDEKS BARIS DATA REEKS (ARRAY SPREADSHEET INDEKS BARIS 0)
+      // 6. PERBAIKAN EMERGENSI: PEMETAAN INDEKS ARRAY IDENTITAS SEKOLAH (BERBASIS INDEKS KODE GS BARU)
       if (bundle.identitas_sekolah && Array.isArray(bundle.identitas_sekolah)) {
         try {
-          // Mengambil nilai kolom 'isi_identitas' dari index baris spesifik (Baris Fisik - 1)
-          const namaKepsek = bundle.identitas_sekolah[11] ? bundle.identitas_sekolah[11].isi_identitas : "-";
-          const nipKepsek  = bundle.identitas_sekolah[12] ? bundle.identitas_sekolah[12].isi_identitas : "";
-          const namaWali   = bundle.identitas_sekolah[13] ? bundle.identitas_sekolah[13].isi_identitas : "-";
-          const nipWali    = bundle.identitas_sekolah[14] ? bundle.identitas_sekolah[14].isi_identitas : "";
-          const tanggal    = bundle.identitas_sekolah[19] ? bundle.identitas_sekolah[19].isi_identitas : "Pasuruan, .........................";
+          // Menembak elemen atas rapor berdasarkan indeks presisi yang dikirim Apps Script
+          document.getElementById('lblSekolah').innerText = bundle.identitas_sekolah[1] ? bundle.identitas_sekolah[1].isi_identitas : "UPT SDN RANUKLINDUNGAN I";
+          document.getElementById('lblAlamat').innerText  = bundle.identitas_sekolah[4] ? bundle.identitas_sekolah[4].isi_identitas : "Bandilan, Ranuklindungan";
+          document.getElementById('lblTp').innerText      = bundle.identitas_sekolah[19] ? bundle.identitas_sekolah[19].isi_identitas : "2025/2026";
 
-          // Header umum sekolah (Baris 1, 2, 4 di spreadsheet biasanya)
-          document.getElementById('lblSekolah').innerText = bundle.identitas_sekolah[0] ? bundle.identitas_sekolah[0].isi_identitas : "UPT SDN RANUKLINDUNGAN I";
-          document.getElementById('lblAlamat').innerText  = bundle.identitas_sekolah[3] ? bundle.identitas_sekolah[3].isi_identitas : "Bandilan, Ranuklindungan";
-          document.getElementById('lblTp').innerText      = bundle.identitas_sekolah[4] ? bundle.identitas_sekolah[4].isi_identitas : "2025/2026";
-
-          // Tembak Data TTD Dinamis dari DB_UTAMA
-          document.getElementById('lblTempatTanggal').innerText = tanggal;
-          document.getElementById('lblNamaGuru').innerText = namaWali;
-          document.getElementById('lblNipGuru').innerText = nipWali ? "NIP. " + nipWali : "NIP. ...........................";
-          document.getElementById('lblNamaKepsek').innerText = namaKepsek;
-          document.getElementById('lblNipKepsek').innerText = nipKepsek ? "NIP. " + nipKepsek : "NIP. ...........................";
+          // Menembak data blok tanda tangan (Tanda Tangan Dinamis)
+          document.getElementById('lblTempatTanggal').innerText = bundle.identitas_sekolah[20] ? bundle.identitas_sekolah[20].isi_identitas : "Pasuruan, .........................";
+          document.getElementById('lblNamaGuru').innerText      = bundle.identitas_sekolah[14] ? bundle.identitas_sekolah[14].isi_identitas : "-";
+          
+          const waliNip = bundle.identitas_sekolah[15] ? bundle.identitas_sekolah[15].isi_identitas : "";
+          document.getElementById('lblNipGuru').innerText       = waliNip ? "NIP. " + waliNip : "NIP. ...........................";
+          
+          document.getElementById('lblNamaKepsek').innerText    = bundle.identitas_sekolah[12] ? bundle.identitas_sekolah[12].isi_identitas : "-";
+          
+          const kepsekNip = bundle.identitas_sekolah[13] ? bundle.identitas_sekolah[13].isi_identitas : "";
+          document.getElementById('lblNipKepsek').innerText     = kepsekNip ? "NIP. " + kepsekNip : "NIP. ...........................";
         } catch(e) {
-          console.log("Gagal memetakan array index identitas: ", e);
+          console.log("Gagal memetakan penyesuaian array index identitas: ", e);
         }
       }
     }
