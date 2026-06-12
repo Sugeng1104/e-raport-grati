@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>8 Profil Lulusan Murid - E-Rapor Pusat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
+  <style>
+    /* =========================================================================
+       CORE STYLES & LUXURY DARK GRADIENT BACKGROUND
+       ========================================================================= */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #1a1f3c 0%, #0d111d 100%);
+      color: #f1f5f9;
+      min-height: 100vh;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* =========================================================================
+       HEADER SECTION
+       ========================================================================= */
+    .header-section {
+      position: relative;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 30px;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      margin-bottom: 40px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .header-section h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+      background: linear-gradient(45deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .meta-info-badge {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .meta-item {
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      color: #d8b4fe;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .meta-item i {
+      color: #a855f7;
+    }
+
+    .btn-kembali {
+      background: rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .btn-kembali:hover {
+      background: #ffffff;
+      color: #0f172a;
+      border-color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .narasi-profil {
+      text-align: left;
+      font-size: 0.95rem;
+      color: #94a3b8;
+      width: 100%;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+    }
+
+    /* =========================================================================
+       MASS INTEGRATION UTILITY PANEL (BARU)
+       ========================================================================= */
+    .utility-panel {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px dashed rgba(168, 85, 247, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .utility-left {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .utility-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .utility-desc {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    .utility-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-download-template {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-download-template:hover {
+      background: #a855f7;
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    }
+
+    .file-upload-box {
+      position: relative;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .file-upload-box input[type="file"] {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .btn-upload-submit {
+      background: #10b981;
+      color: #ffffff;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-upload-submit:hover {
+      background: #059669;
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-upload-submit.processing {
+      background: #065f46 !important;
+      pointer-events: none;
+    }
+
+    .btn-upload-submit.processing i {
+      animation: putarSpiner 0.8s linear infinite;
+    }
+
+    /* =========================================================================
+       TABLE STYLES
+       ========================================================================= */
+    .table-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(20px);
+    }
+
+    .table-header-tool {
+      padding: 20px 24px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #a855f7;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    th {
+      background: #111524;
+      color: #94a3b8;
+      font-weight: 600;
+      padding: 14px 16px;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .sticky-col {
+      position: sticky;
+      left: 0;
+      background: #0f1322;
+      z-index: 2;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+    }
+    
+    th.sticky-col {
+      z-index: 3;
+      background: #111524;
+    }
+
+    /* =========================================================================
+       CONTROLS & NOTIFICATIONS
+       ========================================================================= */
+    .control-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 210px;
+    }
+
+    .select-predikat {
+      flex: 1;
+      background: #161b2c;
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .select-predikat.saved-success {
+      background: rgba(16, 185, 129, 0.15) !important;
+      color: #10b981 !important;
+      border-color: #10b981 !important;
+    }
+
+    .btn-simpan {
+      background: #eab308;
+      color: #0f172a;
+      border: none;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.3s;
+    }
+
+    .btn-simpan.loading {
+      background: #854d0e !important;
+      color: #e2e8f0;
+      pointer-events: none;
+    }
+
+    @keyframes putarSpiner {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .page-loader {
+      text-align: center;
+      padding: 50px 0;
+      color: #94a3b8;
+    }
+    
+    .page-loader i {
+      font-size: 2rem;
+      color: #a855f7;
+      margin-bottom: 10px;
+      display: block;
+      animation: putarSpiner 1s linear infinite;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      z-index: 9999;
+    }
+
+    .toast {
+      background: #1e293b;
+      border-left: 4px solid #10b981;
+      color: #f8fafc;
+      padding: 14px 22px;
+      border-radius: 8px;
+      margin-top: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      transform: translateX(120%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <div class="header-section">
+      <div class="header-top">
+        <h1><i class="fa-solid fa-graduation-cap"></i> Evaluasi 8 Profil Lulusan Murid (DPL)</h1>
+        <a id="btnKembaliHub" class="btn-kembali">
+          <i class="fa-solid fa-arrow-left"></i> Kembali ke Hub Utama
+        </a>
+      </div>
+
+      <div class="meta-info-badge">
+        <div class="meta-item">
+          <i class="fa-solid fa-school"></i>
+          <span id="lblNamaSekolah">Memuat Nama Sekolah...</span>
+        </div>
+        <div class="meta-item">
+          <i class="fa-solid fa-chalkboard-user"></i>
+          <span id="lblNamaGuru">Wali Kelas: Memuat Data Wali Kelas...</span>
+        </div>
+      </div>
+      
+      <div class="narasi-profil">
+        <p>
+          <strong>8 Profil Lulusan Murid (DPL)</strong> merupakan kerangka kompetensi holistik yang dikonsolidasikan langsung ke dalam lembar <em>predikat_dpl</em> sebagai variabel utama penyusunan deskripsi otomatis e-rapor. Gunakan panel integrasi di bawah jika ingin menginput nilai secara sekaligus menggunakan berkas Excel/CSV.
+        </p>
+      </div>
+    </div>
+
+    <div class="utility-panel">
+      <div class="utility-left">
+        <div class="utility-title"><i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Pengisian Masal Lewat Template Excel</div>
+        <div class="utility-desc">Unduh template, isi kolom predikat DPL siswa di komputer Anda, lalu unggah kembali untuk sinkronisasi instan.</div>
+      </div>
+      <div class="utility-actions">
+        <button class="btn-download-template" onclick="unduhTemplateDplMassal()">
+          <i class="fa-solid fa-cloud-arrow-down"></i> Unduh Template Predikat DPL
+        </button>
+        <div class="file-upload-box">
+          <i class="fa-solid fa-folder-open"></i> <span id="fileNameLabel">Pilih Berkas Berisi Nilai...</span>
+          <input type="file" id="fileExcelInput" accept=".xlsx, .xls, .csv" onchange="tanganiPemilihanBerkas(this)">
+        </div>
+        <button class="btn-upload-submit" id="btnProsesUnggah" onclick="prosesUnggahMassalExcel()">
+          <i class="fa-solid fa-paper-plane"></i> Kirim Data
+        </button>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header-tool">
+        <div class="table-title">
+          <i class="fa-solid fa-users-viewfinder"></i> Lembar Kerja Penilaian Karakter Murid
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <div id="loaderData" class="page-loader">
+          <i class="fa-solid fa-circle-notch"></i>
+          Menghubungkan ke Server Cloud. Membaca Database Rapor Siswa...
+        </div>
+
+        <table id="tabelDplSiswa" style="display: none;">
+          <thead>
+            <tr>
+              <th class="sticky-col">No Absen</th>
+              <th>NISN</th>
+              <th>Nama Siswa</th>
+              <th>DPL_1</th>
+              <th>DPL_2</th>
+              <th>DPL_3</th>
+              <th>DPL_4</th>
+              <th>DPL_5</th>
+              <th>DPL_6</th>
+              <th>DPL_7</th>
+              <th>DPL_8</th>
+            </tr>
+          </thead>
+          <tbody id="bodyDataSiswa"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwEpRt1PizUVTq3zatgbEX8gnce2LILCoPjEsf0FertTGfCwuhFps0wVYguPyF8XRyo/exec";
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const dbId = urlParams.get('dbId') || localStorage.getItem("dbIdAktif") || "";
+    const raporId = urlParams.get('raporId') || localStorage.getItem("raporIdAktif") || "";
+    const namaSekolah = urlParams.get('namaSekolah') || localStorage.getItem("namaSekolahAktif") || "";
+
+    let cacheDataSiswaGlobal = [];
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const namaSekolahBersih = decodeURIComponent(namaSekolah || "SEKOLAH TERDAFTAR");
+      document.getElementById('lblNamaSekolah').innerText = namaSekolahBersih;
+
+      const btnKembali = document.getElementById('btnKembaliHub');
+      if (dbId && raporId) {
+        btnKembali.href = `dashboard.html?dbId=${dbId}&raporId=${raporId}&namaSekolah=${encodeURIComponent(namaSekolahBersih)}`;
+      } else {
+        btnKembali.href = `dashboard.html`;
+      }
+
+      muatDaftarSiswaDanGuru();
+    });
+
+    function muatDaftarSiswaDanGuru() {
+      if(!raporId) {
+        tampilkanToast("ID Rapor tidak terdeteksi!", "error");
+        document.getElementById("loaderData").innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:#ef4444; animation:none;"></i> Gagal memuat data.`;
+        return;
+      }
+
+      const urlTarget = `${APPS_SCRIPT_URL}?action=get_status_cetak&raporId=${raporId}`;
+      
+      fetch(urlTarget)
+        .then(response => response.json())
+        .then(res => {
+          if (res.status === "SUCCESS") {
+            if(res.nama_pendaftar) {
+              document.getElementById('lblNamaGuru').innerText = `Wali Kelas: ${res.nama_pendaftar}`;
+            } else {
+              document.getElementById('lblNamaGuru').innerText = `Wali Kelas: (Belum Terdata)`;
+            }
+
+            cacheDataSiswaGlobal = res.dataSiswa || [];
+            renderTabelDpl(cacheDataSiswaGlobal);
+          } else {
+            document.getElementById("loaderData").innerText = "Gagal memuat database: " + res.message;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("loaderData").innerText = "Terjadi gangguan transmisi database cloud.";
+        });
+    }
+
+    function renderTabelDpl(siswaArray) {
+      const tbody = document.getElementById("bodyDataSiswa");
+      tbody.innerHTML = "";
+
+      if(!siswaArray || siswaArray.length === 0) {
+        document.getElementById("loaderData").innerText = "Tidak ada data siswa ditemukan.";
+        return;
+      }
+
+      siswaArray.forEach(siswa => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="sticky-col" style="font-weight:600; text-align:center;">${siswa.no_absen}</td>
+          <td style="color:#94a3b8;">${siswa.nisn || '-'}</td>
+          <td style="font-weight:500;">${siswa.nama}</td>
+        `;
+
+        for (let i = 1; i <= 8; i++) {
+          const tdControl = document.createElement("td");
+          tdControl.innerHTML = `
+            <div class="control-cell">
+              <select class="select-predikat" id="sel_${siswa.no_absen}_dpl${i}" onchange="this.classList.remove('saved-success')">
+                <option value="">- Pilih -</option>
+                <option value="Sangat Baik">Sangat Baik</option>
+                <option value="Baik">Baik</option>
+                <option value="Cukup">Cukup</option>
+                <option value="Perlu bimbingan">Perlu bimbingan</option>
+              </select>
+              <button class="btn-simpan" onclick="simpanPredikatKomponen(this, '${siswa.no_absen}', 'dpl_${i}')">
+                <i class="fa-solid fa-floppy-disk"></i>
+              </button>
+            </div>
+          `;
+          tr.appendChild(tdControl);
+        }
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("loaderData").style.display = "none";
+      document.getElementById("tabelDplSiswa").style.display = "table";
+    }
+
+    function simpanPredikatKomponen(btnElement, noAbsen, namaKomponenDpl) {
+      const cellContainer = btnElement.parentElement;
+      const selectElement = cellContainer.querySelector(".select-predikat");
+      const nilaiPredikatDipilih = selectElement.value;
+
+      if (!nilaiPredikatDipilih) {
+        tampilkanToast("Pilih tingkat predikat terlebih dahulu!", "error");
+        return;
+      }
+
+      btnElement.classList.add("loading");
+
+      const payloadData = {
+        action: "update_predikat_dpl_satuan",
+        raporId: raporId,
+        no_absen: noAbsen,
+        komponen: namaKomponenDpl,
+        predikat: nilaiPredikatDipilih
+      };
+
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(payloadData),
+        mode: "no-cors"
+      })
+      .then(() => {
+        setTimeout(() => {
+          btnElement.classList.remove("loading");
+          selectElement.classList.add("saved-success");
+          tampilkanToast(`Nilai ${namaKomponenDpl.toUpperCase()} Absen ${noAbsen} Berhasil Disimpan!`, "success");
+        }, 500);
+      })
+      .catch(() => {
+        btnElement.classList.remove("loading");
+        tampilkanToast("Gagal menyimpan ke server.", "error");
+      });
+    }
+
+    /* =========================================================================
+       LOGIKA DINAMIS DOWNLOAD TEMPLATE EXCEL (PERSIS TAB PREDIKAT_DPL)
+       ========================================================================= */
+    function unduhTemplateDplMassal() {
+      if(cacheDataSiswaGlobal.length === 0) {
+        tampilkanToast("Data siswa belum siap, tunggu proses pemuatan.", "error");
+        return;
+      }
+
+      // Membentuk baris judul kolom persis struktur tabel predikat_dpl
+      const barisHeader = ["No Absen", "NISN", "Nama Siswa", "dpl_1", "dpl_2", "dpl_3", "dpl_4", "dpl_5", "dpl_6", "dpl_7", "dpl_8"];
+      const dataSpreedsheetArr = [barisHeader];
+
+      cacheDataSiswaGlobal.forEach(s => {
+        dataSpreedsheetArr.push([s.no_absen, s.nisn || "", s.nama, "", "", "", "", "", "", "", ""]);
+      });
+
+      const lembarKerja = XLSX.utils.aoa_to_sheet(dataSpreedsheetArr);
+      const fileBuku = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(fileBuku, lembarKerja, "predikat_dpl");
+
+      // Pembuatan berkas fisik Excel (.xlsx) untuk diunduh langsung
+      XLSX.writeFile(fileBuku, `Template_Predikat_DPL_${decodeURIComponent(namaSekolah || 'Sekolah')}.xlsx`);
+      tampilkanToast("Template predikat_dpl berhasil diunduh!", "success");
+    }
+
+    function tanganiPemilihanBerkas(input) {
+      if(input.files.length > 0) {
+        document.getElementById('fileNameLabel').innerText = input.files[0].name;
+      }
+    }
+
+    /* =========================================================================
+       LOGIKA SINKRONISASI MASS UPLOAD KEMBALI KE SPREADSHEET
+       ========================================================================= */
+    function prosesUnggahMassalExcel() {
+      const fileInput = document.getElementById("fileExcelInput");
+      const btnProses = document.getElementById("btnProsesUnggah");
+
+      if (fileInput.files.length === 0) {
+        tampilkanToast("Silakan pilih file template Excel yang telah diisi!", "error");
+        return;
+      }
+
+      btnProses.classList.add("processing");
+      btnProses.innerHTML = `<i class="fa-solid fa-circle-notch"></i> Memproses...`;
+
+      const berkasMentah = fileInput.files[0];
+      const pembacaBerkas = new FileReader();
+
+      pembacaBerkas.onload = function(e) {
+        try {
+          const dataBiner = e.target.result;
+          const workbook = XLSX.read(dataBiner, { type: 'binary' });
+          const namaSheetPertama = workbook.SheetNames[0];
+          const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[namaSheetPertama]);
+
+          if (sheetData.length === 0) {
+            throw new Error("Berkas kosong atau format kolom rusak.");
+          }
+
+          // Kirim struktur data array hasil ekstraksi Excel ke cloud backend Apps Script
+          kirimArrayMassalKeServer(sheetData);
+
+        } catch (err) {
+          console.error(err);
+          tampilkanToast("Gagal membaca file. Pastikan struktur kolom sesuai.", "error");
+          btnProses.classList.remove("processing");
+          btnProses.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Kirim Data`;
+        }
+      };
+
+      pembacaBerkas.readAsBinaryString(berkasMentah);
+    }
+
+    function kirimArrayMassalKeServer(dataArrayExcel) {
+      const btnProses = document.getElementById("btnProsesUnggah");
+
+      const paketPayload = {
+        action: "update_predikat_dpl_massal", // Pastikan fungsi penanganan massal ini terdaftar di GS Anda
+        raporId: raporId,
+        dataPayload: dataArrayExcel
+      };
+
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(paketPayload),
+        mode: "no-cors"
+      })
+      .then(() => {
+        // Melakukan pemetaan visual balik ke komponen input select di UI web agar otomatis terisi sesuai Excel
+        dataArrayExcel.forEach(baris => {
+          const absen = baris["No Absen"] || baris["no_absen"];
+          if(absen) {
+            for(let i=1; i<=8; i++) {
+              const valDpl = baris[`dpl_${i}`] || baris[`DPL_${i}`];
+              const selectEl = document.getElementById(`sel_${absen}_dpl${i}`);
+              if(selectEl && valDpl) {
+                selectEl.value = valDpl;
+                selectEl.classList.add("saved-success");
+              }
+            }
+          }
+        });
+
+        tampilkanToast("Hebat! Seluruh data massal berhasil tersimpan di predikat_dpl.", "success");
+        document.getElementById("fileExcelInput").value = "";
+        document.getElementById('fileNameLabel').innerText = "Pilih Berkas Berisi Nilai...";
+        
+        btnProses.classList.remove("processing");
+        btnProses.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Kirim Data`;
+      })
+      .catch(err => {
+        console.error(err);
+        tampilkanToast("Gangguan pengiriman massal ke server cloud.", "error");
+        btnProses.classList.remove("processing");
+        btnProses.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Kirim Data`;
+      });
+    }
+
+    function tampilkanToast(pesanText, tipe) {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      
+      if (tipe === "error") {
+        toast.style.borderLeftColor = "#ef4444";
+        toast.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="color:#ef4444"></i> ${pesanText}`;
+      } else {
+        toast.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981"></i> ${pesanText}`;
+      }
+      
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.add("show"), 50);
+      
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 400);
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
