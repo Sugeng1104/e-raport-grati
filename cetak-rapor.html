@@ -25,6 +25,15 @@
     .tabel-border-tegas, .tabel-border-tegas th, .tabel-border-tegas td {
       border: 1.5px solid #000000 !important;
     }
+    /* Warna Hijau Muda Transparan untuk Header & Kolom Nilai */
+    .bg-hijau-rapor {
+      background-color: rgba(220, 252, 231, 0.75) !important; /* Hijau muda transparan sejenis emerald-100 */
+    }
+    /* Style Tabel Kenaikan Kelas (Biru Laut Garis Putus-putus) */
+    .tabel-kenaikan {
+      border: 2px dashed #0284c7 !important; /* Garis putus-putus biru laut */
+      background-color: rgba(240, 249, 255, 0.85) !important; /* Background biru laut sangat muda */
+    }
 
     @page {
       size: A4;           
@@ -133,7 +142,7 @@
       <div class="mb-4">
         <table class="w-full tabel-border-tegas text-xs text-left">
           <thead>
-            <tr class="bg-slate-50 text-center font-bold">
+            <tr class="bg-hijau-rapor text-center font-bold">
               <th class="p-2 w-10 text-center">No</th>
               <th class="p-2 w-48 text-center">Muatan Pelajaran</th>
               <th class="p-2 w-16 text-center">Nilai Akhir</th>
@@ -148,7 +157,7 @@
         <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">MUATAN LOKAL</h3>
         <table class="w-full tabel-border-tegas text-xs text-left">
           <thead>
-            <tr class="bg-slate-50 text-center font-bold">
+            <tr class="bg-hijau-rapor text-center font-bold">
               <th class="p-2 w-10 text-center">No</th>
               <th class="p-2 w-48 text-center">Muatan Pelajaran</th>
               <th class="p-2 w-16 text-center">Nilai Akhir</th>
@@ -162,7 +171,7 @@
       <div class="mb-5 blok-anti-pisah">
         <table class="w-full tabel-border-tegas text-xs text-left">
           <thead>
-            <tr class="bg-slate-50 font-bold">
+            <tr class="bg-hijau-rapor font-bold">
               <th class="p-2 tracking-wide uppercase text-center">Catatan Deskripsi Proses Belajar</th>
             </tr>
           </thead>
@@ -178,7 +187,7 @@
         <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">EKSTRAKURIKULER</h3>
         <table class="w-full tabel-border-tegas text-xs text-left">
           <thead>
-            <tr class="bg-slate-50 text-center font-bold">
+            <tr class="bg-hijau-rapor text-center font-bold">
               <th class="p-2 w-10 text-center">No</th>
               <th class="p-2 w-48 text-center">Kegiatan Ekstrakurikuler</th>
               <th class="p-2 w-16 text-center">Predikat</th>
@@ -189,47 +198,66 @@
         </table>
       </div>
 
-      <div class="mb-6 w-[260px] blok-anti-pisah">
-        <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">KETIDAKHADIRAN</h3>
-        <table class="w-full tabel-border-tegas text-xs text-left">
-          <tbody>
-            <tr>
-              <td class="p-2 w-32 font-medium">Sakit</td>
-              <td id="lblSakit" class="p-2 text-center font-bold w-14 bg-slate-50">-</td>
-              <td class="p-2 text-left">hari</td>
-            </tr>
-            <tr>
-              <td class="p-2 font-medium">Izin</td>
-              <td id="lblIzin" class="p-2 text-center font-bold bg-slate-50">-</td>
-              <td class="p-2 text-left">hari</td>
-            </tr>
-            <tr>
-              <td class="p-2 font-medium">Tanpa Keterangan</td>
-              <td id="lblAlfa" class="p-2 text-center font-bold bg-slate-50">-</td>
-              <td class="p-2 text-left">hari</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="mb-6 flex justify-between items-start gap-4 blok-anti-pisah">
+        
+        <div class="w-[260px]">
+          <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">KETIDAKHADIRAN</h3>
+          <table class="w-full tabel-border-tegas text-xs text-left">
+            <tbody>
+              <tr>
+                <td class="p-2 w-32 font-medium">Sakit</td>
+                <td id="lblSakit" class="p-2 text-center font-bold w-14 bg-slate-50">-</td>
+                <td class="p-2 text-left">hari</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-medium">Izin</td>
+                <td id="lblIzin" class="p-2 text-center font-bold bg-slate-50">-</td>
+                <td class="p-2 text-left">hari</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-medium">Tanpa Keterangan</td>
+                <td id="lblAlfa" class="p-2 text-center font-bold bg-slate-50">-</td>
+                <td class="p-2 text-left">hari</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex-1 max-w-[420px]">
+          <h3 class="font-bold text-xs uppercase mb-1 tracking-wide text-sky-800">Keterangan Kelulusan / Kenaikan</h3>
+          <table class="w-full text-xs text-left tabel-kenaikan rounded-lg">
+            <tbody>
+              <tr>
+                <td id="lblKeputusanKenaikan" class="p-4 text-justify leading-relaxed text-slate-900 text-[12px] font-medium">
+                  Menghitung parameter nilai...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
       </div>
 
       <div class="blok-anti-pisah text-xs mt-12 leading-relaxed">
         
-        <div class="flex justify-between items-end text-center mb-16 px-4">
+        <div class="flex justify-between items-end text-center mb-12 px-4">
           <div class="w-64">
             <p class="mb-20 font-medium text-sm">Orang Tua,</p>
             <div class="border-b border-black w-48 mx-auto"></div>
             <p class="text-xs text-transparent select-none">NIP. -</p> 
           </div>
-          <div class="w-64">
-            <p class="mb-20 font-medium text-sm"><span id="lblTempatTanggal">-</span><br>Wali Kelas 4 (empat)</p>
+          
+          <div class="w-64 relative">
+            <p id="lblTempatTanggal" class="absolute -top-7 left-0 right-0 mx-auto font-medium text-xs text-center text-slate-800">-</p>
+            <p class="mb-20 font-medium text-sm">Wali Kelas 4 (empat)</p>
             <p id="lblNamaGuru" class="font-bold text-sm capitalize">-</p>
             <div class="border-b border-black w-48 mx-auto my-0.5"></div>
             <p id="lblNipGuru" class="text-xs text-slate-700">-</p>
           </div>
         </div>
 
-        <div class="text-center w-full">
-          <p class="mb-20 font-medium text-sm">Mengetahui,<br>Kepala Sekolah</p>
+        <div class="text-center w-full mt-4">
+          <p class="mb-14 font-medium text-sm">Mengetahui,<br>Kepala Sekolah</p>
           <p id="lblNamaKepsek" class="font-bold text-sm capitalize">-</p>
           <div class="border-b border-black w-56 mx-auto my-0.5"></div>
           <p id="lblNipKepsek" class="text-xs text-slate-700">-</p>
@@ -275,8 +303,13 @@
       document.getElementById('loader').classList.add('hidden');
       document.getElementById('coreRapor').classList.remove('hidden');
       
+      // Variable penampung hitung rata-rata
+      let totalNilai = 0;
+      let jumlahMapel = 0;
+      
       // 1. Injeksi Data Identitas Utama
-      document.getElementById('lblNama').innerText = bundle.profil.nama || "-";
+      const namaSiswa = bundle.profil.nama || "-";
+      document.getElementById('lblNama').innerText = namaSiswa;
       document.getElementById('lblMurniNis').innerText = bundle.profil.nis || "-";
       document.getElementById('lblMurniNisn').innerText = bundle.profil.nisn || "-";
       document.getElementById('lblKelas').innerText = bundle.profil.kelas || "IV";
@@ -287,7 +320,6 @@
       document.getElementById('lblAlamat').innerText = bundle.sekolah.alamat || "Bandilan, Ranuklindungan";
       document.getElementById('lblTp').innerText = bundle.sekolah.tp || "2025/2026";
       
-      // Injeksi Catatan Putusan Belajar (DPL)
       document.getElementById('lblDplMurid').innerText = bundle.profil.dpl_murid || "-";
       
       // 2. Render Tabel A: Muatan Pelajaran Utama
@@ -295,11 +327,15 @@
       tbodyUtama.innerHTML = "";
       if (bundle.payloadNilai && bundle.payloadNilai.length > 0) {
         bundle.payloadNilai.forEach(item => {
+          const nilaiAngka = parseFloat(item.nilai) || 0;
+          totalNilai += nilaiAngka;
+          jumlahMapel++;
+
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td class="p-2 text-center font-semibold align-top">${item.no}</td>
             <td class="p-2 font-semibold align-top">${item.mapel}</td>
-            <td class="p-2 text-center font-bold text-sm align-top bg-slate-50">${item.nilai}</td>
+            <td class="p-2 text-center font-bold text-sm align-top bg-hijau-rapor">${item.nilai}</td>
             <td class="p-2 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${item.deskripsi}</td>
           `;
           tbodyUtama.appendChild(tr);
@@ -311,18 +347,33 @@
       tbodyMulok.innerHTML = "";
       if (bundle.payloadMulok && bundle.payloadMulok.length > 0) {
         bundle.payloadMulok.forEach(item => {
+          const nilaiAngka = parseFloat(item.nilai) || 0;
+          totalNilai += nilaiAngka;
+          jumlahMapel++;
+
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td class="p-2 text-center font-semibold align-top">${item.no}</td>
             <td class="p-2 font-semibold align-top">${item.mapel}</td>
-            <td class="p-2 text-center font-bold text-sm align-top bg-slate-50">${item.nilai}</td>
+            <td class="p-2 text-center font-bold text-sm align-top bg-hijau-rapor">${item.nilai}</td>
             <td class="p-2 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${item.deskripsi}</td>
           `;
           tbodyMulok.appendChild(tr);
         });
       }
 
-      // 4. Render Tabel C: Ekstrakurikuler (Fix sinkronisasi Array Object dari Apps Script)
+      // LOGIKA KEPUTUSAN KENAIKAN KELAS BERDASARKAN RATA-RATA
+      const rataRapor = jumlahMapel > 0 ? (totalNilai / jumlahMapel) : 0;
+      const kriteriaKenaikan = 65; // Standar rata-rata minimum Kriteria Kenaikan Kelas IV
+      const containerKenaikan = document.getElementById('lblKeputusanKenaikan');
+
+      if (rataRapor >= kriteriaKenaikan) {
+        containerKenaikan.innerHTML = `Berdasarkan pencapaian seluruh kompetensi, Selamat! Ananda <strong>${namaSiswa}</strong> berhasil <span class="font-bold text-emerald-700">NAIK</span> / <span class="line-through text-red-500">TIDAK NAIK</span> ke Kelas V (lima).`;
+      } else {
+        containerKenaikan.innerHTML = `Berdasarkan hasil evaluasi belajar akhir tahun, Mohon maaf Ananda <strong>${namaSiswa}</strong> <strong>masih tinggal</strong> di Kelas IV (empat) untuk memaksimalkan kompetensi dasar.`;
+      }
+
+      // 4. Render Tabel C: Ekstrakurikuler
       const tbodyEkstra = document.getElementById('bodyTabelEkstra');
       tbodyEkstra.innerHTML = "";
       
@@ -332,7 +383,7 @@
           trEx.innerHTML = `
             <td class="p-2 text-center font-semibold align-top">${item.no}</td>
             <td class="p-2 font-semibold align-top">${item.kegiatan}</td>
-            <td class="p-2 text-center font-bold text-sm align-top bg-slate-50">${item.predikat}</td>
+            <td class="p-2 text-center font-bold text-sm align-top bg-hijau-rapor">${item.predikat}</td>
             <td class="p-2 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${item.keterangan}</td>
           `;
           tbodyEkstra.appendChild(trEx);
