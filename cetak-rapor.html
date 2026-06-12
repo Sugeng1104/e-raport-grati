@@ -51,7 +51,6 @@
         width: 210mm !important; 
         min-height: auto !important; 
       }
-      /* Arsitektur Pencegahan Dokumen Terpotong Tengah */
       .blok-anti-pisah {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
@@ -74,18 +73,16 @@
 
     <div id="coreRapor" class="hidden">
       
-      <!-- HEADER RAPOR -->
       <div class="flex items-center justify-start gap-6 border-b-2 border-black pb-4 mb-4">
-       <img src="img/Logo_SD_Ranu_1.png" 
-            class="w-16 h-auto object-contain" 
-            alt="Logo SDN Ranuklindungan I">
-       <div class="text-center flex-1 pr-16">
-         <h1 class="text-lg font-bold tracking-wide">LAPORAN HASIL BELAJAR</h1>
-         <h2 class="text-base font-bold tracking-wider">(RAPOR)</h2>
-       </div>
+        <img src="img/Logo_SD_Ranu_1.png" 
+             class="w-16 h-auto object-contain" 
+             alt="Logo SDN Ranuklindungan I">
+        <div class="text-center flex-1 pr-16">
+          <h1 class="text-lg font-bold tracking-wide">LAPORAN HASIL BELAJAR</h1>
+          <h2 class="text-base font-bold tracking-wider">(RAPOR)</h2>
+        </div>
       </div>
 
-      <!-- BIODATA / IDENTITAS SISWA -->
       <div class="grid grid-cols-2 gap-x-8 text-[12.5px] leading-relaxed mb-4">
         <table class="w-full">
           <tr>
@@ -133,7 +130,6 @@
         </table>
       </div>
 
-      <!-- TABEL A: MATAPELAJARAN UTAMA -->
       <div class="mb-4">
         <table class="w-full tabel-border-tegas text-xs text-left">
           <thead>
@@ -148,7 +144,6 @@
         </table>
       </div>
 
-      <!-- TABEL B: MUATAN LOKAL -->
       <div class="mb-5">
         <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">MUATAN LOKAL</h3>
         <table class="w-full tabel-border-tegas text-xs text-left">
@@ -164,8 +159,22 @@
         </table>
       </div>
 
-      <!-- TABEL C: EKSTRAKURIKULER (TURUN 5 BARIS DENGAN MT-20 & REGISTER ANTI-PISAH) -->
-      <div class="mt-20 mb-5 blok-anti-pisah">
+      <div class="mb-5 blok-anti-pisah">
+        <table class="w-full tabel-border-tegas text-xs text-left">
+          <thead>
+            <tr class="bg-slate-50 font-bold">
+              <th class="p-2 tracking-wide uppercase text-center">Catatan Deskripsi Proses Belajar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="lblDplMurid" class="p-3 text-justify leading-relaxed whitespace-pre-line text-[11.5px]">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mb-5 blok-anti-pisah">
         <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">EKSTRAKURIKULER</h3>
         <table class="w-full tabel-border-tegas text-xs text-left">
           <thead>
@@ -180,7 +189,6 @@
         </table>
       </div>
 
-      <!-- TABEL D: KETIDAKHADIRAN -->
       <div class="mb-6 w-[260px] blok-anti-pisah">
         <h3 class="font-bold text-xs uppercase mb-1 tracking-wide">KETIDAKHADIRAN</h3>
         <table class="w-full tabel-border-tegas text-xs text-left">
@@ -204,7 +212,6 @@
         </table>
       </div>
 
-      <!-- BLOK TANDA TANGAN (AUTOMATICALLY SEJALUR) -->
       <div class="blok-anti-pisah text-xs mt-12 leading-relaxed">
         
         <div class="flex justify-between items-end text-center mb-16 px-4">
@@ -280,6 +287,9 @@
       document.getElementById('lblAlamat').innerText = bundle.sekolah.alamat || "Bandilan, Ranuklindungan";
       document.getElementById('lblTp').innerText = bundle.sekolah.tp || "2025/2026";
       
+      // Injeksi Catatan Putusan Belajar (DPL)
+      document.getElementById('lblDplMurid').innerText = bundle.profil.dpl_murid || "-";
+      
       // 2. Render Tabel A: Muatan Pelajaran Utama
       const tbodyUtama = document.getElementById('bodyTabelRapor');
       tbodyUtama.innerHTML = "";
@@ -312,30 +322,35 @@
         });
       }
 
-      // 4. Render Tabel C: Ekstrakurikuler
+      // 4. Render Tabel C: Ekstrakurikuler (Fix sinkronisasi Array Object dari Apps Script)
       const tbodyEkstra = document.getElementById('bodyTabelEkstra');
       tbodyEkstra.innerHTML = "";
-      const namaEkskul = (bundle.ekstra && bundle.ekstra.nama) ? bundle.ekstra.nama : "Pramuka";
-      const predikatEkskul = (bundle.ekstra && bundle.ekstra.predikat) ? bundle.ekstra.predikat : "-";
-      const keteranganEkskul = (bundle.ekstra && bundle.ekstra.keterangan) ? bundle.ekstra.keterangan : "-";
-
-      const trEx = document.createElement('tr');
-      trEx.innerHTML = `
-        <td class="p-2 text-center font-semibold align-top">1</td>
-        <td class="p-2 font-semibold align-top">${namaEkskul}</td>
-        <td class="p-2 text-center font-bold text-sm align-top bg-slate-50">${predikatEkskul}</td>
-        <td class="p-2 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${keteranganEkskul}</td>
-      `;
-      tbodyEkstra.appendChild(trEx);
+      
+      if (bundle.ekstrakurikuler && bundle.ekstrakurikuler.length > 0) {
+        bundle.ekstrakurikuler.forEach(item => {
+          const trEx = document.createElement('tr');
+          trEx.innerHTML = `
+            <td class="p-2 text-center font-semibold align-top">${item.no}</td>
+            <td class="p-2 font-semibold align-top">${item.kegiatan}</td>
+            <td class="p-2 text-center font-bold text-sm align-top bg-slate-50">${item.predikat}</td>
+            <td class="p-2 text-justify leading-relaxed text-[11px] align-top whitespace-pre-line">${item.keterangan}</td>
+          `;
+          tbodyEkstra.appendChild(trEx);
+        });
+      } else {
+        const trEx = document.createElement('tr');
+        trEx.innerHTML = `<td colspan="4" class="p-2 text-center text-slate-400">Tidak mengikuti kegiatan ekstrakurikuler</td>`;
+        tbodyEkstra.appendChild(trEx);
+      }
 
       // 5. Render Tabel D: Rekap Ketidakhadiran (Absensi)
       if (bundle.kehadiran) {
-        document.getElementById('lblSakit').innerText = bundle.kehadiran.sakit !== "" ? bundle.kehadiran.sakit : "-";
-        document.getElementById('lblIzin').innerText = bundle.kehadiran.izin !== "" ? bundle.kehadiran.izin : "-";
-        document.getElementById('lblAlfa').innerText = bundle.kehadiran.alfa !== "" ? bundle.kehadiran.alfa : "-";
+        document.getElementById('lblSakit').innerText = bundle.kehadiran.sakit !== "" ? bundle.kehadiran.sakit : "0";
+        document.getElementById('lblIzin').innerText = bundle.kehadiran.izin !== "" ? bundle.kehadiran.izin : "0";
+        document.getElementById('lblAlfa').innerText = bundle.kehadiran.alfa !== "" ? bundle.kehadiran.alfa : "0";
       }
 
-      // 6. Injeksi Dinamis Blok Tanda Tangan Sesuai Request
+      // 6. Injeksi Dinamis Blok Tanda Tangan
       if (bundle.ttd) {
         document.getElementById('lblTempatTanggal').innerText = bundle.ttd.tanggal_cetak || "Pasuruan, .........................";
         document.getElementById('lblNamaGuru').innerText = bundle.ttd.guru_kelas || "-";
