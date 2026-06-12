@@ -235,19 +235,29 @@
 
       <div class="blok-anti-pisah text-xs mt-12 leading-relaxed">
         
-        <div class="flex justify-between items-end text-center mb-12 px-4">
-          <div class="w-64 pb-5">
-            <p class="mb-20 font-medium text-sm">Orang Tua,</p>
-            <div class="border-b border-black w-48 mx-auto"></div>
-            <p class="text-xs text-transparent select-none">NIP. -</p> 
+        <div class="flex justify-between items-stretch text-center mb-12 px-4">
+          
+          <div class="w-64 flex flex-col justify-between">
+            <div>
+              <p class="text-sm text-transparent select-none mb-0.5">Spacer</p>
+              <p class="font-medium text-sm">Orang Tua,</p>
+            </div>
+            <div class="mt-20">
+              <div class="border-b border-black w-48 mx-auto"></div>
+              <p class="text-xs text-transparent select-none mt-0.5">NIP. -</p> 
+            </div>
           </div>
           
-          <div class="w-64 text-center">
-            <p id="lblTempatTanggal" class="font-medium text-sm text-black mb-0.5">-</p>
-            <p class="mb-20 font-medium text-sm">Wali Kelas IV</p>
-            <p id="lblNamaGuru" class="font-bold text-sm capitalize">-</p>
-            <div class="border-b border-black w-48 mx-auto my-0.5"></div>
-            <p id="lblNipGuru" class="text-xs text-slate-700">-</p>
+          <div class="w-64 flex flex-col justify-between text-center">
+            <div>
+              <p id="lblTempatTanggal" class="font-medium text-sm text-black mb-0.5">-</p>
+              <p class="font-medium text-sm">Wali Kelas IV</p>
+            </div>
+            <div class="mt-20">
+              <p id="lblNamaGuru" class="font-bold text-sm capitalize">-</p>
+              <div class="border-b border-black w-48 mx-auto my-0.5"></div>
+              <p id="lblNipGuru" class="text-xs text-slate-700">-</p>
+            </div>
           </div>
         </div>
 
@@ -301,7 +311,6 @@
       let totalNilai = 0;
       let jumlahMapel = 0;
       
-      // 1. Injeksi Data Profil Dasar Siswa
       const namaSiswa = bundle.profil.nama || "-";
       document.getElementById('lblNama').innerText = namaSiswa;
       document.getElementById('lblMurniNis').innerText = bundle.profil.nis || "-";
@@ -311,7 +320,6 @@
       document.getElementById('lblSemester').innerText = bundle.profil.semester || "II (Dua)";
       document.getElementById('lblDplMurid').innerText = bundle.profil.dpl_murid || "-";
       
-      // 2. Render Tabel A: Matapelajaran Utama
       const tbodyUtama = document.getElementById('bodyTabelRapor');
       tbodyUtama.innerHTML = "";
       if (bundle.payloadNilai && bundle.payloadNilai.length > 0) {
@@ -331,7 +339,6 @@
         });
       }
 
-      // 3. Render Tabel B: Muatan Lokal
       const tbodyMulok = document.getElementById('bodyTabelMulok');
       tbodyMulok.innerHTML = "";
       if (bundle.payloadMulok && bundle.payloadMulok.length > 0) {
@@ -351,7 +358,6 @@
         });
       }
 
-      // Logika Kenaikan Kelas otomatis
       const rataRapor = jumlahMapel > 0 ? (totalNilai / jumlahMapel) : 0;
       const kriteriaKenaikan = 65; 
       const containerKenaikan = document.getElementById('lblKeputusanKenaikan');
@@ -362,7 +368,6 @@
         containerKenaikan.innerHTML = `Berdasarkan hasil evaluasi belajar akhir tahun, Mohon maaf Ananda <strong>${namaSiswa}</strong> <strong>masih tinggal</strong> di Kelas IV (empat) untuk memaksimalkan kompetensi dasar.`;
       }
 
-      // 4. Render Tabel C: Ekstrakurikuler
       const tbodyEkstra = document.getElementById('bodyTabelEkstra');
       tbodyEkstra.innerHTML = "";
       if (bundle.ekstrakurikuler && bundle.ekstrakurikuler.length > 0) {
@@ -382,21 +387,18 @@
         tbodyEkstra.appendChild(trEx);
       }
 
-      // 5. Render Tabel D: Rekap Ketidakhadiran
       if (bundle.kehadiran) {
         document.getElementById('lblSakit').innerText = bundle.kehadiran.sakit !== "" ? bundle.kehadiran.sakit : "0";
         document.getElementById('lblIzin').innerText = bundle.kehadiran.izin !== "" ? bundle.kehadiran.izin : "0";
         document.getElementById('lblAlfa').innerText = bundle.kehadiran.alfa !== "" ? bundle.kehadiran.alfa : "0";
       }
 
-      // 6. PEMETAAN INDEKS ARRAY IDENTITAS SEKOLAH
       if (bundle.identitas_sekolah && Array.isArray(bundle.identitas_sekolah)) {
         try {
           document.getElementById('lblSekolah').innerText = bundle.identitas_sekolah[1] ? bundle.identitas_sekolah[1].isi_identitas : "UPT SDN RANUKLINDUNGAN I";
           document.getElementById('lblAlamat').innerText  = bundle.identitas_sekolah[4] ? bundle.identitas_sekolah[4].isi_identitas : "Bandilan, Ranuklindungan";
           document.getElementById('lblTp').innerText      = bundle.identitas_sekolah[19] ? bundle.identitas_sekolah[19].isi_identitas : "2025/2026";
 
-          // Menembak data blok tanda tangan (Tanda Tangan Dinamis)
           document.getElementById('lblTempatTanggal').innerText = bundle.identitas_sekolah[20] ? bundle.identitas_sekolah[20].isi_identitas : "Pasuruan, .........................";
           document.getElementById('lblNamaGuru').innerText      = bundle.identitas_sekolah[14] ? bundle.identitas_sekolah[14].isi_identitas : "-";
           
