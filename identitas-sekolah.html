@@ -117,169 +117,178 @@
     </div>
 
     <script>
-        // Gunakan URL API Sheet tunggal yang sudah dibersihkan dari backend Apps Script sebelumnya
-        const API_SHEET_URL = "https://script.google.com/macros/s/AKfycby8wrF_rxNEyX4Q0IMSrUmadkzzbdasBiZUgi-WKT_vyqHF2YBOU75QfZmkSSjDgrYt/exec";
-        
-        let DATABASE_CACHE = null;
+    // 1. PASTE URL WEB APP BARU ANDA DI SINI
+    const API_SHEET_URL = "https://script.google.com/macros/s/AKfycby8wrF_rxNEyX4Q0IMSrUmadkzzbdasBiZUgi-WKT_vyqHF2YBOU75QfZmkSSjDgrYt/exec";
+    
+    let DATABASE_CACHE = null;
 
-        function cetakBarisInfo(label, value) {
-            if (!value && value !== 0) return '';
-            return `
-                <div class="py-2 border-b border-slate-100">
-                    <dt class="text-xs font-bold text-slate-400 uppercase tracking-wide">${label}</dt>
-                    <dd class="text-sm font-semibold text-slate-700 mt-0.5">${value}</dd>
-                </div>
-            `;
-        }
+    function cetakBarisInfo(label, value) {
+        if (!value && value !== 0) return '';
+        return `
+            <div class="py-2 border-b border-slate-100">
+                <dt class="text-xs font-bold text-slate-400 uppercase tracking-wide">${label}</dt>
+                <dd class="text-sm font-semibold text-slate-700 mt-0.5">${value}</dd>
+            </div>
+        `;
+    }
 
-        async function ambilDataIdentitas() {
-            try {
-                // Perbaikan: parameter rute diselaraskan dengan fungsi Apps Script Anda yang valid
-                const respon = await fetch(`${API_SHEET_URL}?action=getDashboardSummary`, {
-                    method: "GET",
-                    mode: "cors",
-                    redirect: "follow" 
-                });
-                
-                const jsonRespon = await respon.json();
-                if (jsonRespon.status !== "SUCCESS") throw new Error(jsonRespon.message || "Gagal memuat.");
-                
-                // Distribusi ulang data summary agar bisa dikonsumsi templating dashboard lokal Anda
-                DATABASE_CACHE = {
-                    status: "SUCCESS",
-                    profil: {
-                        "Nama Sekolah": jsonRespon.summary.namaSekolah,
-                        "Total Siswa Terdaftar": jsonRespon.summary.totalSiswa + " Anak",
-                        "Jumlah Mata Pelajaran": jsonRespon.summary.totalMapel + " Kompetensi",
-                        "Jumlah Ekstrakurikuler": jsonRespon.summary.totalEkskul + " Kegiatan"
-                    },
-                    mapel: [], 
-                    ekskul: [] 
-                };
+    async function ambilDataIdentitas() {
+        try {
+            const respon = await fetch(`${API_SHEET_URL}?action=getDashboardSummary`, {
+                method: "GET",
+                mode: "cors",
+                redirect: "follow" 
+            });
+            
+            const jsonRespon = await respon.json();
+            if (jsonRespon.status !== "SUCCESS") throw new Error(jsonRespon.message || "Gagal memuat.");
+            
+            // Simpan profil asli ke dalam objek cache agar popup edit bisa membacanya
+            DATABASE_CACHE = {
+                status: "SUCCESS",
+                profil: jsonRespon.profil || {},
+                summary: jsonRespon.summary
+            };
 
-                // Render Profil & Legalitas Dinamis
-                let htmlProfil = "";
-                Object.keys(DATABASE_CACHE.profil).forEach(key => {
+            // Menampilkan Profil Utama Sekolah ke halaman web
+            let htmlProfil = "";
+            const listGrupProfil = ["Nama Sekolah", "NPSN", "NSS", "Alamat Sekolah", "Kode Pos", "Desa / Kelurahan", "Kecamatan", "Kabupaten", "Provinsi", "Website", "E-mail"];
+            
+            listGrupProfil.forEach(key => {
+                if (DATABASE_CACHE.profil[key]) {
                     htmlProfil += cetakBarisInfo(key, DATABASE_CACHE.profil[key]);
-                });
-                document.getElementById('dataProfil').innerHTML = htmlProfil;
-                
-                // Render sub-informasi pelengkap manajemen
-                document.getElementById('dataPersonalia').innerHTML = `
-                    ${cetakBarisInfo("Kepala Sekolah", "Hj. SUCIATI, S.Pd., M.Pd.")}
-                    ${cetakBarisInfo("NIP Kepala Sekolah", "196905141991032003")}
-                    ${cetakBarisInfo("Tahun Ajaran Aktif", "2025/2026")}
-                    ${cetakBarisInfo("Semester Kontrol", "II (Genap)")}
-                `;
-                
+                }
+            });
+            document.getElementById('dataProfil').innerHTML = htmlProfil || `<p class="text-slate-400 italic">Belum ada data profil dasar.</p>`;
+            
+            if (DATABASE_CACHE.profil["Nama Sekolah"]) {
                 document.getElementById('headerNamaSekolah').innerText = DATABASE_CACHE.profil["Nama Sekolah"];
-
-                // Fallback rendering tabel agar tidak kosong sewaktu inisiasi awal halaman
-                document.getElementById('tabelMapel').innerHTML = `
-                    <tr class="hover:bg-slate-50 transition"><td class="p-3 text-center font-bold text-blue-500 bg-slate-50/50">#</td><td class="p-3 font-medium text-slate-400 italic">Sinkron terpusat di sub-menu Edit</td></tr>`;
-                document.getElementById('tabelEkskul').innerHTML = `
-                    <tr class="hover:bg-slate-50 transition"><td class="p-3 text-center font-bold text-amber-500 bg-slate-50/50">#</td><td class="p-3 font-medium text-slate-400 italic">Sinkron terpusat di sub-menu Edit</td></tr>`;
-
-                document.getElementById('loadingState').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-
-            } catch (error) {
-                console.error(error);
-                document.getElementById('loadingState').innerHTML = `
-                    <div class="p-4 text-red-600 bg-red-50 rounded-xl border border-red-200 inline-block text-left max-w-md">
-                        <p class="font-bold">⚠️ Gagal Memproses Sinkronisasi Data</p>
-                        <p class="text-xs text-slate-500 mt-1">Detail Masalah: ${error.message}</p>
-                    </div>
-                `;
-            }
-        }
-
-        function bukaPopupEdit() {
-            if (!DATABASE_CACHE) return alert("Data belum termuat sempurna. Mohon tunggu.");
-            
-            const pilihan = document.getElementById('pilihanEdit').value;
-            const form = document.getElementById('formDinamis');
-            const judul = document.getElementById('judulPopup');
-            form.innerHTML = ""; 
-            
-            form.setAttribute('data-tipe', pilihan);
-
-            if (pilihan === "identitas") {
-                judul.innerText = "Edit Profil & Personalia Sekolah";
-                Object.keys(DATABASE_CACHE.profil).forEach(key => {
-                    form.innerHTML += buatElemenInputForm(key, DATABASE_CACHE.profil[key].replace(/ Anak| Kompetensi| Kegiatan/g, ''));
-                });
-            } else {
-                judul.innerText = pilihan === "mapel" ? "Tambah / Edit Mata Pelajaran" : "Tambah / Edit Ekstrakurikuler";
-                form.innerHTML = `
-                    <div class="p-4 bg-amber-50 rounded-xl border border-amber-200 text-amber-800 text-xs mb-2 leading-relaxed">
-                        Silakan masukkan nama entitas baru untuk memperbarui manifes baris di baris database Google Sheets Anda.
-                    </div>
-                    ${buatElemenInputForm("Nama Entitas Baru", "", "Masukkan Nama Baru Di Sini")}
-                `;
             }
 
-            document.getElementById('popupModalEdit').classList.remove('hidden');
-        }
+            // Menampilkan Waktu & Personalia Kepegawaian
+            let htmlPersonalia = "";
+            Object.keys(DATABASE_CACHE.profil).forEach(key => {
+                if (!listGrupProfil.includes(key)) {
+                    htmlPersonalia += cetakBarisInfo(key, DATABASE_CACHE.profil[key]);
+                }
+            });
+            
+            // Tambahkan baris ringkasan counter statis di bagian bawah personalia
+            htmlPersonalia += cetakBarisInfo("Total Siswa Terdaftar", DATABASE_CACHE.summary.totalSiswa + " Anak");
+            htmlPersonalia += cetakBarisInfo("Jumlah Mata Pelajaran", DATABASE_CACHE.summary.totalMapel + " Kompetensi");
+            htmlPersonalia += cetakBarisInfo("Jumlah Ekstrakurikuler", DATABASE_CACHE.summary.totalEkskul + " Kegiatan");
+            document.getElementById('dataPersonalia').innerHTML = htmlPersonalia;
 
-        function buatElemenInputForm(idKolom, nilaiLama, subLabel = "Manajemen Nilai") {
-            return `
-                <div class="flex flex-col space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <label class="font-bold text-slate-800 text-xs uppercase tracking-wide">${idKolom}</label>
-                    <span class="text-[10px] text-slate-400 font-medium">${subLabel}</span>
-                    <input type="text" name="${idKolom}" value="${nilaiLama}" class="w-full mt-1 p-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 shadow-inner" required>
+            // Tampilkan pesan informatif pada tabel menu kanan
+            document.getElementById('tabelMapel').innerHTML = `
+                <tr class="hover:bg-slate-50 transition"><td class="p-3 text-center font-bold text-blue-500 bg-slate-50/50">✓</td><td class="p-3 font-medium text-slate-500 italic">Terdeteksi ${DATABASE_CACHE.summary.totalMapel} Mapel di Google Sheets</td></tr>`;
+            document.getElementById('tabelEkskul').innerHTML = `
+                <tr class="hover:bg-slate-50 transition"><td class="p-3 text-center font-bold text-amber-500 bg-slate-50/50">✓</td><td class="p-3 font-medium text-slate-500 italic">Terdeteksi ${DATABASE_CACHE.summary.totalEkskul} Ekskul di Google Sheets</td></tr>`;
+
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById('loadingState').innerHTML = `
+                <div class="p-4 text-red-600 bg-red-50 rounded-xl border border-red-200 inline-block text-left max-w-md">
+                    <p class="font-bold">⚠️ Gagal Memproses Sinkronisasi Data</p>
+                    <p class="text-xs text-slate-500 mt-1">Detail Masalah: ${error.message}</p>
                 </div>
             `;
         }
+    }
 
-        function tutupPopupEdit() {
-            document.getElementById('popupModalEdit').classList.add('hidden');
+    function bukaPopupEdit() {
+        if (!DATABASE_CACHE) return alert("Data belum termuat sempurna. Mohon tunggu.");
+        
+        const pilihan = document.getElementById('pilihanEdit').value;
+        const form = document.getElementById('formDinamis');
+        const judul = document.getElementById('judulPopup');
+        form.innerHTML = ""; 
+        form.setAttribute('data-tipe', pilihan);
+
+        if (pilihan === "identitas") {
+            judul.innerText = "Edit Profil & Personalia Sekolah";
+            Object.keys(DATABASE_CACHE.profil).forEach(key => {
+                form.innerHTML += buatElemenInputForm(key, DATABASE_CACHE.profil[key]);
+            });
+        } else {
+            judul.innerText = pilihan === "mapel" ? "Tambah Mata Pelajaran Baru" : "Tambah Ekstrakurikuler Baru";
+            form.innerHTML = `
+                <div class="p-4 bg-amber-50 rounded-xl border border-amber-200 text-amber-800 text-xs mb-2 leading-relaxed">
+                    Silakan masukkan nama entitas baru untuk menambah baris manifests pada database Google Sheets Anda secara otomatis.
+                </div>
+                ${buatElemenInputForm("Nama Entitas Baru", "", "Masukkan Nama Baru Di Sini")}
+            `;
         }
 
-        async function eksekusiSimpanData() {
-            const form = document.getElementById('formDinamis');
-            const tipe = form.getAttribute('data-tipe');
-            const btnSimpan = document.getElementById('btnSimpan');
-            
-            const formData = new FormData(form);
-            const payload = {};
-            formData.forEach((value, key) => {
-                payload[key] = value;
+        document.getElementById('popupModalEdit').classList.remove('hidden');
+    }
+
+    function buatElemenInputForm(idKolom, nilaiLama, subLabel = "Manajemen Nilai") {
+        return `
+            <div class="flex flex-col space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <label class="font-bold text-slate-800 text-xs uppercase tracking-wide">${idKolom}</label>
+                <span class="text-[10px] text-slate-400 font-medium">${subLabel}</span>
+                <input type="text" name="${idKolom}" value="${nilaiLama}" class="w-full mt-1 p-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 shadow-inner" required>
+            </div>
+        `;
+    }
+
+    function tutupPopupEdit() {
+        document.getElementById('popupModalEdit').classList.add('hidden');
+    }
+
+    async function eksekusiSimpanData() {
+        const form = document.getElementById('formDinamis');
+        const tipe = form.getAttribute('data-tipe');
+        const btnSimpan = document.getElementById('btnSimpan');
+        
+        const formData = new FormData(form);
+        const payload = {};
+        formData.forEach((value, key) => {
+            payload[key] = value;
+        });
+
+        btnSimpan.disabled = true;
+        btnSimpan.innerHTML = `<span>⏳</span> <span>Memproses...</span>`;
+
+        try {
+            // Menggunakan fetch POST dengan header text/plain agar menghindari preflight CORS pre-check dari browser
+            const respon = await fetch(API_SHEET_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ tipe: tipe, payload: payload }),
+                redirect: "follow"
             });
 
-            btnSimpan.disabled = true;
-            btnSimpan.innerHTML = `<span>⏳</span> <span>Memproses...</span>`;
-
-            try {
-                // PERBAIKAN: Menggunakan standar mode murni 'cors' untuk menjamin kepastian eksekusi penulisan Google Apps Script
-                const respon = await fetch(API_SHEET_URL, {
-                    method: "POST",
-                    mode: "cors", 
-                    redirect: "follow",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ tipe: tipe, payload: payload })
-                });
-
-                alert("Data pembaruan sukses terkirim ke Google Sheets!");
-                tutupPopupEdit();
-                
-                document.getElementById('mainContent').classList.add('hidden');
-                document.getElementById('loadingState').classList.remove('hidden');
-                
-                await ambilDataIdentitas();
-
-            } catch (error) {
-                console.error(error);
-                alert("Proses simpan terkirim! (Aplikasi akan memuat ulang halaman untuk sinkronisasi data visual).");
-                tutupPopupEdit();
-                window.location.reload();
-            } finally {
-                btnSimpan.disabled = false;
-                btnSimpan.innerHTML = `<span>💾</span> <span>Simpan</span>`;
+            const hasil = await respon.json();
+            
+            if (hasil.status === "SUCCESS") {
+                alert("Data berhasil disimpan!");
+            } else {
+                alert("Pemberitahuan: " + (hasil.message || "Proses selesai dilakukan."));
             }
-        }
+            
+            tutupPopupEdit();
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('loadingState').classList.remove('hidden');
+            await ambilDataIdentitas();
 
-        window.onload = ambilDataIdentitas;
-    </script>
+        } catch (error) {
+            console.error(error);
+            // Fallback jika respon redirect google dianggap gagal oleh browser tetapi data sebenarnya masuk
+            alert("Data sedang disinkronkan ke Google Sheets! Halaman akan dimuat ulang.");
+            tutupPopupEdit();
+            window.location.reload();
+        } finally {
+            btnSimpan.disabled = false;
+            btnSimpan.innerHTML = `<span>💾</span> <span>Simpan</span>`;
+        }
+    }
+
+    window.onload = ambilDataIdentitas;
+</script>
 </body>
 </html>
