@@ -27,7 +27,7 @@
             </div>
 
             <a href="index.html" class="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg transition text-sm flex items-center space-x-1">
-                <span>⬅️</span> <span>Kembali ke Hub Utama</span>
+                <span>⬅️</span> <span>Kembali</span>
             </a>
         </div>
     </header>
@@ -36,7 +36,7 @@
         
         <div id="loadingState" class="text-center py-12 bg-white rounded-2xl shadow-sm border border-slate-200">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent mb-2"></div>
-            <p class="text-slate-500 font-medium">Menarik data dari Google Sheets secara Real-time...</p>
+            <p class="text-slate-500 font-medium">Menghubungkan ke Google Sheets secara Real-time...</p>
         </div>
 
         <div id="mainContent" class="grid grid-cols-1 lg:grid-cols-12 gap-6 hidden">
@@ -107,8 +107,8 @@
     </div>
 
     <script>
-        // Ganti dengan URL Web App Apps Script Anda yang berakhiran /exec
-        const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
+        // ⚠️ PASTIKAN MASUKKAN URL WEB APP APPS SCRIPT ANDA YANG BERAKHIRAN /exec DI SINI
+        const API_SHEET_URL = "https://script.google.com/macros/s/PASTIKAN_ID_DEPLOYMENT_ANDA_BENAR/exec";
         
         let DATABASE_CACHE = null;
 
@@ -125,8 +125,7 @@
             try {
                 const respon = await fetch(`${API_SHEET_URL}?action=getDashboardSummary`, {
                     method: "GET",
-                    mode: "cors",
-                    redirect: "follow" 
+                    mode: "cors"
                 });
                 
                 DATABASE_CACHE = await respon.json();
@@ -135,21 +134,21 @@
                 // Set nama sekolah di header
                 document.getElementById('headerNamaSekolah').innerText = DATABASE_CACHE.summary.namaSekolah;
 
-                // Membagi objek profil dari Kolom A & B secara pintar berdasarkan filter kata kunci
+                // Memisahkan data array objek profil secara dinamis ke seksi masing-masing
                 let htmlProfil = "";
                 let htmlPersonalia = "";
                 const kriteriaProfil = ["nama sekolah", "npsn", "nss", "alamat", "kode pos", "desa", "kelurahan", "kecamatan", "kabupaten", "provinsi", "website", "e-mail", "email", "status"];
 
-                Object.keys(DATABASE_CACHE.profil).forEach(key => {
-                    const matchesProfil = kriteriaProfil.some(k => key.toLowerCase().includes(k));
+                DATABASE_CACHE.profil.forEach(item => {
+                    const matchesProfil = kriteriaProfil.some(k => item.kunci.toLowerCase().includes(k));
                     if (matchesProfil) {
-                        htmlProfil += cetakBarisInfo(key, DATABASE_CACHE.profil[key]);
+                        htmlProfil += cetakBarisInfo(item.kunci, item.nilai);
                     } else {
-                        htmlPersonalia += cetakBarisInfo(key, DATABASE_CACHE.profil[key]);
+                        htmlPersonalia += cetakBarisInfo(item.kunci, item.nilai);
                     }
                 });
 
-                // Tambahkan total siswa dinamis ke seksi personalia/umum
+                // Tambahkan counter total siswa dinamis bawaan Apps Script ke bawah seksi personalia
                 htmlPersonalia += cetakBarisInfo("Total Siswa Aktif", DATABASE_CACHE.summary.totalSiswa + " Anak");
 
                 document.getElementById('dataProfil').innerHTML = htmlProfil || '<p class="text-slate-400 italic">Tidak ada data profil.</p>';
@@ -165,9 +164,9 @@
             } catch (error) {
                 console.error(error);
                 document.getElementById('loadingState').innerHTML = `
-                    <div class="p-4 text-red-600 bg-red-50 rounded-xl border border-red-200 inline-block text-left max-w-md">
+                    <div class="p-4 text-red-600 bg-red-50 rounded-xl border border-red-200 inline-block text-left max-w-md mx-auto">
                         <p class="font-bold">⚠️ Gagal Memproses Sinkronisasi Data</p>
-                        <p class="text-xs text-slate-500 mt-1">Detail Masalah: ${error.message}</p>
+                        <p class="text-xs text-slate-500 mt-1">Detail Masalah: ${error.message}. Pastikan URL API_SHEET_URL sudah benar dan Deployment disetel ke 'Anyone'.</p>
                     </div>
                 `;
             }
@@ -180,17 +179,16 @@
             const form = document.getElementById('formDinamis');
             const judul = document.getElementById('judulPopup');
             form.innerHTML = ""; 
-            
             form.setAttribute('data-tipe', pilihan);
 
             if (pilihan === "identitas") {
                 judul.innerText = "Edit Profil & Personalia (Kolom A & B)";
-                // Render semua isi profil yang ada untuk diedit nilainya secara massal
-                Object.keys(DATABASE_CACHE.profil).forEach(key => {
+                // Render form berdasarkan array objek profil bawaan Apps Script
+                DATABASE_CACHE.profil.forEach(item => {
                     form.innerHTML += `
                         <div class="flex flex-col space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                            <label class="font-bold text-slate-800 text-xs uppercase tracking-wide">${key}</label>
-                            <input type="text" name="${key}" value="${DATABASE_CACHE.profil[key]}" class="w-full mt-1 p-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 shadow-inner">
+                            <label class="font-bold text-slate-800 text-xs uppercase tracking-wide">${item.kunci}</label>
+                            <input type="text" name="${item.kunci}" value="${item.nilai}" class="w-full mt-1 p-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 shadow-inner">
                         </div>
                     `;
                 });
@@ -198,7 +196,7 @@
                 judul.innerText = "Tambah Mata Pelajaran Baru (Kolom D)";
                 form.innerHTML = `
                     <div class="p-4 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl text-xs leading-relaxed mb-2">
-                        Sesuai sistem Apps Script, input ini akan menaruh nama mata pelajaran baru pada baris kosong paling pertama di Kolom D.
+                        Sistem akan mendaftarkan nama mata pelajaran baru ini pada baris kosong paling pertama di Kolom D.
                     </div>
                     <div class="flex flex-col space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
                         <label class="font-bold text-slate-800 text-xs uppercase tracking-wide">Nama Mata Pelajaran Baru</label>
@@ -209,7 +207,7 @@
                 judul.innerText = "Tambah Ekstrakurikuler Baru (Kolom F)";
                 form.innerHTML = `
                     <div class="p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs leading-relaxed mb-2">
-                        Sesuai sistem Apps Script, input ini akan menaruh nama ekstrakurikuler baru pada baris kosong paling pertama di Kolom F.
+                        Sistem akan mendaftarkan nama ekstrakurikuler baru ini pada baris kosong paling pertama di Kolom F.
                     </div>
                     <div class="flex flex-col space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
                         <label class="font-bold text-slate-800 text-xs uppercase tracking-wide">Nama Ekstrakurikuler Baru</label>
@@ -237,36 +235,34 @@
             });
 
             btnSimpan.disabled = true;
-            btnSimpan.innerHTML = `<span>⏳</span> <span>Memproses...</span>`;
+            btnSimpan.innerHTML = `<span>⏳</span> <span>Sinkronisasi Cloud...</span>`;
 
             try {
-                // Fetch POST menggunakan header text/plain untuk mengeliminasi preflight CORS blocks
+                // Trik Utama: Menggunakan Content-Type text/plain untuk melewati CORS Preflight block browser
                 const respon = await fetch(API_SHEET_URL, {
                     method: "POST",
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ tipe: tipe, payload: payload }),
-                    redirect: "follow"
+                    body: JSON.stringify({ tipe: tipe, payload: payload })
                 });
 
                 const hasil = await respon.json();
                 
                 if (hasil.status === "SUCCESS") {
-                    alert("Data berhasil diperbarui ke Google Sheets!");
+                    alert("Data berhasil disinkronkan ke Google Sheets!");
                 } else {
-                    alert("Respons: " + (hasil.message || "Proses selesai."));
+                    alert("Info: " + (hasil.message || "Selesai diproses."));
                 }
 
                 tutupPopupEdit();
                 document.getElementById('mainContent').classList.add('hidden');
                 document.getElementById('loadingState').classList.remove('hidden');
                 
-                // Sinkronisasi data ulang secara langsung
                 await ambilDataIdentitas();
 
             } catch (error) {
                 console.error(error);
-                // Fallback jika redirect web app dianggap opaque / net::ERR_ABORTED oleh browser
-                alert("Sinkronisasi data dikirim. Halaman akan memuat ulang untuk pembaruan visual.");
+                // Fallback otomatis jika browser mendeteksi redirect bertipe opaque
+                alert("Data dikirim ke server. Halaman akan dimuat ulang untuk memperbarui tampilan data.");
                 tutupPopupEdit();
                 window.location.reload();
             } finally {
