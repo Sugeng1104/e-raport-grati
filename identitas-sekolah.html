@@ -17,9 +17,9 @@
             
             <div class="flex items-center space-x-2 bg-white/10 p-1.5 rounded-xl border border-white/20">
                 <select id="pilihanEdit" class="bg-slate-800 text-white text-sm font-semibold px-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-400">
-                    <option value="identitas">🗄️ Profil & Personalia</option>
-                    <option value="mapel">📚 Tambah Mata Pelajaran</option>
-                    <option value="ekskul">🏅 Tambah Ekstrakurikuler</option>
+                    <option value="identitas">🗄️ Profil & Legalitas</option>
+                    <option value="mapel">📚 Kelola Mata Pelajaran</option>
+                    <option value="ekskul">🏅 Kelola Ekstrakurikuler</option>
                 </select>
                 <button onclick="bukaPopupEdit()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold px-4 py-2 rounded-lg shadow transition flex items-center space-x-1 text-sm">
                     <span>✏️</span> <span>Kelola</span>
@@ -40,44 +40,60 @@
         </div>
 
         <div id="mainContent" class="grid grid-cols-1 lg:grid-cols-12 gap-6 hidden">
-            <section class="lg:col-span-7 space-y-6">
+            <section class="lg:col-span-6 space-y-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 border-b pb-3 mb-4 flex items-center space-x-2">
                         <span class="text-blue-500">🏛️</span> <span>Profil & Legalitas Sekolah</span>
                     </h2>
-                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm" id="dataProfil"></dl>
+                    <dl class="grid grid-cols-1 gap-y-3 text-sm" id="dataProfil"></dl>
                 </div>
 
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 border-b pb-3 mb-4 flex items-center space-x-2">
                         <span class="text-emerald-500">👥</span> <span>Manajemen Personalia & Tahun Ajaran</span>
                     </h2>
-                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm" id="dataPersonalia"></dl>
+                    <dl class="grid grid-cols-1 gap-y-3 text-sm" id="dataPersonalia"></dl>
                 </div>
             </section>
 
-            <section class="lg:col-span-5 space-y-6">
+            <section class="lg:col-span-6 space-y-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-                    <h2 class="text-lg font-bold text-slate-900 border-b pb-3 mb-3 flex items-center space-x-2">
-                        <span class="text-indigo-500">📚</span> <span>Ringkasan Mata Pelajaran</span>
-                    </h2>
-                    <div class="overflow-hidden border border-slate-200 rounded-xl p-4 bg-slate-50/50">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-slate-600">Total Terdata di Kolom D:</span>
-                            <span id="badgeMapel" class="px-3 py-1 bg-indigo-100 text-indigo-700 font-bold rounded-full text-xs">0 Terdaftar</span>
-                        </div>
+                    <div class="flex justify-between items-center border-b pb-3 mb-3">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                            <span class="text-indigo-500">📚</span> <span>Daftar Mata Pelajaran</span>
+                        </h2>
+                        <span id="badgeMapel" class="px-3 py-1 bg-indigo-100 text-indigo-700 font-bold rounded-full text-xs">0 Terdaftar</span>
+                    </div>
+                    <div class="overflow-hidden border border-slate-200 rounded-xl max-h-60 overflow-y-auto shadow-inner bg-slate-50">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200 sticky top-0 z-10">
+                                    <th class="p-3 w-16 text-center">No</th>
+                                    <th class="p-3">Nama Mata Pelajaran (Kolom D)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelMapel" class="divide-y divide-slate-200 bg-white"></tbody>
+                        </table>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-                    <h2 class="text-lg font-bold text-slate-900 border-b pb-3 mb-3 flex items-center space-x-2">
-                        <span class="text-amber-500">🏅</span> <span>Ringkasan Ekstrakurikuler</span>
-                    </h2>
-                    <div class="overflow-hidden border border-slate-200 rounded-xl p-4 bg-slate-50/50">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-slate-600">Total Terdata di Kolom F:</span>
-                            <span id="badgeEkskul" class="px-3 py-1 bg-amber-100 text-amber-700 font-bold rounded-full text-xs">0 Kegiatan</span>
-                        </div>
+                    <div class="flex justify-between items-center border-b pb-3 mb-3">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                            <span class="text-amber-500">🏅</span> <span>Kegiatan Ekstrakurikuler</span>
+                        </h2>
+                        <span id="badgeEkskul" class="px-3 py-1 bg-amber-100 text-amber-700 font-bold rounded-full text-xs">0 Kegiatan</span>
+                    </div>
+                    <div class="overflow-hidden border border-slate-200 rounded-xl max-h-60 overflow-y-auto shadow-inner bg-slate-50">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200 sticky top-0 z-10">
+                                    <th class="p-3 w-16 text-center">ID</th>
+                                    <th class="p-3">Nama Ekstrakurikuler (Kolom F)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelEkskul" class="divide-y divide-slate-200 bg-white"></tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -107,16 +123,17 @@
     </div>
 
     <script>
-        // ⚠️ PASTIKAN MASUKKAN URL WEB APP APPS SCRIPT ANDA YANG BERAKHIRAN /exec DI SINI
         const API_SHEET_URL = "https://script.google.com/macros/s/AKfycby8wrF_rxNEyX4Q0IMSrUmadkzzbdasBiZUgi-WKT_vyqHF2YBOU75QfZmkSSjDgrYt/exec";
         
         let DATABASE_CACHE = null;
+        let LIST_MAPEL_BERSIH = [];
+        let LIST_EKSKUL_BERSIH = [];
 
         function cetakBarisInfo(label, value) {
             return `
-                <div class="py-2 border-b border-slate-100">
-                    <dt class="text-xs font-bold text-slate-400 uppercase tracking-wide">${label}</dt>
-                    <dd class="text-sm font-semibold text-slate-700 mt-0.5">${value || "-"}</dd>
+                <div class="py-2 border-b border-slate-100 flex justify-between items-center gap-4">
+                    <dt class="text-xs font-bold text-slate-400 uppercase tracking-wide w-1/2">${label}</dt>
+                    <dd class="text-sm font-semibold text-slate-700 w-1/2 text-right break-words">${value || "-"}</dd>
                 </div>
             `;
         }
@@ -131,32 +148,75 @@
                 DATABASE_CACHE = await respon.json();
                 if (DATABASE_CACHE.status !== "SUCCESS") throw new Error(DATABASE_CACHE.message);
                 
-                // Set nama sekolah di header
                 document.getElementById('headerNamaSekolah').innerText = DATABASE_CACHE.summary.namaSekolah;
 
-                // Memisahkan data array objek profil secara dinamis ke seksi masing-masing
                 let htmlProfil = "";
                 let htmlPersonalia = "";
+                LIST_MAPEL_BERSIH = [];
+                LIST_EKSKUL_BERSIH = [];
+                
+                // Kata kunci untuk memilah data profil vs personalia
                 const kriteriaProfil = ["nama sekolah", "npsn", "nss", "alamat", "kode pos", "desa", "kelurahan", "kecamatan", "kabupaten", "provinsi", "website", "e-mail", "email", "status"];
 
-                DATABASE_CACHE.profil.forEach(item => {
-                    const matchesProfil = kriteriaProfil.some(k => item.kunci.toLowerCase().includes(k));
+                // Mengolah objek profil tunggal kiriman dari Apps Script Anda
+                Object.keys(DATABASE_CACHE.profil).forEach(key => {
+                    const nilai = DATABASE_CACHE.profil[key];
+                    
+                    // Cek 1: Jika kunci mengandung nama indeks duplikasi atau kosong, saring ke tabel kanan
+                    if (key.startsWith("Mata Pelajaran ke-") || key.toLowerCase().includes("mapel_row_")) {
+                        if(nilai && nilai.trim() !== "") LIST_MAPEL_BERSIH.push({ kunciAsli: key, nama: nilai });
+                        return;
+                    }
+                    if (key.startsWith("Ekstrakurikuler ke-") || key.toLowerCase().includes("ekskul_row_")) {
+                        if(nilai && nilai.trim() !== "") LIST_EKSKUL_BERSIH.push({ kunciAsli: key, nama: nilai });
+                        return;
+                    }
+
+                    // Cek 2: Pisahkan sisa data murni Kolom A & B ke Profil vs Personalia
+                    const matchesProfil = kriteriaProfil.some(k => key.toLowerCase().includes(k));
                     if (matchesProfil) {
-                        htmlProfil += cetakBarisInfo(item.kunci, item.nilai);
+                        htmlProfil += cetakBarisInfo(key, nilai);
                     } else {
-                        htmlPersonalia += cetakBarisInfo(item.kunci, item.nilai);
+                        htmlPersonalia += cetakBarisInfo(key, nilai);
                     }
                 });
 
-                // Tambahkan counter total siswa dinamis bawaan Apps Script ke bawah seksi personalia
+                // Tambahkan counter total siswa ke bagian bawah seksi personalia
                 htmlPersonalia += cetakBarisInfo("Total Siswa Aktif", DATABASE_CACHE.summary.totalSiswa + " Anak");
 
-                document.getElementById('dataProfil').innerHTML = htmlProfil || '<p class="text-slate-400 italic">Tidak ada data profil.</p>';
+                document.getElementById('dataProfil').innerHTML = htmlProfil || '<p class="text-slate-400 italic">Tidak ada data profil dasar.</p>';
                 document.getElementById('dataPersonalia').innerHTML = htmlPersonalia || '<p class="text-slate-400 italic">Tidak ada data personalia.</p>';
 
-                // Update Badges Counter Kolom D & F
-                document.getElementById('badgeMapel').innerText = DATABASE_CACHE.summary.totalMapel + " Mata Pelajaran";
-                document.getElementById('badgeEkskul').innerText = DATABASE_CACHE.summary.totalEkskul + " Kegiatan";
+                // Render Tabel Mata Pelajaran (Kolom D) secara Riil & Utuh
+                let htmlTabelMapel = "";
+                let totalMapelRiil = DATABASE_CACHE.summary.totalMapel;
+                
+                for(let m = 0; m < totalMapelRiil; m++) {
+                    // Ambil nama mapel dari list bersih frontend, jika kosong beri nama placeholder aman
+                    let namaMapel = LIST_MAPEL_BERSIH[m] ? LIST_MAPEL_BERSIH[m].nama : `Mata Pelajaran ${m+1}`;
+                    htmlTabelMapel += `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-3 text-center font-bold text-indigo-500 bg-slate-50/50 w-16">${m + 1}</td>
+                            <td class="p-3 font-semibold text-slate-700">${namaMapel}</td>
+                        </tr>`;
+                }
+                document.getElementById('tabelMapel').innerHTML = htmlTabelMapel || '<tr><td colspan="2" class="p-3 text-center italic text-slate-400">Belum ada mata pelajaran terdaftar</td></tr>';
+                document.getElementById('badgeMapel').innerText = totalMapelRiil + " Mata Pelajaran";
+
+                // Render Tabel Ekstrakurikuler (Kolom F) secara Riil & Utuh
+                let htmlTabelEkskul = "";
+                let totalEkskulRiil = DATABASE_CACHE.summary.totalEkskul;
+                
+                for(let e = 0; e < totalEkskulRiil; e++) {
+                    let namaEkskul = LIST_EKSKUL_BERSIH[e] ? LIST_EKSKUL_BERSIH[e].nama : `Ekstrakurikuler ${e+1}`;
+                    htmlTabelEkskul += `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-3 text-center font-bold text-amber-500 bg-slate-50/50 w-16">${e + 1}</td>
+                            <td class="p-3 font-semibold text-slate-700">${namaEkskul}</td>
+                        </tr>`;
+                }
+                document.getElementById('tabelEkskul').innerHTML = htmlTabelEkskul || '<tr><td colspan="2" class="p-3 text-center italic text-slate-400">Belum ada ekstrakurikuler terdaftar</td></tr>';
+                document.getElementById('badgeEkskul').innerText = totalEkskulRiil + " Kegiatan";
 
                 document.getElementById('loadingState').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
@@ -166,14 +226,13 @@
                 document.getElementById('loadingState').innerHTML = `
                     <div class="p-4 text-red-600 bg-red-50 rounded-xl border border-red-200 inline-block text-left max-w-md mx-auto">
                         <p class="font-bold">⚠️ Gagal Memproses Sinkronisasi Data</p>
-                        <p class="text-xs text-slate-500 mt-1">Detail Masalah: ${error.message}. Pastikan URL API_SHEET_URL sudah benar dan Deployment disetel ke 'Anyone'.</p>
-                    </div>
-                `;
+                        <p class="text-xs text-slate-500 mt-1">Detail Masalah: ${error.message}</p>
+                    </div>`;
             }
         }
 
         function bukaPopupEdit() {
-            if (!DATABASE_CACHE) return alert("Data belum termuat sempurna dari Google Sheets. Mohon tunggu.");
+            if (!DATABASE_CACHE) return alert("Data belum termuat sempurna. Mohon tunggu.");
             
             const pilihan = document.getElementById('pilihanEdit').value;
             const form = document.getElementById('formDinamis');
@@ -182,38 +241,74 @@
             form.setAttribute('data-tipe', pilihan);
 
             if (pilihan === "identitas") {
-                judul.innerText = "Edit Profil & Personalia (Kolom A & B)";
-                // Render form berdasarkan array objek profil bawaan Apps Script
-                DATABASE_CACHE.profil.forEach(item => {
+                judul.innerText = "Edit Profil, Legalitas & Personalia";
+                Object.keys(DATABASE_CACHE.profil).forEach(key => {
+                    // Saring agar baris Mapel/Ekskul tidak ikut masuk ke form edit identitas utama
+                    if (key.startsWith("Mata Pelajaran ke-") || key.startsWith("Ekstrakurikuler ke-") || key.includes("_row_")) return;
+                    
                     form.innerHTML += `
                         <div class="flex flex-col space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                            <label class="font-bold text-slate-800 text-xs uppercase tracking-wide">${item.kunci}</label>
-                            <input type="text" name="${item.kunci}" value="${item.nilai}" class="w-full mt-1 p-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 shadow-inner">
-                        </div>
-                    `;
+                            <label class="font-bold text-slate-800 text-xs uppercase tracking-wide">${key}</label>
+                            <input type="text" name="${key}" value="${DATABASE_CACHE.profil[key]}" class="w-full mt-1 p-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 shadow-inner">
+                        </div>`;
                 });
             } else if (pilihan === "mapel") {
-                judul.innerText = "Tambah Mata Pelajaran Baru (Kolom D)";
-                form.innerHTML = `
-                    <div class="p-4 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl text-xs leading-relaxed mb-2">
-                        Sistem akan mendaftarkan nama mata pelajaran baru ini pada baris kosong paling pertama di Kolom D.
+                judul.innerText = "Kelola & Tambah Mata Pelajaran (Kolom D)";
+                
+                let htmlInputs = `<div class="p-3 bg-indigo-50 border border-indigo-100 text-indigo-800 rounded-xl text-xs leading-relaxed mb-2">
+                                    💡 <strong>Ubah yang ada:</strong> Edit teks pada baris di bawah untuk mengganti nama mata pelajaran langsung pada database Anda.
+                                  </div>`;
+                
+                // Urutkan input berdasarkan baris data riil di kolom D menggunakan fungsi Edit Identitas
+                let totalM = DATABASE_CACHE.summary.totalMapel;
+                for(let m = 0; m < totalM; m++) {
+                    let item = LIST_MAPEL_BERSIH[m] || { kunciAsli: `Mata Pelajaran ke-${m+1}`, nama: "" };
+                    htmlInputs += `
+                        <div class="flex flex-col space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <label class="font-bold text-slate-600 text-xs uppercase tracking-wide">Edit Baris ke-${m+1}</label>
+                            <input type="text" name="${item.kunciAsli}" value="${item.nama}" class="w-full mt-1 p-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-slate-700">
+                        </div>`;
+                }
+
+                // Sediakan Input Tambah Baru di bagian bawah (Sesuai parameter 'Nama Entitas Baru' di doPost Apps Script Anda)
+                htmlInputs += `
+                    <div class="p-3 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl text-xs leading-relaxed mt-4 mb-2">
+                        ➕ <strong>Tambah Baru:</strong> Isi kotak di bawah ini untuk mendaftarkan satu mata pelajaran baru ke baris kosong pertama.
                     </div>
-                    <div class="flex flex-col space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                        <label class="font-bold text-slate-800 text-xs uppercase tracking-wide">Nama Mata Pelajaran Baru</label>
-                        <input type="text" name="Nama Entitas Baru" placeholder="Contoh: Bahasa Daerah" class="w-full mt-1 p-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 shadow-inner" required>
-                    </div>
-                `;
+                    <div class="flex flex-col space-y-1 bg-slate-100 p-3 rounded-xl border border-slate-300">
+                        <label class="font-bold text-emerald-800 text-xs uppercase tracking-wide">Nama Mata Pelajaran Baru</label>
+                        <input type="text" name="Nama Entitas Baru" placeholder="Masukkan nama baru jika ingin menambah" class="w-full mt-1 p-2 bg-white rounded-lg border border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold text-slate-700">
+                    </div>`;
+                
+                form.innerHTML = htmlInputs;
             } else if (pilihan === "ekskul") {
-                judul.innerText = "Tambah Ekstrakurikuler Baru (Kolom F)";
-                form.innerHTML = `
-                    <div class="p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs leading-relaxed mb-2">
-                        Sistem akan mendaftarkan nama ekstrakurikuler baru ini pada baris kosong paling pertama di Kolom F.
+                judul.innerText = "Kelola & Tambah Ekstrakurikuler (Kolom F)";
+                
+                let htmlInputs = `<div class="p-3 bg-amber-50 border border-amber-100 text-amber-800 rounded-xl text-xs leading-relaxed mb-2">
+                                    💡 <strong>Ubah yang ada:</strong> Edit teks pada baris di bawah untuk mengganti nama kegiatan ekstrakurikuler langsung pada database Anda.
+                                  </div>`;
+                
+                let totalE = DATABASE_CACHE.summary.totalEkskul;
+                for(let e = 0; e < totalE; e++) {
+                    let item = LIST_EKSKUL_BERSIH[e] || { kunciAsli: `Ekstrakurikuler ke-${e+1}`, nama: "" };
+                    htmlInputs += `
+                        <div class="flex flex-col space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <label class="font-bold text-slate-600 text-xs uppercase tracking-wide">Edit Baris ke-${e+1}</label>
+                            <input type="text" name="${item.kunciAsli}" value="${item.nama}" class="w-full mt-1 p-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 font-semibold text-slate-700">
+                        </div>`;
+                }
+
+                // Sediakan Input Tambah Baru di bagian bawah (Sesuai parameter 'Nama Entitas Baru' di doPost Apps Script Anda)
+                htmlInputs += `
+                    <div class="p-3 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl text-xs leading-relaxed mt-4 mb-2">
+                        ➕ <strong>Tambah Baru:</strong> Isi kotak di bawah ini untuk mendaftarkan satu kegiatan ekstrakurikuler baru ke baris kosong pertama.
                     </div>
-                    <div class="flex flex-col space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                        <label class="font-bold text-slate-800 text-xs uppercase tracking-wide">Nama Ekstrakurikuler Baru</label>
-                        <input type="text" name="Nama Entitas Baru" placeholder="Contoh: Pramuka Garuda" class="w-full mt-1 p-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 shadow-inner" required>
-                    </div>
-                `;
+                    <div class="flex flex-col space-y-1 bg-slate-100 p-3 rounded-xl border border-slate-300">
+                        <label class="font-bold text-emerald-800 text-xs uppercase tracking-wide">Nama Ekstrakurikuler Baru</label>
+                        <input type="text" name="Nama Entitas Baru" placeholder="Masukkan nama baru jika ingin menambah" class="w-full mt-1 p-2 bg-white rounded-lg border border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold text-slate-700">
+                    </div>`;
+                
+                form.innerHTML = htmlInputs;
             }
 
             document.getElementById('popupModalEdit').classList.remove('hidden');
@@ -225,30 +320,43 @@
 
         async function eksekusiSimpanData() {
             const form = document.getElementById('formDinamis');
-            const tipe = form.getAttribute('data-tipe');
+            let tipe = form.getAttribute('data-tipe');
             const btnSimpan = document.getElementById('btnSimpan');
             
             const formData = new FormData(form);
             const payload = {};
+            let adaInputBaru = false;
+
             formData.forEach((value, key) => {
+                if (key === "Nama Entitas Baru" && value.trim() !== "") {
+                    adaInputBaru = true;
+                }
                 payload[key] = value;
             });
 
+            // Trik Cerdas: Jika pengguna mengedit baris nama mapel/ekskul yang sudah ada, 
+            // kita alihkan 'tipe' kirim menjadi 'identitas' agar diproses oleh perulangan Kolom B di Apps Script Anda.
+            // Namun, jika pengguna mengisi kotak 'Nama Entitas Baru', kita biarkan tipenya tetap 'mapel'/'ekskul' agar masuk ke fungsi append baris kosong.
+            let tipeKirim = tipe;
+            if ((tipe === "mapel" || tipe === "ekskul") && !adaInputBaru) {
+                tipeKirim = "identitas"; 
+            }
+
             btnSimpan.disabled = true;
-            btnSimpan.innerHTML = `<span>⏳</span> <span>Sinkronisasi Cloud...</span>`;
+            btnSimpan.innerHTML = `<span>⏳</span> <span>Sinkronisasi Data...</span>`;
 
             try {
-                // Trik Utama: Menggunakan Content-Type text/plain untuk melewati CORS Preflight block browser
                 const respon = await fetch(API_SHEET_URL, {
                     method: "POST",
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ tipe: tipe, payload: payload })
+                    body: JSON.stringify({ tipe: tipeKirim, payload: payload }),
+                    redirect: "follow"
                 });
 
                 const hasil = await respon.json();
                 
                 if (hasil.status === "SUCCESS") {
-                    alert("Data berhasil disinkronkan ke Google Sheets!");
+                    alert("Berhasil! Perubahan data telah disinkronkan ke Google Sheets.");
                 } else {
                     alert("Info: " + (hasil.message || "Selesai diproses."));
                 }
@@ -261,8 +369,7 @@
 
             } catch (error) {
                 console.error(error);
-                // Fallback otomatis jika browser mendeteksi redirect bertipe opaque
-                alert("Data dikirim ke server. Halaman akan dimuat ulang untuk memperbarui tampilan data.");
+                alert("Data pembaruan terkirim! Halaman akan memuat ulang untuk menyinkronkan daftar.");
                 tutupPopupEdit();
                 window.location.reload();
             } finally {
