@@ -169,10 +169,12 @@
         </div>
     </div>
 
+   <!-- JAVASCRIPT SYSTEM ENGINE -->
     <script>
         const API_SHEET_URL = "https://script.google.com/macros/s/AKfycby8wrF_rxNEyX4Q0IMSrUmadkzzbdasBiZUgi-WKT_vyqHF2YBOU75QfZmkSSjDgrYt/exec";
         let ARRAY_SISWA_CACHE = [];
 
+        // 1. MENGAMBIL DATA DARI API (CLOUD SINKRONISASI)
         async function muatDataSiswa() {
             try {
                 const respon = await fetch(`${API_SHEET_URL}?action=getDataSiswa`, {
@@ -186,22 +188,22 @@
                 
                 ARRAY_SISWA_CACHE = json.data;
                 
-                // Hitung & Pasang Statistik Atas
+                // Kalkulasi & Pasang Statistik Dashboard Atas
                 document.getElementById('statTotal').innerText = json.total + " Siswa";
-                const cowok = ARRAY_SISWA_CACHE.filter(s => s.jk === "L" || s.jk === "Laki-laki").length;
+                const cowok = ARRAY_SISWA_CACHE.filter(s => s.jk === "L" || s.jk === "Laki-laki" || s.jk === "Laki-Laki").length;
                 const cewek = ARRAY_SISWA_CACHE.filter(s => s.jk === "P" || s.jk === "Perempuan").length;
                 document.getElementById('statLaki').innerText = cowok + " Anak";
                 document.getElementById('statPerempuan').innerText = cewek + " Anak";
 
-                // Render Baris Tabel
+                // Render Baris Tabel Utama
                 renderTabelSiswa(ARRAY_SISWA_CACHE);
 
-                // Hilangkan Loading
+                // Manajemen State UI (Hilangkan Loading, Munculkan Konten)
                 document.getElementById('loadingState').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
 
             } catch (error) {
-                console.error(error);
+                console.error("Sinkronisasi Gagal:", error);
                 document.getElementById('loadingState').innerHTML = `
                     <div class="p-5 text-red-600 bg-red-50 rounded-2xl border border-red-200 inline-block text-left max-w-md mx-auto shadow-sm">
                         <p class="font-bold text-sm">⚠️ Sinkronisasi Cloud Gagal</p>
@@ -211,6 +213,7 @@
             }
         }
 
+        // 2. RENDER DATA KE DALAM TABEL HTML
         function renderTabelSiswa(dataArray) {
             const tbody = document.getElementById('tabelSiswa');
             tbody.innerHTML = "";
@@ -221,9 +224,14 @@
             }
 
             dataArray.forEach((siswa, index) => {
-                const badgeJk = (siswa.jk === "L" || siswa.jk === "Laki-laki") 
+                // Standarisasi Badge Jenis Kelamin (UI Ramah Anak)
+                const isLaki = siswa.jk === "L" || siswa.jk === "Laki-laki" || siswa.jk === "Laki-Laki";
+                const badgeJk = isLaki 
                     ? `<span class="bg-blue-50/80 text-blue-600 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-blue-100">LAKI-LAKI</span>`
                     : `<span class="bg-pink-50/80 text-pink-600 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-pink-100">PEREMPUAN</span>`;
+
+                // Transformasi Nama ke Huruf Kapital penuh untuk standardisasi berkas induk
+                const namaKapital = siswa.nama ? siswa.nama.toUpperCase() : "-";
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-teal-50/30 transition-all border-b border-slate-100 cursor-pointer group" onclick="bukaModalDetail(${index})">
@@ -232,7 +240,7 @@
                             <div class="font-semibold text-slate-700">${siswa.nis}</div>
                             <div class="text-[10px] text-slate-400 mt-0.5">${siswa.nisn}</div>
                         </td>
-                        <td class="p-4 font-bold text-slate-900 tracking-wide group-hover:text-teal-700 transition-colors">${siswa.nama}</td>
+                        <td class="p-4 font-bold text-slate-900 tracking-wide group-hover:text-teal-700 transition-colors">${namaKapital}</td>
                         <td class="p-4 text-center">${badgeJk}</td>
                         <td class="p-4 text-xs font-medium text-slate-500">${siswa.tempat_lahir}, ${siswa.tanggal_lahir}</td>
                         <td class="p-4 text-center" onclick="event.stopPropagation();">
@@ -245,44 +253,57 @@
             });
         }
 
-        // FUNGSI PENCARIAN LIVE FILTERING (Client-Side Memory Filtering)
+        // 3. LIVE FILTERING PENCARIAN (OPTIMASI MEMORI SISI KLIEN)
         function filterCariSiswa() {
             const keyword = document.getElementById('pencarianSiswa').value.toLowerCase();
             const hasilFilter = ARRAY_SISWA_CACHE.filter(siswa => {
-                return (siswa.nama && siswa.nama.toLowerCase().includes(keyword)) || 
-                       (siswa.nis && siswa.nis.toString().includes(keyword)) || 
-                       (siswa.nisn && siswa.nisn.toString().includes(keyword));
+                const namaMatch = siswa.nama && siswa.nama.toLowerCase().includes(keyword);
+                const nisMatch = siswa.nis && siswa.nis.toString().includes(keyword);
+                const nisnMatch = siswa.nisn && siswa.nisn.toString().includes(keyword);
+                return namaMatch || nisMatch || nisnMatch;
             });
             renderTabelSiswa(hasilFilter);
         }
 
-        // BUKA POP-UP BIODATA DETAIL
+        // 4. MAPPING DATA PROFIL KE POP-UP DETAIL (FIX PENEMPATAN SALAH)
         function bukaModalDetail(indeksAsli) {
             const siswa = ARRAY_SISWA_CACHE[indeksAsli];
+            if (!siswa) return;
             
+            // --- DATA HEADER ---
             document.getElementById('mdlAbsen').innerText = `No. Absen ${siswa.no_absen || '-'}`;
-            document.getElementById('mdlNama').innerText = siswa.nama || '-';
+            document.getElementById('mdlNama').innerText = siswa.nama ? siswa.nama.toUpperCase() : '-';
             document.getElementById('mdlIdentitas').innerText = `NIS: ${siswa.nis || '-'} | NISN: ${siswa.nisn || '-'}`;
-            document.getElementById('mdlJk').innerText = (siswa.jk === "L" || siswa.jk === "Laki-laki") ? "👨 Laki-Laki" : "👩 Perempuan";
+            
+            // --- DATA PRIBADI ---
+            const isLaki = siswa.jk === "L" || siswa.jk === "Laki-laki" || siswa.jk === "Laki-Laki";
+            document.getElementById('mdlJk').innerText = isLaki ? "👨 Laki-Laki" : "👩 Perempuan";
             document.getElementById('mdlTTL').innerText = `${siswa.tempat_lahir || '-'}, ${siswa.tanggal_lahir || '-'}`;
             document.getElementById('mdlAlamat').innerText = siswa.alamat || '-';
+            
+            // --- DATA PERKEMBANGAN FISIK ANAK SD ---
             document.getElementById('mdlBB').innerText = siswa.bb ? `${siswa.bb} kg` : "-";
             document.getElementById('mdlTB').innerText = siswa.tb ? `${siswa.tb} cm` : "-";
             document.getElementById('mdlLK').innerText = siswa.lingkar_kepala ? `${siswa.lingkar_kepala} cm` : "-";
+            
+            // --- DATA ORANG TUA / WALI ---
             document.getElementById('mdlAyah').innerText = siswa.ayah || '-';
             document.getElementById('mdlKerjaAyah').innerText = siswa.kerja_ayah ? `💼 ${siswa.kerja_ayah}` : "💼 -";
             document.getElementById('mdlIbu').innerText = siswa.ibu || '-';
             document.getElementById('mdlKerjaIbu').innerText = siswa.kerja_ibu ? `💼 ${siswa.kerja_ibu}` : "💼 -";
 
+            // Tampilkan Modal & Kunci Scroll Latar Belakang (UX Best Practice)
             document.getElementById('modalDetailSiswa').classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Kunci scroll halaman belakang
+            document.body.style.overflow = 'hidden'; 
         }
 
+        // 5. PENUTUP MODAL DETAIL
         function tutupModalDetail() {
             document.getElementById('modalDetailSiswa').classList.add('hidden');
-            document.body.style.overflow = ''; // Aktifkan kembali scroll halaman belakang
+            document.body.style.overflow = ''; // Kembalikan scroll normal
         }
 
+        // Inisialisasi Pertama Kali Saat Halaman Dimuat
         window.onload = muatDataSiswa;
     </script>
 </body>
