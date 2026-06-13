@@ -106,9 +106,9 @@
             <td id="lblSekolah" class="font-medium">-</td>
           </tr>
           <tr>
-            <td class="py-0.5 font-medium">Alamat</td>
+            <td class="py-0.5 font-medium">Alamat Peserta Didik</td>
             <td>:</td>
-            <td id="lblAlamat">-</td>
+            <td id="lblAlamat" class="font-medium">-</td>
           </tr>
         </table>
         <table class="w-full">
@@ -320,6 +320,11 @@
       document.getElementById('lblSemester').innerText = bundle.profil.semester || "II (Dua)";
       document.getElementById('lblDplMurid').innerText = bundle.profil.dpl_murid || "-";
       
+      // =========================================================================
+      // PERBAIKAN UTAMA FRONTEND: Memetakan variabel alamat rumah siswa ke layar
+      // =========================================================================
+      document.getElementById('lblAlamat').innerText = bundle.profil.alamat || "-";
+      
       const tbodyUtama = document.getElementById('bodyTabelRapor');
       tbodyUtama.innerHTML = "";
       if (bundle.payloadNilai && bundle.payloadNilai.length > 0) {
@@ -396,7 +401,6 @@
       if (bundle.identitas_sekolah && Array.isArray(bundle.identitas_sekolah)) {
         try {
           document.getElementById('lblSekolah').innerText = bundle.identitas_sekolah[1] ? bundle.identitas_sekolah[1].isi_identitas : "UPT SDN RANUKLINDUNGAN I";
-          document.getElementById('lblAlamat').innerText  = bundle.identitas_sekolah[4] ? bundle.identitas_sekolah[4].isi_identitas : "Bandilan, Ranuklindungan";
           document.getElementById('lblTp').innerText      = bundle.identitas_sekolah[19] ? bundle.identitas_sekolah[19].isi_identitas : "2025/2026";
 
           document.getElementById('lblTempatTanggal').innerText = bundle.identitas_sekolah[20] ? bundle.identitas_sekolah[20].isi_identitas : "Pasuruan, .........................";
