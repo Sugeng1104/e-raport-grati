@@ -381,7 +381,7 @@
                     alert("Terjadi gangguan komunikasi data.");
                 } finally {
                     btn.disabled = false;
-                    btn.innerHTML = `<span>🚀</span> <span>Kirim Berkas Excel UH</span>`;
+                    btn.innerHTML = `<span>🚀</span> <span>Kirim Berkas Excel</span>`;
                 }
             };
 
@@ -510,6 +510,8 @@
         }
 
         async function muatDataTpDariCloud() {
+            const tableBody = document.getElementById('tableBodyTp');
+            
             try {
                 const responServer = await fetch(`${API_SHEET_URL}?action=getPreviewTab&tabName=tp`);
                 const dataJson = await responServer.json();
