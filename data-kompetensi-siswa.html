@@ -219,7 +219,7 @@
             icon.className = "fa-solid fa-file-excel text-2xl text-emerald-400";
         }
 
-        // Membaca Berkas Excel di Browser dengan SheetJS & Mengirim Data Bersih JSON ke Google Apps Script
+        // PERBAIKAN TOTAL: Membaca & Menstabilkan Matriks Kolom Excel Sebelum Dikirim
         async function eksekusiKirimNilaiExcel() {
             const input = document.getElementById('fileExcelUH');
             const btn = document.getElementById('btnKirimNilai');
@@ -241,19 +241,44 @@
             reader.onload = async function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
+                    // raw: true memastikan teks berawalan angka 0 seperti NISN tidak berubah format
+                    const workbook = XLSX.read(data, { type: 'array', raw: true });
                     
-                    // Ambil lembar kerja/sheet urutan pertama di dalam file excel
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     
-                    // Konversi baris data tabel excel murni ke dalam format matriks Array JSON Matriks [][]
-                    const rawRowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    // Ambil data dalam bentuk matriks mentah [ [] , [] ]
+                    const rawRowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+
+                    // PROSES SANITASI DAN PENYELARASAN STRUKTUR KOLOM RIGID
+                    const cleanRowsMatrix = rawRowsMatrix.map((row, index) => {
+                        // Untuk baris pertama (Header), paksa susunan standard
+                        if (index === 0) {
+                            return ["no_absen", "NISN", "nama_siswa", "uh_1", "uh_2", "uh_3", "uh_4", "uh_5"];
+                        }
+                        
+                        // Untuk baris data siswa, pastikan tidak ada data yang bergeser/kosong (defval = 0 untuk nilai)
+                        return [
+                            row[0] !== undefined && row[0] !== "" ? row[0] : index, // no_absen
+                            row[1] !== undefined && row[1] !== "" ? row[1].toString().trim() : "-", // NISN
+                            row[2] !== undefined && row[2] !== "" ? row[2].toString().trim().toUpperCase() : "", // nama_siswa
+                            row[3] !== undefined && row[3] !== "" ? Number(row[3]) : 0, // uh_1
+                            row[4] !== undefined && row[4] !== "" ? Number(row[4]) : 0, // uh_2
+                            row[5] !== undefined && row[5] !== "" ? Number(row[5]) : 0, // uh_3
+                            row[6] !== undefined && row[6] !== "" ? Number(row[6]) : 0, // uh_4
+                            row[7] !== undefined && row[7] !== "" ? Number(row[7]) : 0  // uh_5
+                        ];
+                    });
+
+                    // Validasi jika Excel kosong atau tidak terbaca
+                    if (cleanRowsMatrix.length <= 1) {
+                        throw new Error("Berkas Excel terdeteksi kosong atau format baris tidak sesuai.");
+                    }
 
                     const payloadData = {
                         tipe: "upload_excel_uh",
                         fileName: file.name,
-                        rowsData: rawRowsMatrix // Kirim data riil langsung berupa array objek terstruktur
+                        rowsData: cleanRowsMatrix // Kirim data yang sudah divalidasi aman dan presisi
                     };
 
                     const response = await fetch(API_SHEET_URL, {
@@ -280,7 +305,7 @@
 
                 } catch (error) {
                     console.error("Fetch Error:", error);
-                    alert("Terjadi gangguan format dokumen Excel atau komunikasi dengan server cloud.");
+                    alert("Terjadi gangguan: " + error.message);
                 } finally {
                     btn.disabled = false;
                     spin.className = "fa-solid fa-paper-plane";
@@ -288,7 +313,6 @@
                 }
             };
 
-            // Membaca dokumen biner excel
             reader.readAsArrayBuffer(file);
         }
 
@@ -524,6 +548,6 @@
 
         // Jalankan pengambilan pratinjau data sesaat setelah halaman web termuat penuh
         window.addEventListener('DOMContentLoaded', muatDataTpDariCloud);
-    </script>
+</script>
 </body>
 </html>
