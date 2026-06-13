@@ -221,100 +221,108 @@
 
         // PERBAIKAN TOTAL: Membaca & Menstabilkan Matriks Kolom Excel Sebelum Dikirim
         async function eksekusiKirimNilaiExcel() {
-            const input = document.getElementById('fileExcelUH');
-            const btn = document.getElementById('btnKirimNilai');
-            const spin = document.getElementById('spinUH');
-            const text = document.getElementById('textUH');
-            
-            if (input.files.length === 0) {
-                alert("Silakan pilih file Excel uh_siswa terlebih dahulu.");
-                return;
-            }
+    const input = document.getElementById('fileExcelUH');
+    const btn = document.getElementById('btnKirimNilai');
+    const spin = document.getElementById('spinUH');
+    const text = document.getElementById('textUH');
+    
+    if (input.files.length === 0) {
+        alert("Silakan pilih file Excel uh_siswa terlebih dahulu.");
+        return;
+    }
 
-            const file = input.files[0];
-            const reader = new FileReader();
-            
-            btn.disabled = true;
-            spin.className = "fa-solid fa-circle-notch animate-spin text-white";
-            text.innerText = "Membaca & Memetakan Berkas...";
+    const file = input.files[0];
+    const reader = new FileReader();
+    
+    btn.disabled = true;
+    spin.className = "fa-solid fa-circle-notch animate-spin text-white";
+    text.innerText = "Membaca Seluruh Tab Dokumen...";
 
-            reader.onload = async function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    // raw: true memastikan teks berawalan angka 0 seperti NISN tidak berubah format
-                    const workbook = XLSX.read(data, { type: 'array', raw: true });
-                    
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    
-                    // Ambil data dalam bentuk matriks mentah [ [] , [] ]
+    reader.onload = async function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array', raw: true });
+            
+            // Tempat menampung seluruh data sheet: { "n_agama": [...], "n_matematika": [...] }
+            const paketSemuaSheet = {};
+            // Daftar tab sheet resmi yang akan diproses
+            const sheetResmi = ["n_agama", "n_BIndonesia", "n_pancasila", "n_matematika", "n_IPAS", "n_pjok", "n_kesenian", "n_bIng", "n_bJawa", "n_BTQ"];
+
+            workbook.SheetNames.forEach(sheetName => {
+                // Hanya proses jika nama sheet di Excel termasuk dalam daftar sheet resmi
+                if (sheetResmi.includes(sheetName)) {
+                    const worksheet = workbook.Sheets[sheetName];
                     const rawRowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
-
-                    // PROSES SANITASI DAN PENYELARASAN STRUKTUR KOLOM RIGID
+                    
+                    // Lakukan sanitasi matriks kolom secara rigid untuk tiap sheet
                     const cleanRowsMatrix = rawRowsMatrix.map((row, index) => {
-                        // Untuk baris pertama (Header), paksa susunan standard
                         if (index === 0) {
                             return ["no_absen", "NISN", "nama_siswa", "uh_1", "uh_2", "uh_3", "uh_4", "uh_5"];
                         }
-                        
-                        // Untuk baris data siswa, pastikan tidak ada data yang bergeser/kosong (defval = 0 untuk nilai)
                         return [
-                            row[0] !== undefined && row[0] !== "" ? row[0] : index, // no_absen
-                            row[1] !== undefined && row[1] !== "" ? row[1].toString().trim() : "-", // NISN
-                            row[2] !== undefined && row[2] !== "" ? row[2].toString().trim().toUpperCase() : "", // nama_siswa
-                            row[3] !== undefined && row[3] !== "" ? Number(row[3]) : 0, // uh_1
-                            row[4] !== undefined && row[4] !== "" ? Number(row[4]) : 0, // uh_2
-                            row[5] !== undefined && row[5] !== "" ? Number(row[5]) : 0, // uh_3
-                            row[6] !== undefined && row[6] !== "" ? Number(row[6]) : 0, // uh_4
-                            row[7] !== undefined && row[7] !== "" ? Number(row[7]) : 0  // uh_5
+                            row[0] !== undefined && row[0] !== "" ? row[0] : index, 
+                            row[1] !== undefined && row[1] !== "" ? row[1].toString().trim() : "-", 
+                            row[2] !== undefined && row[2] !== "" ? row[2].toString().trim().toUpperCase() : "", 
+                            row[3] !== undefined && row[3] !== "" ? Number(row[3]) : 0, 
+                            row[4] !== undefined && row[4] !== "" ? Number(row[4]) : 0, 
+                            row[5] !== undefined && row[5] !== "" ? Number(row[5]) : 0, 
+                            row[6] !== undefined && row[6] !== "" ? Number(row[6]) : 0, 
+                            row[7] !== undefined && row[7] !== "" ? Number(row[7]) : 0  
                         ];
                     });
-
-                    // Validasi jika Excel kosong atau tidak terbaca
-                    if (cleanRowsMatrix.length <= 1) {
-                        throw new Error("Berkas Excel terdeteksi kosong atau format baris tidak sesuai.");
+                    
+                    if (cleanRowsMatrix.length > 1) {
+                        paketSemuaSheet[sheetName] = cleanRowsMatrix;
                     }
-
-                    const payloadData = {
-                        tipe: "upload_excel_uh",
-                        fileName: file.name,
-                        rowsData: cleanRowsMatrix // Kirim data yang sudah divalidasi aman dan presisi
-                    };
-
-                    const response = await fetch(API_SHEET_URL, {
-                        method: "POST",
-                        mode: "cors", 
-                        headers: {
-                            "Content-Type": "text/plain;charset=utf-8"
-                        },
-                        body: JSON.stringify(payloadData)
-                    });
-
-                    const resText = await response.text();
-                    const result = JSON.parse(resText); 
-
-                    if (result.status === "SUCCESS") {
-                        tampilkanSuccessModal(result.message);
-                        input.value = "";
-                        document.getElementById('labelNamaFile').innerText = "Pilih file Excel dari gawai Anda";
-                        document.getElementById('labelNamaFile').className = "text-xs font-bold text-slate-400";
-                        document.getElementById('iconFileUH').className = "fa-solid fa-cloud-arrow-up text-2xl text-slate-500";
-                    } else {
-                        alert(`❌ GAGAL SERVER: ${result.message}`);
-                    }
-
-                } catch (error) {
-                    console.error("Fetch Error:", error);
-                    alert("Terjadi gangguan: " + error.message);
-                } finally {
-                    btn.disabled = false;
-                    spin.className = "fa-solid fa-paper-plane";
-                    text.innerText = "Kirim Berkas Excel";
                 }
+            });
+
+            if (Object.keys(paketSemuaSheet).length === 0) {
+                throw new Error("Tidak ditemukan tab sheet n_agama, n_matematika, dll yang valid di file Excel ini.");
+            }
+
+            const payloadData = {
+                tipe: "upload_excel_uh_multi",
+                fileName: file.name,
+                allSheetsData: paketSemuaSheet // Kirim bundle data seluruh sheet sekaligus
             };
 
-            reader.readAsArrayBuffer(file);
+            text.innerText = "Mentransmisikan Data Multi-Sheet...";
+
+            const response = await fetch(API_SHEET_URL, {
+                method: "POST",
+                mode: "cors", 
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: JSON.stringify(payloadData)
+            });
+
+            const resText = await response.text();
+            const result = JSON.parse(resText); 
+
+            if (result.status === "SUCCESS") {
+                tampilkanSuccessModal(result.message);
+                input.value = "";
+                document.getElementById('labelNamaFile').innerText = "Pilih file Excel dari gawai Anda";
+                document.getElementById('labelNamaFile').className = "text-xs font-bold text-slate-400";
+                document.getElementById('iconFileUH').className = "fa-solid fa-cloud-arrow-up text-2xl text-slate-500";
+            } else {
+                alert(`❌ GAGAL SERVER: ${result.message}`);
+            }
+
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            alert("Terjadi gangguan: " + error.message);
+        } finally {
+            btn.disabled = false;
+            spin.className = "fa-solid fa-paper-plane";
+            text.innerText = "Kirim Berkas Excel";
         }
+    };
+
+    reader.readAsArrayBuffer(file);
+}
 
         // Mengirimkan Trigger Kalkulasi Rata-Rata Otomatis Nilai Riil ke Server
         async function eksekusiKirimNilaiTotal() {
