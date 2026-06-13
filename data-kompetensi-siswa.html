@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
@@ -121,20 +121,6 @@
                     </button>
                 </div>
 
-                <div class="bg-gradient-to-br from-slate-900 to-blue-950 border border-blue-900/40 text-slate-200 rounded-2xl p-5 shadow-2xl">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Pratinjau Tabel Database</h3>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="bukaPreviewTab('database_uh')" class="p-2.5 bg-slate-950/60 border border-slate-800 hover:border-blue-500/30 hover:bg-slate-900 rounded-xl text-left transition group">
-                            <div class="text-[10px] font-bold text-slate-500 group-hover:text-blue-400 transition-colors">TABEL NILAI</div>
-                            <div class="text-xs font-bold text-white mt-0.5 truncate">database_uh</div>
-                        </button>
-                        <button onclick="bukaPreviewTab('rekap_rapor_pusat')" class="p-2.5 bg-slate-950/60 border border-slate-800 hover:border-blue-500/30 hover:bg-slate-900 rounded-xl text-left transition group">
-                            <div class="text-[10px] font-bold text-slate-500 group-hover:text-blue-400 transition-colors">REKAP PUSAT</div>
-                            <div class="text-xs font-bold text-white mt-0.5 truncate">rapor_pusat</div>
-                        </button>
-                    </div>
-                </div>
-
             </div>
 
             <div class="lg:col-span-2 space-y-4">
@@ -197,52 +183,29 @@
         </div>
     </main>
 
-    <div id="modalPreviewTab" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden transition-all duration-300">
-        <div id="modalContent" class="bg-slate-900 rounded-2xl w-full max-w-5xl shadow-2xl border border-blue-900/40 flex flex-col max-h-[85vh] scale-95 opacity-0 transition-all duration-200 overflow-hidden">
-            
-            <div class="p-5 border-b border-slate-800 flex items-start justify-between bg-slate-950/60">
-                <div>
-                    <h3 id="modalTitle" class="text-base font-bold text-white tracking-tight">Pratinjau Database</h3>
-                    <p id="modalSubtitle" class="text-xs text-slate-400 mt-0.5">Memuat manifes baris siswa...</p>
-                </div>
-                <button onclick="tutupModalPreview()" class="p-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white rounded-lg transition shadow-sm">
-                    <i class="fa-solid fa-xmark text-sm"></i>
-                </button>
+    <div id="successModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden animate-fade-in">
+        <div class="bg-slate-900 border border-emerald-500/30 rounded-2xl p-6 max-w-md w-full text-center shadow-2xl transform transition-all">
+            <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl animate-bounce">
+                <i class="fa-solid fa-circle-check"></i>
             </div>
-
-            <div class="p-6 overflow-y-auto flex-1 custom-scrollbar bg-slate-900">
-                
-                <div id="modalLoading" class="py-12 text-center text-slate-500 font-medium text-xs flex flex-col items-center justify-center gap-3">
-                    <div class="h-8 w-8 border-4 border-slate-800 border-t-blue-500 rounded-full animate-spin"></div>
-                    <span>Mengunduh lembar komparasi data langsung dari Google Sheets...</span>
-                </div>
-
-                <div id="modalEmptyNotice" class="py-12 text-center text-slate-500 italic text-xs hidden">
-                    <i class="fa-solid fa-folder-open text-3xl text-slate-700 mb-2 block"></i> Tidak ada baris rekaman nilai siswa di lembar sheet ini.
-                </div>
-
-                <div id="modalTableWrapper" class="overflow-x-auto border border-slate-800 rounded-xl custom-scrollbar hidden">
-                    <table class="w-full text-xs text-left border-collapse">
-                        <thead id="modalTableHead" class="sticky top-0 z-10 font-bold text-[11px] uppercase tracking-wider whitespace-nowrap text-slate-300">
-                            </thead>
-                        <tbody id="modalTableBody" class="divide-y divide-slate-800 text-slate-400 whitespace-nowrap">
-                            </tbody>
-                    </table>
-                </div>
-
-            </div>
-
-            <div class="p-4 bg-slate-950/60 border-t border-slate-800 flex justify-between items-center text-[11px] text-slate-500">
-                <span>*Maksimal menampilkan 100 baris entri teratas demi stabilitas muatan halaman.</span>
-                <button onclick="tutupModalPreview()" class="bg-slate-950 hover:bg-slate-800 text-white font-bold py-1.5 px-4 rounded-lg border border-slate-800 transition">Tutup</button>
-            </div>
-
+            <h3 class="text-lg font-bold text-white mb-2">Proses Sinkronisasi Berhasil!</h3>
+            <p id="successModalMessage" class="text-xs text-slate-400 mb-6 leading-relaxed">Data Nilai Ulangan Harian berhasil diproses, menimpa entri lama secara bersih, dan aman tersimpan di seluruh lembar tujuan.</p>
+            <button onclick="tutupSuccessModal()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition shadow-lg shadow-emerald-600/20">Selesai</button>
         </div>
     </div>
 
     <script>
-        const API_SHEET_URL = "https://script.google.com/macros/s/AKfycby8wrF_rxNEyX4Q0IMSrUmadkzzbdasBiZUgi-WKT_vyqHF2YBOU75QfZmkSSjDgrYt/exec";
+        const API_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaX845-m1zvy8akoQVibGx8Vu62oXbn2qtPJVExSi3Jd5aFSahoNIqTmQILpShU8zeTw/exec";
         let databaseLokalTp = [];
+
+        function tampilkanSuccessModal(pesan) {
+            document.getElementById('successModalMessage').innerText = pesan;
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        function tutupSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
 
         function validasiPilihFile() {
             const input = document.getElementById('fileExcelUH');
@@ -254,7 +217,7 @@
             const namaFile = input.files[0].name.toLowerCase();
             
             if (!namaFile.includes("uh_siswa")) {
-                alert("🚨 PENOLAKAN SISTEM: Nama file wajib mengandung nama 'uh_siswa'. Contoh: uh_siswa.xlsx");
+                alert("🚨 PENOLAKAN SISTEM: Nama file wajib mengandung kata 'uh_siswa'. Contoh: rekap_uh_siswa.xlsx");
                 input.value = ""; 
                 label.innerText = "Pilih file Excel dari gawai Anda";
                 label.className = "text-xs font-bold text-slate-400";
@@ -304,11 +267,11 @@
                         body: JSON.stringify(payloadData)
                     });
 
-                    const textResponse = await response.text();
-                    const result = JSON.parse(textResponse); 
+                    const resText = await response.text();
+                    const result = JSON.parse(resText); 
 
                     if (result.status === "SUCCESS") {
-                        alert(`🎉 SINKRONISASI BERHASIL!\n\n${result.message}\nData berhasil terdistribusi ke seluruh sheet mata pelajaran dan rekap_harian.`);
+                        tampilkanSuccessModal(result.message);
                         input.value = "";
                         document.getElementById('labelNamaFile').innerText = "Pilih file Excel dari gawai Anda";
                         document.getElementById('labelNamaFile').className = "text-xs font-bold text-slate-400";
@@ -353,11 +316,11 @@
                     body: JSON.stringify({ tipe: "hitung_dan_kirim_total" })
                 });
 
-                const textResponse = await response.text();
-                const result = JSON.parse(textResponse);
+                const resText = await response.text();
+                const result = JSON.parse(resText);
 
                 if (result.status === "SUCCESS") {
-                    alert(`🎉 SINKRONISASI BERHASIL!\n\n${result.message}`);
+                    tampilkanSuccessModal(result.message);
                 } else {
                     alert(`❌ GAGAL: ${result.message}`);
                 }
@@ -436,11 +399,11 @@
                         body: JSON.stringify(payloadData)
                     });
 
-                    const textResponse = await response.text();
-                    const result = JSON.parse(textResponse);
+                    const resText = await response.text();
+                    const result = JSON.parse(resText);
 
                     if (result.status === "SUCCESS") {
-                        alert(`🎉 SUKSES INTEGRASI ASAS!\n\nData berhasil disimpan di lembar sheet "tp" database cloud.`);
+                        tampilkanSuccessModal("Data instrumen kompetensi dasar TP berhasil diintegrasikan ke sheet 'tp' database cloud.");
                         input.value = "";
                         document.getElementById('labelNamaFileAsas').innerText = "Pilih file Excel dari gawai Anda";
                         document.getElementById('labelNamaFileAsas').className = "text-xs font-bold text-slate-400";
@@ -491,7 +454,7 @@
 
         function tentukanNamaAliasMapel(idMapel) {
             const listMapel = {
-                'n_agama': '专 Agama & BP',
+                'n_agama': '🕌 Agama & BP',
                 'n_pancasila': '🦅 Pancasila',
                 'n_BIndonesia': '🇮🇩 B. Indonesia',
                 'n_matematika': '📐 Matematika',
@@ -545,96 +508,6 @@
             } else {
                 const dataSaring = databaseLokalTp.filter(item => item.mapel === filterValue);
                 renderDataKeTabelHtml(dataSaring);
-            }
-        }
-
-        async function bukaPreviewTab(namaTab) {
-            const modal = document.getElementById('modalPreviewTab');
-            const content = document.getElementById('modalContent');
-            const title = document.getElementById('modalTitle');
-            const subtitle = document.getElementById('modalSubtitle');
-            const loading = document.getElementById('modalLoading');
-            const wrapper = document.getElementById('modalTableWrapper');
-            const emptyNotice = document.getElementById('modalEmptyNotice');
-            
-            const tHead = document.getElementById('modalTableHead');
-            const tBody = document.getElementById('modalTableBody');
-
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            }, 25);
-
-            title.innerText = `Pratinjau Database: ${namaTab}`;
-            subtitle.innerText = "Menghubungkan ke API Gateway...";
-            loading.classList.remove('hidden');
-            wrapper.classList.add('hidden');
-            emptyNotice.classList.add('hidden');
-            tHead.innerHTML = '';
-            tBody.innerHTML = '';
-
-            try {
-                const responServer = await fetch(`${API_SHEET_URL}?action=getPreviewTab&tabName=${namaTab}`);
-                const dataJson = await responServer.json();
-
-                loading.classList.add('hidden');
-
-                if (dataJson.status === "SUCCESS") {
-                    subtitle.innerText = `Total Data Tersimpan: ${dataJson.totalBaris} Baris Rekaman`;
-                    
-                    if (dataJson.data.length === 0) {
-                        emptyNotice.classList.remove('hidden');
-                    } else {
-                        let barisHeaderHtml = '<tr>';
-                        dataJson.headers.forEach(headKolom => {
-                            barisHeaderHtml += `<th class="px-4 py-3 border-b border-slate-800 font-bold bg-slate-950 text-slate-300">${headKolom}</th>`;
-                        });
-                        barisHeaderHtml += '</tr>';
-                        tHead.innerHTML = barisHeaderHtml;
-
-                        let barisDataHtml = '';
-                        dataJson.data.forEach(itemBaris => {
-                            barisDataHtml += '<tr class="hover:bg-slate-950/60 transition-colors">';
-                            itemBaris.forEach(itemSel => {
-                                let isiSel = itemSel !== "" ? itemSel : "-";
-                                barisDataHtml += `<td class="px-4 py-2.5 border-b border-slate-800/40 max-w-[180px] truncate">${isiSel}</td>`;
-                            });
-                            barisDataHtml += '</tr>';
-                        });
-                        tBody.innerHTML = barisDataHtml;
-                        wrapper.classList.remove('hidden');
-                    }
-                } else {
-                    subtitle.innerText = "Gagal memproses permintaan.";
-                    tBody.innerHTML = `<tr><td class="px-4 py-8 text-center text-red-400 font-bold italic">${dataJson.message}</td></tr>`;
-                    wrapper.classList.remove('hidden');
-                }
-            } catch (err) {
-                console.error("Gagal mendapatkan pratinjau tab:", err);
-                loading.classList.add('hidden');
-                subtitle.innerText = "Koneksi terputus.";
-                tBody.innerHTML = `<tr><td class="px-4 py-8 text-center text-red-400 font-bold text-xs">Gagal terhubung dengan server cloud.</td></tr>`;
-                wrapper.classList.remove('hidden');
-            }
-        }
-
-        function tutupModalPreview() {
-            const modal = document.getElementById('modalPreviewTab');
-            const content = document.getElementById('modalContent');
-            
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 180);
-        }
-
-        window.onclick = function(e) {
-            const modal = document.getElementById('modalPreviewTab');
-            if (e.target === modal) {
-                tutupModalPreview();
             }
         }
 
