@@ -3,194 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Integrasi Nilai & Kompetensi Siswa</title>
+    <title>Sistem Manajemen Kompetensi & Nilai Siswa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.4);
-        }
+        /* Custom scrollbar murni untuk estetika dark-theme */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-slate-900 via-blue-950 to-slate-950 min-h-screen text-slate-100 antialiased">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans dynamic-gradient">
 
-    <header class="bg-slate-900/60 border-b border-blue-900/40 sticky top-0 z-40 shadow-xl backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3 text-center sm:text-left">
-                <div class="p-2.5 bg-gradient-to-br from-blue-500 to-cyan-600 text-white rounded-xl shadow-lg shadow-blue-500/20">
-                    <i class="fa-solid fa-graduation-cap text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-cyan-200 tracking-tight">Portal Nilai & Kompetensi Siswa</h1>
-                    <p class="text-xs text-blue-300/70 font-medium">Sinkronisasi Database Pusat Pengolahan Rapor</p>
-                </div>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        
+        <header class="mb-8 border-b border-slate-800 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">
+                    <i class="fa-solid fa-graduation-cap mr-2"></i>KONSOLIDASI NILAI & KOMPETENSI
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">Kelola Unggahan Lembar Ulangan Harian dan Matriks Alur Tujuan Pembelajaran (ATP) Sekolah.</p>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-blue-500/10 text-cyan-400 rounded-full border border-blue-500/30 shadow-inner">
-                    <span class="h-2 w-2 rounded-full bg-cyan-400 animate-pulse"></span> Cloud Terhubung
-                </span>
+            <div class="flex items-center gap-2 bg-slate-900 px-4 py-2 rounded-xl border border-slate-800">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-[11px] font-mono text-slate-400">Server Cloud Connected</span>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             
-            <div class="space-y-6 lg:col-span-1">
-                
-                <div class="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-blue-900/30 p-5 shadow-2xl group transition-all duration-300 hover:border-blue-500/40">
-                    <div class="flex items-center gap-2.5 mb-4">
-                        <div class="p-2 bg-amber-500/10 text-amber-400 rounded-lg border border-amber-500/20">
+            <div class="bg-slate-900 rounded-3xl border border-slate-800/80 p-6 flex flex-col justify-between shadow-xl">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
                             <i class="fa-solid fa-file-excel text-lg"></i>
                         </div>
-                        <h2 class="font-bold text-white text-sm tracking-tight">Upload Nilai Ulangan Harian</h2>
+                        <div>
+                            <h3 class="text-sm font-bold tracking-tight">Ulangan Harian Siswa</h3>
+                            <p class="text-[11px] text-slate-400">Format wajib mengandung nama 'uh_siswa'</p>
+                        </div>
                     </div>
                     
-                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                        Unggah berkas rekapitulasi UH. Nama file wajib mengandung kata <span class="font-semibold text-amber-400 font-mono">uh_siswa</span> (Format: .xlsx/.xls).
-                    </p>
-
-                    <div class="space-y-3">
-                        <label class="block">
-                            <span class="sr-only">Pilih berkas UH</span>
-                            <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 bg-slate-950/40 rounded-xl p-4 text-center hover:bg-slate-950/80 hover:border-blue-500/50 transition cursor-pointer relative group/drop">
-                                <input type="file" id="fileExcelUH" accept=".xlsx, .xls" onchange="validasiPilihFile()" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                                <i id="iconFileUH" class="fa-solid fa-cloud-arrow-up text-2xl text-slate-500 group-hover/drop:text-blue-400 mb-2 transition-colors"></i>
-                                <span id="labelNamaFile" class="text-xs font-bold text-slate-400 group-hover/drop:text-slate-200 transition-colors">Pilih file Excel dari gawai Anda</span>
-                            </div>
+                    <div class="my-4">
+                        <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-800 bg-slate-950/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-slate-950/80 hover:border-slate-700 transition relative group">
+                            <input type="file" id="fileExcelUH" accept=".xlsx, .xls" class="hidden" onchange="validasiPilihFile()">
+                            <i id="iconFileUH" class="fa-solid fa-cloud-arrow-up text-2xl text-slate-500 mb-2 transition-transform group-hover:-translate-y-1"></i>
+                            <span id="labelNamaFile" class="text-xs font-bold text-slate-400">Pilih file Excel dari gawai Anda</span>
                         </label>
-
-                        <button id="btnKirimNilai" onclick="eksekusiKirimNilaiExcel()" class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-500/10 transition duration-200 disabled:opacity-40 disabled:cursor-not-allowed">
-                            <i id="spinUH" class="fa-solid fa-paper-plane"></i> <span id="textUH">Kirim Berkas Excel</span>
-                        </button>
                     </div>
                 </div>
 
-                <div class="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-blue-900/30 p-5 shadow-2xl transition-all duration-300 hover:border-blue-500/40">
-                    <div class="flex items-center gap-2.5 mb-4">
-                        <div class="p-2 bg-blue-500/10 text-blue-400 rounded-lg border border-blue-500/20">
-                            <i class="fa-solid fa-clipboard-list text-lg"></i>
-                        </div>
-                        <h2 class="font-bold text-white text-sm tracking-tight">Upload Transkrip ASAS & TP</h2>
-                    </div>
-                    
-                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                        Unggah berkas instrumen kompetensi dasar. Nama berkas wajib presisi: <span class="font-semibold text-blue-400 font-mono">20518953-TP-Kelas-IV.xlsx</span>.
-                    </p>
-
-                    <div class="space-y-3">
-                        <div id="boxDropAsas" class="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 bg-slate-950/40 rounded-2xl p-4 text-center hover:bg-slate-950/80 hover:border-blue-500/50 transition relative group/drop">
-                            <input type="file" id="fileExcelASAS" accept=".xlsx, .xls" onchange="validasiPilihFileAsas()" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                            <i id="iconFileAsas" class="fa-solid fa-file-shield text-2xl text-slate-500 group-hover/drop:text-cyan-400 mb-2 transition-colors"></i>
-                            <span id="labelNamaFileAsas" class="text-xs font-bold text-slate-400 group-hover/drop:text-slate-200 transition-colors">Pilih file Excel dari gawai Anda</span>
-                        </div>
-
-                        <button id="btnKirimAsas" onclick="eksekusiKirimAsasExcel()" class="w-full bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition duration-200 disabled:opacity-40 disabled:cursor-not-allowed">
-                            <i id="spinAsas" class="fa-solid fa-share-from-square"></i> <span id="textAsas">Kirim Berkas ASAS</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-blue-900/30 p-5 shadow-2xl transition-all duration-300 hover:border-blue-500/40">
-                    <div class="flex items-center gap-2.5 mb-3">
-                        <div class="p-2 bg-purple-500/10 text-purple-400 rounded-lg border border-purple-500/20">
-                            <i class="fa-solid fa-calculator text-lg"></i>
-                        </div>
-                        <h2 class="font-bold text-white text-sm tracking-tight">Kalkulator Rapor Pusat</h2>
-                    </div>
-                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                        Hitung otomatis nilai rata-rata dari seluruh mata pelajaran di server cloud dan kirimkan ke Rekapitulasi Rapor Pusat.
-                    </p>
-                    <button id="btnKirimTotal" onclick="eksekusiKirimNilaiTotal()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-500/10 transition duration-200">
-                        <i id="spinTotal" class="fa-solid fa-chart-bar"></i> <span id="textTotal">Kirim Nilai Total (Rata-rata)</span>
-                    </button>
-                </div>
-
+                <button id="btnKirimNilai" onclick="eksekusiKirimNilaiExcel()" class="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 text-xs font-extrabold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 mt-4 shadow-lg shadow-emerald-500/10">
+                    <i id="spinUH" class="fa-solid fa-paper-plane"></i>
+                    <span id="textUH">Kirim Berkas Excel</span>
+                </button>
             </div>
 
-            <div class="lg:col-span-2 space-y-4">
-                <div class="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-blue-900/30 shadow-2xl overflow-hidden flex flex-col h-full">
-                    
-                    <div class="p-5 border-b border-blue-900/20 bg-slate-900/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="bg-slate-900 rounded-3xl border border-slate-800/80 p-6 flex flex-col justify-between shadow-xl">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                            <i class="fa-solid fa-shield-halved text-lg"></i>
+                        </div>
                         <div>
-                            <h2 class="font-bold text-white tracking-tight text-base">Alur Tujuan Pembelajaran (TP)</h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Daftar kompetensi dasar yang aktif pada sistem semester ini</p>
-                        </div>
-                        
-                        <div class="flex items-center gap-2">
-                            <label for="selectFilterMapel" class="text-xs font-bold text-slate-400 whitespace-nowrap"><i class="fa-solid fa-filter mr-1 text-blue-400"></i> Mapel:</label>
-                            <select id="selectFilterMapel" onchange="filterDataTabelTp()" class="text-xs font-semibold bg-slate-950 border border-slate-800 text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-                                <option value="all">📁 Semua Mata Pelajaran</option>
-                                <option value="n_agama">🕌 Agama & BP</option>
-                                <option value="n_pancasila">🦅 Pancasila</option>
-                                <option value="n_BIndonesia">🇮🇩 B. Indonesia</option>
-                                <option value="n_matematika">📐 Matematika</option>
-                                <option value="n_IPAS">🔬 IPAS</option>
-                                <option value="n_pjok">🏃 PJOK</option>
-                                <option value="n_kesenian">🎨 Seni & Budaya</option>
-                                <option value="n_bJawa">🛡️ B. Jawa</option>
-                                <option value="n_bIng">🇬🇧 B. Inggris</option>
-                                <option value="n_BTQ">📖 BTQ</option>
-                            </select>
+                            <h3 class="text-sm font-bold tracking-tight">Instrumen Capaian TP</h3>
+                            <p class="text-[11px] text-slate-400">Nama wajib: 20518953-TP-Kelas-IV.xlsx</p>
                         </div>
                     </div>
-
-                    <div class="overflow-x-auto custom-scrollbar">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-950/50 border-b border-blue-900/20 text-slate-400 font-bold text-[10px] uppercase tracking-wider">
-                                    <th class="p-3 text-center w-12">No</th>
-                                    <th class="p-3 w-32">Kode TP</th>
-                                    <th class="p-3 w-40">Mata Pelajaran</th>
-                                    <th class="p-3 pr-6">Deskripsi Kriteria Kompetensi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBodyTp" class="text-xs divide-y divide-slate-800 text-slate-300">
-                                <tr>
-                                    <td colspan="4" class="p-8 text-center text-slate-500 italic">
-                                        <i class="fa-solid fa-circle-notch animate-spin mr-2 text-blue-400"></i> Memuat data dari server cloud...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    
+                    <div class="my-4">
+                        <label id="boxDropAsas" class="flex flex-col items-center justify-center border-2 border-dashed border-slate-800 bg-slate-950/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-slate-950/80 hover:border-slate-700 transition relative group">
+                            <input type="file" id="fileExcelASAS" accept=".xlsx, .xls" class="hidden" onchange="validasiPilihFileAsas()">
+                            <i id="iconFileAsas" class="fa-solid fa-file-shield text-2xl text-slate-500 mb-2 transition-transform group-hover:-translate-y-1"></i>
+                            <span id="labelNamaFileAsas" class="text-xs font-bold text-slate-400">Pilih file Excel dari gawai Anda</span>
+                        </label>
                     </div>
-
-                    <div class="p-4 bg-slate-950/40 border-t border-blue-900/20 text-[11px] text-slate-400 flex justify-between items-center">
-                        <div>Menampilkan data realtime berdasarkan lembar <span class="font-mono bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800 font-bold text-blue-400">tp</span></div>
-                        <button onclick="muatDataTpDariCloud()" class="text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1 transition-colors">
-                            <i class="fa-solid fa-rotate text-[10px]"></i> Refresh
-                        </button>
-                    </div>
-
                 </div>
+
+                <button id="btnKirimAsas" onclick="eksekusiKirimAsasExcel()" class="w-full bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 text-xs font-extrabold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 mt-4 shadow-lg shadow-cyan-500/10">
+                    <i id="spinAsas" class="fa-solid fa-share-from-square"></i>
+                    <span id="textAsas">Kirim Berkas ASAS</span>
+                </button>
+            </div>
+
+            <div class="bg-slate-900 rounded-3xl border border-slate-800/80 p-6 flex flex-col justify-between shadow-xl border-l-4 border-l-amber-500/50">
+                <div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400">
+                            <i class="fa-solid fa-calculator text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold tracking-tight">Kalkulator Rapor Pusat</h3>
+                            <p class="text-[11px] text-slate-400">Sinkronisasi Nilai Kompilasi Akhir</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-normal p-3 bg-slate-950/60 rounded-xl border border-slate-800/60 my-2">
+                        Fitur ini akan secara otomatis menghitung rata-rata nilai riil dari 5 Ulangan Harian (uh_1 sampai uh_5) seluruh siswa yang tersimpan di basis data saat ini dan mengirimkannya langsung ke Rekapitulasi Rapor Pusat.
+                    </p>
+                </div>
+
+                <button id="btnKirimTotal" onclick="eksekusiKirimNilaiTotal()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-slate-950 text-xs font-extrabold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 mt-4 shadow-lg">
+                    <i id="spinTotal" class="fa-solid fa-chart-bar"></i>
+                    <span id="textTotal">Kirim Nilai Total (Rata-rata)</span>
+                </button>
             </div>
 
         </div>
-    </main>
 
-    <div id="successModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden animate-fade-in">
-        <div class="bg-slate-900 border border-emerald-500/30 rounded-2xl p-6 max-w-md w-full text-center shadow-2xl transform transition-all">
-            <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl animate-bounce">
-                <i class="fa-solid fa-circle-check"></i>
+        <hr class="border-slate-800 my-8">
+
+        <div class="bg-slate-900 rounded-3xl border border-slate-800/80 shadow-2xl overflow-hidden">
+            
+            <div class="p-6 border-b border-slate-800/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/50">
+                <div>
+                    <h2 class="text-base font-bold tracking-tight text-cyan-400 flex items-center gap-2">
+                        <i class="fa-solid fa-table-list"></i> Pratinjau Kompetensi Dasar (TP) Cloud
+                    </h2>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Menampilkan data instrumen capaian TP siswa yang aktif di server.</p>
+                </div>
+                
+                <div class="w-full sm:w-auto flex items-center gap-2">
+                    <label for="selectFilterMapel" class="text-[11px] font-bold text-slate-400 whitespace-nowrap"><i class="fa-solid fa-filter mr-1"></i> Saring Mapel :</label>
+                    <select id="selectFilterMapel" onchange="filterDataTabelTp()" class="bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-cyan-500/50 w-full sm:w-48 cursor-pointer">
+                        <option value="all">🌟 Semua Mata Pelajaran</option>
+                        <option value="n_agama">🕌 Agama & BP</option>
+                        <option value="n_pancasila">Eagle Pancasila</option>
+                        <option value="n_BIndonesia">🇮🇩 B. Indonesia</option>
+                        <option value="n_matematika">📐 Matematika</option>
+                        <option value="n_IPAS">🔬 IPAS</option>
+                        <option value="n_pjok">🏃 PJOK</option>
+                        <option value="n_kesenian">🎨 Seni & Budaya</option>
+                        <option value="n_bJawa">🛡️ B. Jawa</option>
+                        <option value="n_bIng">🇬🇧 B. Inggris</option>
+                        <option value="n_BTQ">📖 BTQ</option>
+                    </select>
+                </div>
             </div>
-            <h3 class="text-lg font-bold text-white mb-2">Proses Sinkronisasi Berhasil!</h3>
-            <p id="successModalMessage" class="text-xs text-slate-400 mb-6 leading-relaxed">Data Nilai Ulangan Harian berhasil diproses, menimpa entri lama secara bersih, dan aman tersimpan di seluruh lembar tujuan.</p>
-            <button onclick="tutupSuccessModal()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition shadow-lg shadow-emerald-600/20">Selesai</button>
+
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-950/60 border-b border-slate-800 text-[11px] font-bold tracking-wider text-slate-400 uppercase">
+                            <th class="p-3.5 text-center w-16">No</th>
+                            <th class="p-3.5 w-32">Kode TP</th>
+                            <th class="p-3.5 w-44">Mata Pelajaran</th>
+                            <th class="p-3.5 pr-6">Deskripsi Kompetensi Alur Pembelajaran (ATP)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyTp" class="text-xs divide-y divide-slate-800/40">
+                        <tr>
+                            <td colspan="4" class="p-8 text-center text-slate-500 italic">
+                                <i class="fa-solid fa-circle-notch animate-spin mr-2"></i>Menghubungi Cloud & Memuat Baris Kompetensi...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="p-3 bg-slate-950/30 border-t border-slate-800/40 text-center">
+                <p class="text-[10px] font-mono text-slate-500">Menampilkan maksimal 100 baris entri data awal instrumen.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="successModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full text-center shadow-2xl relative animate-in zoom-in-95 duration-200">
+            <div class="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400 mx-auto mb-4 border border-emerald-500/20">
+                <i class="fa-solid fa-circle-check text-3xl"></i>
+            </div>
+            <h3 class="text-base font-black tracking-tight text-white mb-2">INTEGRASI DATA BERHASIL</h3>
+            <p id="successModalMessage" class="text-xs text-slate-400 leading-relaxed mb-6 px-2">Data laporan Anda telah berhasil diurai dan diselaraskan menuju repositori cloud secara aman.</p>
+            <button onclick="tutupSuccessModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition">
+                Selesai & Tutup Jendela
+            </button>
         </div>
     </div>
 
@@ -207,6 +195,7 @@
             document.getElementById('successModal').classList.add('hidden');
         }
 
+        // Validasi Ekstensi & Ketentuan Nama Berkas File Excel UH
         function validasiPilihFile() {
             const input = document.getElementById('fileExcelUH');
             const label = document.getElementById('labelNamaFile');
@@ -217,7 +206,7 @@
             const namaFile = input.files[0].name.toLowerCase();
             
             if (!namaFile.includes("uh_siswa")) {
-                alert("🚨 PENOLAKAN SISTEM: Nama file wajib mengandung kata 'uh_siswa'. Contoh: rekap_uh_siswa.xlsx");
+                alert("🚨 PENOLAKAN SISTEM: Nama file wajib mengandung kata 'uh_siswa'.\nContoh: nilai_uh_siswa_kelas4.xlsx");
                 input.value = ""; 
                 label.innerText = "Pilih file Excel dari gawai Anda";
                 label.className = "text-xs font-bold text-slate-400";
@@ -230,6 +219,7 @@
             icon.className = "fa-solid fa-file-excel text-2xl text-emerald-400";
         }
 
+        // Membaca Berkas Excel di Browser dengan SheetJS & Mengirim Data Bersih JSON ke Google Apps Script
         async function eksekusiKirimNilaiExcel() {
             const input = document.getElementById('fileExcelUH');
             const btn = document.getElementById('btnKirimNilai');
@@ -246,18 +236,26 @@
             
             btn.disabled = true;
             spin.className = "fa-solid fa-circle-notch animate-spin text-white";
-            text.innerText = "Memproses & Mengirim...";
+            text.innerText = "Membaca & Memetakan Berkas...";
 
             reader.onload = async function(e) {
-                const base64Data = e.target.result.split(',')[1];
-                
-                const payloadData = {
-                    tipe: "upload_excel_uh",
-                    fileName: file.name,
-                    fileData: base64Data
-                };
-
                 try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // Ambil lembar kerja/sheet urutan pertama di dalam file excel
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    // Konversi baris data tabel excel murni ke dalam format matriks Array JSON Matriks [][]
+                    const rawRowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    const payloadData = {
+                        tipe: "upload_excel_uh",
+                        fileName: file.name,
+                        rowsData: rawRowsMatrix // Kirim data riil langsung berupa array objek terstruktur
+                    };
+
                     const response = await fetch(API_SHEET_URL, {
                         method: "POST",
                         mode: "cors", 
@@ -282,7 +280,7 @@
 
                 } catch (error) {
                     console.error("Fetch Error:", error);
-                    alert("Terjadi gangguan komunikasi data dengan server cloud.");
+                    alert("Terjadi gangguan format dokumen Excel atau komunikasi dengan server cloud.");
                 } finally {
                     btn.disabled = false;
                     spin.className = "fa-solid fa-paper-plane";
@@ -290,15 +288,17 @@
                 }
             };
 
-            reader.readAsDataURL(file);
+            // Membaca dokumen biner excel
+            reader.readAsArrayBuffer(file);
         }
 
+        // Mengirimkan Trigger Kalkulasi Rata-Rata Otomatis Nilai Riil ke Server
         async function eksekusiKirimNilaiTotal() {
             const btn = document.getElementById('btnKirimTotal');
             const spin = document.getElementById('spinTotal');
             const text = document.getElementById('textTotal');
 
-            if(!confirm("Apakah Anda ingin menghitung rata-rata nilai UH seluruh mapel dari database saat ini dan mengirimkannya ke Rekapitulasi Rapor Pusat?")) {
+            if(!confirm("Apakah Anda ingin menghitung rata-rata nilai riil (UH 1 - UH 5) dari database saat ini dan mengirimkannya langsung ke Rekapitulasi Rapor Pusat?")) {
                 return;
             }
 
@@ -334,6 +334,7 @@
             }
         }
 
+        // Validasi File ASAS Wajib Presisi Sesuai Nama Berkas Yang Dipersyaratkan
         function validasiPilihFileAsas() {
             const input = document.getElementById('fileExcelASAS');
             const label = document.getElementById('labelNamaFileAsas');
@@ -347,7 +348,7 @@
             const namaWajibAlternatif = "20518953-TP-Kelas-IV.xls";
             
             if (namaFile !== namaWajib && namaFile !== namaWajibAlternatif) {
-                alert(`🚨 PENOLAKAN UNGHAH ASAS:\nNama berkas wajib presisi "${namaWajib}"`);
+                alert(`🚨 PENOLAKAN UNGHAH ASAS:\nNama berkas wajib ditulis presisi sejenis: "${namaWajib}"`);
                 input.value = "";
                 label.innerText = "Pilih file Excel dari gawai Anda";
                 label.className = "text-xs font-bold text-slate-400";
@@ -362,6 +363,7 @@
             icon.className = "fa-solid fa-file-circle-check text-2xl text-cyan-400";
         }
 
+        // Unggah Dokumen Administrasi Kompetensi Capaian TP
         async function eksekusiKirimAsasExcel() {
             const input = document.getElementById('fileExcelASAS');
             const btn = document.getElementById('btnKirimAsas');
@@ -381,15 +383,19 @@
             text.innerText = "Mentransmisikan Data...";
 
             reader.onload = async function(e) {
-                const base64Data = e.target.result.split(',')[1];
-                
-                const payloadData = {
-                    tipe: "upload_asas_tp",
-                    fileName: file.name,
-                    fileData: base64Data
-                };
-
                 try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const rowsDataTp = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    const payloadData = {
+                        tipe: "upload_asas_tp",
+                        fileName: file.name,
+                        rowsData: rowsDataTp
+                    };
+
                     const response = await fetch(API_SHEET_URL, {
                         method: "POST",
                         mode: "cors",
@@ -423,9 +429,10 @@
                 }
             };
 
-            reader.readAsDataURL(file);
+            reader.readAsArrayBuffer(file);
         }
 
+        // Mengambil Entri Baris Preview Capaian TP dari Database Cloud Pusat
         async function muatDataTpDariCloud() {
             try {
                 const responServer = await fetch(`${API_SHEET_URL}?action=getPreviewTab&tabName=tp`);
@@ -452,6 +459,7 @@
             }
         }
 
+        // Utilitas Penerjemah ID Kunci Mata Pelajaran Menjadi Emoji Label Cantik
         function tentukanNamaAliasMapel(idMapel) {
             const listMapel = {
                 'n_agama': '🕌 Agama & BP',
@@ -468,6 +476,7 @@
             return listMapel[idMapel] || idMapel;
         }
 
+        // Data Cadangan Lokal Jika Server Baru Dibuka / Kosong
         function tampilkanMockupJikaDataKosong() {
             databaseLokalTp = [
                 { no: 1, kode: "TP-AGM-01", mapel: "n_agama", namaMapel: "🕌 Agama & BP", deskripsi: "Memahami rukun iman dan implementasi akhlak mulia dalam kehidupan sehari-hari." },
@@ -479,6 +488,7 @@
             renderDataKeTabelHtml(databaseLokalTp);
         }
 
+        // Render Data Array Menjadi Baris Kode HTML Tabel Murni
         function renderDataKeTabelHtml(data) {
             const tableBody = document.getElementById('tableBodyTp');
             tableBody.innerHTML = "";
@@ -501,6 +511,7 @@
             });
         }
 
+        // Event Handler Melakukan Penyaringan Dropdown Komponen Mapel
         function filterDataTabelTp() {
             const filterValue = document.getElementById('selectFilterMapel').value;
             if (filterValue === "all") {
@@ -511,6 +522,7 @@
             }
         }
 
+        // Jalankan pengambilan pratinjau data sesaat setelah halaman web termuat penuh
         window.addEventListener('DOMContentLoaded', muatDataTpDariCloud);
     </script>
 </body>
